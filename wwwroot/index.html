@@ -3241,30 +3241,36 @@
         
         // Update header visibility for official ballot table based on candidate count
         function updateOfficialTableHeaderVisibility(candidateCount) {
-            const headerCells = document.querySelectorAll('thead th');
+            const thead = document.querySelector('table thead');
+            if (!thead) return;
             
-            // First, restore all UCV columns to visible (in case switching from 5 to 7)
-            for (let i = 1; i <= 7; i++) {
-                headerCells.forEach(cell => {
-                    if (cell.textContent.trim() === `UCV ${i}`) {
-                        cell.style.display = '';  // Reset to default display
-                    }
-                });
-            }
+            const allHeaderCells = thead.querySelectorAll('th');
             
-            // Hide UCV header columns beyond candidateCount (5 or 7)
-            for (let i = candidateCount + 1; i <= 7; i++) {
-                headerCells.forEach(cell => {
-                    if (cell.textContent.trim() === `UCV ${i}`) {
+            // First, restore all cells visibility
+            allHeaderCells.forEach(cell => {
+                cell.style.display = '';
+            });
+            
+            // Find and hide UCV columns beyond the candidate count
+            allHeaderCells.forEach(cell => {
+                const text = cell.textContent.trim();
+                // Check if this is a UCV column (UCV 1, UCV 2, ..., UCV 7)
+                const match = text.match(/^UCV\s+(\d+)$/);
+                if (match) {
+                    const ucvNum = parseInt(match[1]);
+                    // Hide if this candidate number exceeds the level's candidate count
+                    if (ucvNum > candidateCount) {
                         cell.style.display = 'none';
+                        console.log(`Hiding UCV ${ucvNum} for level with ${candidateCount} candidates`);
                     }
-                });
-            }
+                }
+            });
             
-            // Also adjust the colspan of the UCV parent header to match actual candidate count
-            headerCells.forEach(cell => {
+            // Update colspan for UCV parent header
+            allHeaderCells.forEach(cell => {
                 if (cell.textContent.includes('Số phiếu bầu cho mỗi người ứng cử viên')) {
                     cell.setAttribute('colspan', candidateCount.toString());
+                    console.log(`Updated UCV parent header colspan to ${candidateCount}`);
                 }
             });
         }
