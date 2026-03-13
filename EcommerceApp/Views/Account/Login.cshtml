@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">🛒 EcommerceApp</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">🏠 Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="/shop">🛍️ Cửa hàng</a></li>
+                <li class="nav-item"><a class="nav-link" href="/cart">🛒 Giỏ hàng</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/account/login">👤 Tài khoản</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin/dashboard">⚙️ Admin</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title text-center mb-4">Đăng nhập</h4>
+                    
+                    <form method="post" action="/account/login">
+                        <div class="mb-3">
+                            <label class="form-label">Email:</label>
+                            <input type="email" name="email" class="form-control" placeholder="user@example.com" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu:</label>
+                            <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Nhớ tôi</label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <p class="text-center">
+                        Chưa có tài khoản? <a href="/account/register">Đăng ký ngay</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
