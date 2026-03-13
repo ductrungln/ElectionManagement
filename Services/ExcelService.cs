@@ -959,10 +959,10 @@ namespace ElectionManagement.Services
                 int ucvCount = level.ToLower() == "tinh" ? 7 : 5;
                 Console.WriteLine($"[DEBUG] Calculated ucvCount: {ucvCount}");
                 
-                int uvcStartCol = 18; // Column R
+                int uvcStartCol = 17; // Column Q (moved left by 1 due to removed "Bầu 05 đại biểu")
                 int totalCol = level.ToLower() == "tinh" 
-                    ? uvcStartCol + 6  // For tỉnh: 6 UCV columns (1,2,3,4,6,7 - skip 5), then total = column 24
-                    : uvcStartCol + ucvCount; // For others: 5 UCV columns, then total = column 23
+                    ? uvcStartCol + 6  // For tỉnh: 6 UCV columns (1,2,3,4,6,7), then total = column 23
+                    : uvcStartCol + ucvCount; // For others: 5 UCV columns, then total = column 22
                 int maxCol = totalCol;
                 
                 Console.WriteLine($"[DEBUG] totalCol: {totalCol}, maxCol: {maxCol}");
@@ -1093,8 +1093,8 @@ namespace ElectionManagement.Services
                 ws.Cells[level1Row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
                 ws.Cells[level1Row, 11].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
-                // Cols 13-17: MERGED - "Phân loại phiếu"
-                ws.Cells[$"M{level1Row}:Q{level1Row}"].Merge = true;
+                // Cols 13-16: MERGED - "Phân loại phiếu" (removed Bầu 05 đại biểu)
+                ws.Cells[$"M{level1Row}:P{level1Row}"].Merge = true;
                 ws.Cells[level1Row, 13].Value = "Phân loại phiếu";
                 ws.Cells[level1Row, 13].Style.Font.Bold = true;
                 ws.Cells[level1Row, 13].Style.Font.Size = 9;
@@ -1154,11 +1154,10 @@ namespace ElectionManagement.Services
                 ws.Cells[level2Row, 11].Value = "Số phiếu";
                 ws.Cells[level2Row, 12].Value = "Tỉ lệ so với số phiếu thu vào (%)";
                 
-                ws.Cells[level2Row, 13].Value = "Bầu 05 đại biểu";
-                ws.Cells[level2Row, 14].Value = "Bầu 04 đại biểu";
-                ws.Cells[level2Row, 15].Value = "Bầu 03 đại biểu";
-                ws.Cells[level2Row, 16].Value = "Bầu 02 đại biểu";
-                ws.Cells[level2Row, 17].Value = "Bầu 01 đại biểu";
+                ws.Cells[level2Row, 13].Value = "Bầu 04 đại biểu";
+                ws.Cells[level2Row, 14].Value = "Bầu 03 đại biểu";
+                ws.Cells[level2Row, 15].Value = "Bầu 02 đại biểu";
+                ws.Cells[level2Row, 16].Value = "Bầu 01 đại biểu";
                 
                 // UCV columns - dynamic based on level
                 // For provincial level (tỉnh): skip UCV 5, display UCV 1,2,3,4,6,7
@@ -1233,15 +1232,14 @@ namespace ElectionManagement.Services
                 ws.Cells[row, 10].Value = 5.56M;
                 ws.Cells[row, 11].Value = 850;
                 ws.Cells[row, 12].Value = 94.44M;
-                ws.Cells[row, 13].Value = 400;
-                ws.Cells[row, 14].Value = 200;
-                ws.Cells[row, 15].Value = 150;
-                ws.Cells[row, 16].Value = 100;
-                ws.Cells[row, 17].Value = 50;
+                ws.Cells[row, 13].Value = 200;  // B\u1ea7u 04 \u0111\u1ea1i bi\u1ec3u
+                ws.Cells[row, 14].Value = 150;  // B\u1ea7u 03 \u0111\u1ea1i bi\u1ec3u
+                ws.Cells[row, 15].Value = 100;  // B\u1ea7u 02 \u0111\u1ea1i bi\u1ec3u
+                ws.Cells[row, 16].Value = 50;   // B\u1ea7u 01 \u0111\u1ea1i bi\u1ec3u
                 
                 // UCV votes - dynamic based on level
-                // For provincial level: use columns 18-23 for UCV 1,2,3,4,6,7; column 24 for total
-                // For other levels: use columns 18-22 for UCV 1,2,3,4,5; column 23 for total
+                // For provincial level: use columns 17-22 for UCV 1,2,3,4,6,7; column 23 for total
+                // For other levels: use columns 17-21 for UCV 1,2,3,4,5; column 22 for total
                 int ucvCol = uvcStartCol;
                 if (ucvCount == 5)
                 {
