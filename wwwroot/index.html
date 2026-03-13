@@ -3245,9 +3245,22 @@
         function updateOfficialTableHeaderVisibility(candidateCount) {
             console.log(`[updateOfficialTableHeaderVisibility] candidateCount=${candidateCount}`);
             
+            // Find the official ballot table (the one with officialTableBody)
+            const tbody = document.getElementById('officialTableBody');
+            if (!tbody) {
+                console.log('[updateOfficialTableHeaderVisibility] officialTableBody not found!');
+                return;
+            }
+            
+            const table = tbody.closest('table');
+            if (!table) {
+                console.log('[updateOfficialTableHeaderVisibility] table not found!');
+                return;
+            }
+            
             // Hide ALL cells (header, body, footer) for UCV columns beyond candidateCount
-            const allCells = document.querySelectorAll('table th, table td');
-            console.log(`[updateOfficialTableHeaderVisibility] found ${allCells.length} cells total`);
+            const allCells = table.querySelectorAll('th, td');
+            console.log(`[updateOfficialTableHeaderVisibility] found ${allCells.length} cells in official ballot table`);
             
             let hidCount = 0;
             allCells.forEach((cell, idx) => {
@@ -3257,25 +3270,25 @@
                 const match = text.match(/^UCV\s+(\d+)$/);
                 if (match) {
                     const ucvNum = parseInt(match[1]);
-                    console.log(`[Cell ${idx}] Found UCV ${ucvNum}`);
+                    console.log(`[updateOfficialTableHeaderVisibility] Found cell "UCV ${ucvNum}"`);
                     
                     // Hide if this candidate number exceeds the level's candidate count
                     if (ucvNum > candidateCount) {
                         cell.style.display = 'none';
-                        console.log(`[updateOfficialTableHeaderVisibility] Hiding cell UCV ${ucvNum}`);
+                        console.log(`[updateOfficialTableHeaderVisibility] Hiding UCV ${ucvNum}`);
                         hidCount++;
                     } else {
-                        // Make sure to show it if we're switching back to 7
+                        // Make sure to show it
                         cell.style.display = '';
                     }
                 }
             });
             
-            console.log(`[updateOfficialTableHeaderVisibility] Hidden ${hidCount} cells total`);
+            console.log(`[updateOfficialTableHeaderVisibility] Hidden ${hidCount} cells`);
             
             // Update colspan for UCV parent header
-            const allHeaderCells = document.querySelectorAll('table th');
-            allHeaderCells.forEach(cell => {
+            const parentHeaders = table.querySelectorAll('thead th');
+            parentHeaders.forEach(cell => {
                 if (cell.textContent.includes('Số phiếu bầu cho mỗi người ứng cử viên')) {
                     cell.setAttribute('colspan', candidateCount.toString());
                     console.log(`[updateOfficialTableHeaderVisibility] Updated UCV parent header colspan to ${candidateCount}`);
