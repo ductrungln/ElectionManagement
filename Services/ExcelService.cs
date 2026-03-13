@@ -1202,30 +1202,9 @@ namespace ElectionManagement.Services
                 ws.Cells[row, 1].Value = 1;
                 ws.Cells[row, 2].Value = 1;
                 ws.Cells[row, 3].Value = "Khu vực 1";
-                ws.Cells[row, 4].Value = 1000;
-                ws.Cells[row, 5].Value = 950;
-                ws.Cells[row, 6].Value = 95.00M;
-                ws.Cells[row, 7].Value = 950;
-                ws.Cells[row, 8].Value = 900;
-                ws.Cells[row, 9].Value = 50;
-                ws.Cells[row, 10].Value = 5.56M;
-                ws.Cells[row, 11].Value = 850;
-                ws.Cells[row, 12].Value = 94.44M;
-                ws.Cells[row, 13].Value = 200;  // B\u1ea7u 04 \u0111\u1ea1i bi\u1ec3u
-                ws.Cells[row, 14].Value = 150;  // B\u1ea7u 03 \u0111\u1ea1i bi\u1ec3u
-                ws.Cells[row, 15].Value = 100;  // B\u1ea7u 02 \u0111\u1ea1i bi\u1ec3u
-                ws.Cells[row, 16].Value = 50;   // B\u1ea7u 01 \u0111\u1ea1i bi\u1ec3u
                 
                 // UCV votes - all levels show UCV 1-7
                 int ucvCol = uvcStartCol;
-                ws.Cells[row, ucvCol].Value = 400;      // UCV 1
-                ws.Cells[row, ucvCol + 1].Value = 200;  // UCV 2
-                ws.Cells[row, ucvCol + 2].Value = 150;  // UCV 3
-                ws.Cells[row, ucvCol + 3].Value = 100;  // UCV 4
-                ws.Cells[row, ucvCol + 4].Value = 75;   // UCV 5
-                ws.Cells[row, ucvCol + 5].Value = 60;   // UCV 6
-                ws.Cells[row, ucvCol + 6].Value = 50;   // UCV 7
-                ws.Cells[row, ucvCol + 7].Value = 1035; // Total
 
                 for (int col = 1; col <= maxCol; col++)
                 {
