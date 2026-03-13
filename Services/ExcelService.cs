@@ -17,6 +17,8 @@ namespace ElectionManagement.Services
         Task<byte[]> ExportElectionResults(List<ElectionResult> data);
         Task<byte[]> ExportElectionProgress(List<ElectionProgress> data);
         Task<byte[]> ExportProgressSummary(List<dynamic> summaryData);
+        Task<byte[]> ExportComprehensiveElectionResults(List<ElectionResult> results, List<ElectionProgress> progress, string level);
+        Task<byte[]> ExportOfficialBallotVerificationForm(List<ElectionResult> results, string level, string area = "");
     }
 
     public class ImportResult
@@ -669,6 +671,747 @@ namespace ElectionManagement.Services
                 return unitNum;
             
             return null;
+        }
+
+        // Comprehensive export with all tables as shown in the UI
+        public async Task<byte[]> ExportComprehensiveElectionResults(List<ElectionResult> results, List<ElectionProgress> progress, string level)
+        {
+            using (var package = new ExcelPackage())
+            {
+                // Sheet 1: Summary by Unit (SỐ LIỆU ĐƠN VỊ BẦU CỬ)
+                var summarySheet = package.Workbook.Worksheets.Add("Tổng hợp đơn vị");
+                CreateSummarySheet(summarySheet, results, progress, level);
+
+                // Sheet 2: Detail by District (CHI TIẾT THEO KHU VỰC)
+                var detailSheet = package.Workbook.Worksheets.Add("Chi tiết theo khu vực");
+                CreateDetailSheet(detailSheet, results);
+
+                // Sheet 3: Results by Candidate (KẾT QUẢ THEO ỨNG VIÊN)
+                var candidateSheet = package.Workbook.Worksheets.Add("Kết quả theo ứng viên");
+                CreateCandidateResultsSheet(candidateSheet, results);
+
+                // Sheet 4: Summary by Unit - Winners & Losers (KẾT QUẢ TRÚNG CỬ - THẤT CỬ THEO TỔ)
+                var summaryByUnitSheet = package.Workbook.Worksheets.Add("Kết quả trúng/thất cử");
+                CreateWinnersLosersSheet(summaryByUnitSheet, results);
+
+                return await Task.FromResult(package.GetAsByteArray());
+            }
+        }
+
+        private void CreateSummarySheet(ExcelWorksheet ws, List<ElectionResult> results, List<ElectionProgress> progress, string level)
+        {
+            int row = 1;
+            
+            // Title
+            ws.Cells[row, 1].Value = "SỐ LIỆU ĐƠN VỊ BẦU CỬ";
+            ws.Cells[row, 1].Style.Font.Bold = true;
+            ws.Cells[row, 1].Style.Font.Size = 14;
+            row += 2;
+
+            // Summary statistics
+            if (results.Count > 0)
+            {
+                int totalVoters = results.Sum(r => r.TongCuTri);
+                int votesReceived = results.Sum(r => r.PhieuThuVe);
+                int validVotes = results.Sum(r => r.PhieuHopLe);
+                int invalidVotes = results.Sum(r => r.PhieuKhongHopLe);
+                decimal turnoutRate = totalVoters > 0 ? ((decimal)votesReceived / totalVoters) * 100 : 0;
+
+                // Add statistics in pairs
+                ws.Cells[row, 1].Value = "Tổng số cử tri";
+                ws.Cells[row, 2].Value = totalVoters;
+                ws.Cells[row, 3].Value = "Tổng số phiếu bầu";
+                ws.Cells[row, 4].Value = validVotes + invalidVotes;
+                row++;
+
+                ws.Cells[row, 1].Value = "Phiếu thu về";
+                ws.Cells[row, 2].Value = votesReceived;
+                ws.Cells[row, 3].Value = "Tỉ lệ cử tri đi bầu";
+                ws.Cells[row, 4].Value = Math.Round(turnoutRate, 2) + "%";
+                row++;
+
+                ws.Cells[row, 1].Value = "Phiếu hợp lệ";
+                ws.Cells[row, 2].Value = validVotes;
+                ws.Cells[row, 3].Value = "Phiếu không hợp lệ";
+                ws.Cells[row, 4].Value = invalidVotes;
+                row++;
+
+                // Summary candidate votes
+                ws.Cells[row, 1].Value = "Ứng cử viên 1";
+                ws.Cells[row, 2].Value = results.Sum(r => r.UngCuVien1);
+                ws.Cells[row, 3].Value = "Ứng cử viên 2";
+                ws.Cells[row, 4].Value = results.Sum(r => r.UngCuVien2);
+                row++;
+
+                ws.Cells[row, 1].Value = "Ứng cử viên 3";
+                ws.Cells[row, 2].Value = results.Sum(r => r.UngCuVien3);
+                ws.Cells[row, 3].Value = "Ứng cử viên 4";
+                ws.Cells[row, 4].Value = results.Sum(r => r.UngCuVien4);
+                row++;
+
+                ws.Cells[row, 1].Value = "Ứng cử viên 5";
+                ws.Cells[row, 2].Value = results.Sum(r => r.UngCuVien5);
+                row++;
+            }
+
+            ws.Cells.AutoFitColumns();
+        }
+
+        private void CreateDetailSheet(ExcelWorksheet ws, List<ElectionResult> results)
+        {
+            int row = 1;
+            
+            // Title
+            ws.Cells[row, 1].Value = "CHI TIẾT THEO KHU VỰC";
+            ws.Cells[row, 1].Style.Font.Bold = true;
+            ws.Cells[row, 1].Style.Font.Size = 14;
+            row += 2;
+
+            // Headers
+            var headers = new[] { "STT", "Khu vực", "Tổng cử tri", "Phiếu phát ra", "Phiếu thu về", 
+                "Phiếu hợp lệ", "Phiếu không hợp lệ", "Ứng cử viên 1", "Ứng cử viên 2", 
+                "Ứng cử viên 3", "Ứng cử viên 4", "Ứng cử viên 5" };
+            
+            for (int col = 0; col < headers.Length; col++)
+            {
+                ws.Cells[row, col + 1].Value = headers[col];
+                ws.Cells[row, col + 1].Style.Font.Bold = true;
+                ws.Cells[row, col + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, col + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            }
+            row++;
+
+            // Data rows
+            foreach (var result in results.OrderBy(r => r.Stt))
+            {
+                ws.Cells[row, 1].Value = result.Stt;
+                ws.Cells[row, 2].Value = result.KhuVuc;
+                ws.Cells[row, 3].Value = result.TongCuTri;
+                ws.Cells[row, 4].Value = result.PhieuPhatRa;
+                ws.Cells[row, 5].Value = result.PhieuThuVe;
+                ws.Cells[row, 6].Value = result.PhieuHopLe;
+                ws.Cells[row, 7].Value = result.PhieuKhongHopLe;
+                ws.Cells[row, 8].Value = result.UngCuVien1;
+                ws.Cells[row, 9].Value = result.UngCuVien2;
+                ws.Cells[row, 10].Value = result.UngCuVien3;
+                ws.Cells[row, 11].Value = result.UngCuVien4;
+                ws.Cells[row, 12].Value = result.UngCuVien5;
+                row++;
+            }
+
+            ws.Cells.AutoFitColumns();
+        }
+
+        private void CreateCandidateResultsSheet(ExcelWorksheet ws, List<ElectionResult> results)
+        {
+            int row = 1;
+
+            // Title
+            ws.Cells[row, 1].Value = "KẾT QUẢ BẦU CỬ THEO ỨNG VIÊN";
+            ws.Cells[row, 1].Style.Font.Bold = true;
+            ws.Cells[row, 1].Style.Font.Size = 14;
+            row += 2;
+
+            // Headers
+            var headers = new[] { "Ứng cử viên", "Số phiếu bầu", "Tỉ lệ (%)", "Kết quả" };
+            for (int col = 0; col < headers.Length; col++)
+            {
+                ws.Cells[row, col + 1].Value = headers[col];
+                ws.Cells[row, col + 1].Style.Font.Bold = true;
+                ws.Cells[row, col + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, col + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            }
+            row++;
+
+            int totalValidVotes = results.Sum(r => r.PhieuHopLe);
+            
+            // Candidate results
+            var candidates = new[]
+            {
+                new { Name = "Ứng cử viên 1", Votes = results.Sum(r => r.UngCuVien1) },
+                new { Name = "Ứng cử viên 2", Votes = results.Sum(r => r.UngCuVien2) },
+                new { Name = "Ứng cử viên 3", Votes = results.Sum(r => r.UngCuVien3) },
+                new { Name = "Ứng cử viên 4", Votes = results.Sum(r => r.UngCuVien4) },
+                new { Name = "Ứng cử viên 5", Votes = results.Sum(r => r.UngCuVien5) }
+            };
+
+            foreach (var candidate in candidates)
+            {
+                decimal percentage = totalValidVotes > 0 ? ((decimal)candidate.Votes / totalValidVotes) * 100 : 0;
+                string status = percentage > 50 ? "Trúng cử" : 
+                               percentage > 0 ? "Thất cử" : "Không có phiếu";
+
+                ws.Cells[row, 1].Value = candidate.Name;
+                ws.Cells[row, 2].Value = candidate.Votes;
+                ws.Cells[row, 3].Value = Math.Round(percentage, 2) + "%";
+                ws.Cells[row, 4].Value = status;
+                
+                // Color code the status
+                if (status == "Trúng cử")
+                    ws.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGreen);
+                else if (status == "Thất cử")
+                    ws.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightCoral);
+                
+                row++;
+            }
+
+            ws.Cells.AutoFitColumns();
+        }
+
+        private string GetColumnLetter(int col)
+        {
+            string result = "";
+            while (col > 0)
+            {
+                col--;
+                result = (char)('A' + col % 26) + result;
+                col /= 26;
+            }
+            return result;
+        }
+
+        private void CreateWinnersLosersSheet(ExcelWorksheet ws, List<ElectionResult> results)
+        {
+            int row = 1;
+
+            // Title
+            ws.Cells[row, 1].Value = "KẾT QUẢ TRÚNG CỬ - THẤT CỰ THEO TỔ/ĐƠN VỊ";
+            ws.Cells[row, 1].Style.Font.Bold = true;
+            ws.Cells[row, 1].Style.Font.Size = 14;
+            row += 2;
+
+            // Calculate results for each group/unit (1-10)
+            var unitResults = new Dictionary<int, dynamic>();
+            int totalValidVotes = results.Sum(r => r.PhieuHopLe);
+
+            for (int unitNum = 1; unitNum <= 10; unitNum++)
+            {
+                int u1Votes = results.Sum(r => r.UngCuVien1);
+                int u2Votes = results.Sum(r => r.UngCuVien2);
+                int u3Votes = results.Sum(r => r.UngCuVien3);
+                int u4Votes = results.Sum(r => r.UngCuVien4);
+                int u5Votes = results.Sum(r => r.UngCuVien5);
+
+                var winners = new List<string>();
+                var losers = new List<string>();
+
+                if (totalValidVotes > 0)
+                {
+                    if (u1Votes > totalValidVotes / 2) winners.Add("Ứng cử viên 1"); else if (u1Votes > 0) losers.Add("Ứng cử viên 1");
+                    if (u2Votes > totalValidVotes / 2) winners.Add("Ứng cử viên 2"); else if (u2Votes > 0) losers.Add("Ứng cử viên 2");
+                    if (u3Votes > totalValidVotes / 2) winners.Add("Ứng cử viên 3"); else if (u3Votes > 0) losers.Add("Ứng cử viên 3");
+                    if (u4Votes > totalValidVotes / 2) winners.Add("Ứng cử viên 4"); else if (u4Votes > 0) losers.Add("Ứng cử viên 4");
+                    if (u5Votes > totalValidVotes / 2) winners.Add("Ứng cử viên 5"); else if (u5Votes > 0) losers.Add("Ứng cử viên 5");
+                }
+
+                unitResults[unitNum] = new
+                {
+                    UnitNum = unitNum,
+                    Winners = string.Join(", ", winners.Count > 0 ? winners : new List<string> { "Không có" }),
+                    Losers = string.Join(", ", losers.Count > 0 ? losers : new List<string> { "Không có" })
+                };
+            }
+
+            // Headers
+            var headers = new[] { "Tổ/Đơn vị", "Ứng cử viên Trúng cử", "Ứng cử viên Thất cử" };
+            for (int col = 0; col < headers.Length; col++)
+            {
+                ws.Cells[row, col + 1].Value = headers[col];
+                ws.Cells[row, col + 1].Style.Font.Bold = true;
+                ws.Cells[row, col + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, col + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            }
+            row++;
+
+            // Data rows
+            foreach (var item in unitResults.OrderBy(x => x.Key))
+            {
+                ws.Cells[row, 1].Value = $"Tổ {item.Value.UnitNum}";
+                
+                ws.Cells[row, 2].Value = item.Value.Winners;
+                ws.Cells[row, 2].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGreen);
+
+                ws.Cells[row, 3].Value = item.Value.Losers;
+                ws.Cells[row, 3].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightCoral);
+
+                row++;
+            }
+
+            ws.Cells.AutoFitColumns();
+        }
+
+        public async Task<byte[]> ExportOfficialBallotVerificationForm(List<ElectionResult> results, string level, string area = "")
+        {
+            using (var package = new ExcelPackage())
+            {
+                var ws = package.Workbook.Worksheets.Add("Biểu tổng hợp kiểm phiếu");
+                ws.View.ZoomScale = 60;
+
+                // Determine column structure based on level
+                // xã (district/commune) and other lower levels: 5 UCVs
+                // tỉnh (province): 7 UCVs
+                Console.WriteLine($"[DEBUG] ExportOfficialBallotVerificationForm - Received level: '{level}'");
+                Console.WriteLine($"[DEBUG] level.ToLower(): '{level.ToLower()}'");
+                Console.WriteLine($"[DEBUG] level.ToLower() == \"tinh\": {level.ToLower() == "tinh"}");
+                
+                int ucvCount = level.ToLower() == "tinh" ? 7 : 5;
+                Console.WriteLine($"[DEBUG] Calculated ucvCount: {ucvCount}");
+                
+                int uvcStartCol = 18; // Column R
+                int totalCol = uvcStartCol + ucvCount; // Column W (23) for xã, or Y (25) for tỉnh
+                int maxCol = totalCol;
+                
+                Console.WriteLine($"[DEBUG] totalCol: {totalCol}, maxCol: {maxCol}");
+
+                int row = 1;
+
+                // Header section
+                ws.Cells[row, 1].Value = "Xã/Phường: ...................";
+                row++;
+                ws.Cells[row, 1].Value = "TỔ BẦU CỬ.................";
+                row += 2;
+
+                // Title
+                ws.Cells[$"A{row}:Z{row}"].Merge = true;
+                ws.Cells[row, 1].Value = "BẢNG TỔNG HỢP KIỂM PHIẾU BẦU CỬ ĐẠI BIỂU HỘI ĐỒNG NHÂN DÂN TỈNH/CẤP XÃ NHIỆM KỲ 2026-2031";
+                ws.Cells[row, 1].Style.Font.Bold = true;
+                ws.Cells[row, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                row++;
+
+                ws.Cells[$"A{row}:Z{row}"].Merge = true;
+                ws.Cells[row, 1].Value = "TẠI TỔ BẦU CỬ SỐ 1 ĐƠN VỊ BẦU CỬ HỘI ĐỒNG NHÂN DÂN TỈNH/ CẤP XÃ SỐ: 1";
+                ws.Cells[row, 1].Style.Font.Bold = true;
+                ws.Cells[row, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                row += 2;
+
+                // === LEVEL 1 HEADERS (MERGED CELLS) ===
+                int level1Row = row;
+
+                // Cols 1-3: NOT merged - single column headers
+                ws.Cells[level1Row, 1].Value = "Xã/phường";
+                ws.Cells[level1Row, 1].Style.Font.Bold = true;
+                ws.Cells[level1Row, 1].Style.Font.Size = 10;
+                ws.Cells[level1Row, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 1].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                ws.Cells[level1Row, 2].Value = "Tổ bầu cử";
+                ws.Cells[level1Row, 2].Style.Font.Bold = true;
+                ws.Cells[level1Row, 2].Style.Font.Size = 10;
+                ws.Cells[level1Row, 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 2].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 2].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 2].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 2].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                ws.Cells[level1Row, 3].Value = "Khu vực bỏ phiếu";
+                ws.Cells[level1Row, 3].Style.Font.Bold = true;
+                ws.Cells[level1Row, 3].Style.Font.Size = 10;
+                ws.Cells[level1Row, 3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 3].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 3].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 3].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 3].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                // Cols 4-6: NO merge, NO text at Level 1 (empty cells for alignment)
+                
+                // Style cols D, E, F (merged vertically)
+                ws.Cells[level1Row, 4].Value = "Tổng số cử tri trong danh sách tham gia bỏ phiếu";
+                ws.Cells[level1Row, 4].Style.Font.Bold = true;
+                ws.Cells[level1Row, 4].Style.Font.Size = 9;
+                ws.Cells[level1Row, 4].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 4].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 4].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 4].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 4].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                ws.Cells[level1Row, 4].Style.WrapText = true;
+
+                ws.Cells[level1Row, 5].Value = "Số cử tri thực tế bỏ phiếu";
+                ws.Cells[level1Row, 5].Style.Font.Bold = true;
+                ws.Cells[level1Row, 5].Style.Font.Size = 9;
+                ws.Cells[level1Row, 5].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 5].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 5].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 5].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 5].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                ws.Cells[level1Row, 5].Style.WrapText = true;
+
+                ws.Cells[level1Row, 6].Value = "Tỉ lệ (%)";
+                ws.Cells[level1Row, 6].Style.Font.Bold = true;
+                ws.Cells[level1Row, 6].Style.Font.Size = 9;
+                ws.Cells[level1Row, 6].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 6].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 6].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 6].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 6].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                ws.Cells[level1Row, 6].Style.WrapText = true;
+
+                // Cols 7-8: NOT merged - single columns
+                ws.Cells[level1Row, 7].Value = "Số phiếu phát ra";
+                ws.Cells[level1Row, 7].Style.Font.Bold = true;
+                ws.Cells[level1Row, 7].Style.Font.Size = 10;
+                ws.Cells[level1Row, 7].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 7].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 7].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 7].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 7].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                ws.Cells[level1Row, 8].Value = "Số phiếu thu vào";
+                ws.Cells[level1Row, 8].Style.Font.Bold = true;
+                ws.Cells[level1Row, 8].Style.Font.Size = 10;
+                ws.Cells[level1Row, 8].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 8].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 8].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 8].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 8].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                // Cols 9-10: MERGED - "Số phiếu không hợp lệ"
+                ws.Cells[$"I{level1Row}:J{level1Row}"].Merge = true;
+                ws.Cells[level1Row, 9].Value = "Số phiếu không hợp lệ";
+                ws.Cells[level1Row, 9].Style.Font.Bold = true;
+                ws.Cells[level1Row, 9].Style.Font.Size = 9;
+                ws.Cells[level1Row, 9].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 9].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 9].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 9].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 9].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                // Cols 11-12: MERGED - "Số phiếu hợp lệ"
+                ws.Cells[$"K{level1Row}:L{level1Row}"].Merge = true;
+                ws.Cells[level1Row, 11].Value = "Số phiếu hợp lệ";
+                ws.Cells[level1Row, 11].Style.Font.Bold = true;
+                ws.Cells[level1Row, 11].Style.Font.Size = 9;
+                ws.Cells[level1Row, 11].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 11].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 11].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 11].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                // Cols 13-17: MERGED - "Phân loại phiếu"
+                ws.Cells[$"M{level1Row}:Q{level1Row}"].Merge = true;
+                ws.Cells[level1Row, 13].Value = "Phân loại phiếu";
+                ws.Cells[level1Row, 13].Style.Font.Bold = true;
+                ws.Cells[level1Row, 13].Style.Font.Size = 9;
+                ws.Cells[level1Row, 13].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, 13].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, 13].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, 13].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, 13].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                // Cols 18-22+: MERGED - "Số phiếu bầu cho mỗi người ứng cử viên"
+                string uvcEndCol = GetColumnLetter(totalCol - 1);
+                Console.WriteLine($"[DEBUG] UCV Headers - uvcStartCol: {uvcStartCol}, Total UCV columns: {ucvCount}, uvcEndCol: {uvcEndCol}, Merge range: R{level1Row}:{uvcEndCol}{level1Row}");
+                ws.Cells[$"R{level1Row}:{uvcEndCol}{level1Row}"].Merge = true;
+                ws.Cells[level1Row, uvcStartCol].Value = "Số phiếu bầu cho mỗi người ứng cử viên";
+                ws.Cells[level1Row, uvcStartCol].Style.Font.Bold = true;
+                ws.Cells[level1Row, uvcStartCol].Style.Font.Size = 8;
+                ws.Cells[level1Row, uvcStartCol].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, uvcStartCol].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, uvcStartCol].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, uvcStartCol].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, uvcStartCol].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                // Total column header (W7 / Y7) - text at level 1
+                Console.WriteLine($"[DEBUG] Total column - Column {totalCol}, Letter: {GetColumnLetter(totalCol)}");
+                ws.Cells[level1Row, totalCol].Value = "Tổng số phiếu bầu của các ứng cử viên";
+                ws.Cells[level1Row, totalCol].Style.Font.Bold = true;
+                ws.Cells[level1Row, totalCol].Style.Font.Size = 9;
+                ws.Cells[level1Row, totalCol].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, totalCol].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, totalCol].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, totalCol].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Yellow);
+                ws.Cells[level1Row, totalCol].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                ws.Cells[level1Row, totalCol].Style.WrapText = true;
+
+                // Set row height for level 1 header
+                ws.Rows[level1Row].Height = 25;
+
+                row++;
+
+                // === LEVEL 2 HEADERS (SUB-COLUMNS) - SEPARATE ROW (NOT MERGED WITH LEVEL 1) ===
+                int level2Row = row;
+
+                ws.Cells[level2Row, 1].Value = "Xã/phường";
+                ws.Cells[level2Row, 2].Value = "Tổ bầu cử";
+                ws.Cells[level2Row, 3].Value = "Khu vực bỏ phiếu";
+                
+                ws.Cells[level2Row, 4].Value = "Tổng số cử tri trong danh sách tham gia bỏ phiếu";
+                ws.Cells[level2Row, 5].Value = "Số cử tri thực tế bỏ phiếu";
+                ws.Cells[level2Row, 6].Value = "Tỉ lệ (%)";
+                
+                ws.Cells[level2Row, 7].Value = "Số phiếu phát ra";
+                ws.Cells[level2Row, 8].Value = "Số phiếu thu vào";
+                
+                ws.Cells[level2Row, 9].Value = "Số phiếu";
+                ws.Cells[level2Row, 10].Value = "Tỉ lệ so với số phiếu thu vào (%)";
+                
+                ws.Cells[level2Row, 11].Value = "Số phiếu";
+                ws.Cells[level2Row, 12].Value = "Tỉ lệ so với số phiếu thu vào (%)";
+                
+                ws.Cells[level2Row, 13].Value = "Bầu 05 đại biểu";
+                ws.Cells[level2Row, 14].Value = "Bầu 04 đại biểu";
+                ws.Cells[level2Row, 15].Value = "Bầu 03 đại biểu";
+                ws.Cells[level2Row, 16].Value = "Bầu 02 đại biểu";
+                ws.Cells[level2Row, 17].Value = "Bầu 01 đại biểu";
+                
+                // UCV columns - dynamic based on level
+                Console.WriteLine($"[DEBUG] Level 2 UCV Headers - Setting {ucvCount} UCV columns starting at column {uvcStartCol}");
+                for (int i = 1; i <= ucvCount; i++)
+                {
+                    int colNum = uvcStartCol + i - 1;
+                    ws.Cells[level2Row, colNum].Value = $"UCV {i}";
+                    Console.WriteLine($"[DEBUG] Set UCV {i} at column {colNum} ({GetColumnLetter(colNum)})");
+                }
+
+                // Total column header - no text in level2Row since it's merged with level1Row
+                // ws.Cells[level2Row, totalCol].Value = "Tổng số phiếu bầu của các ứng cử viên";
+
+                // Style level 2 headers
+                for (int col = 1; col <= maxCol; col++)
+                {
+                    ws.Cells[level2Row, col].Style.Font.Bold = true;
+                    ws.Cells[level2Row, col].Style.Font.Size = 9;
+                    ws.Cells[level2Row, col].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    ws.Cells[level2Row, col].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                    ws.Cells[level2Row, col].Style.WrapText = true;
+                    ws.Cells[level2Row, col].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    ws.Cells[level2Row, col].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(200, 200, 200));
+                    ws.Cells[level2Row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                }
+                ws.Rows[level2Row].Height = 35;
+
+                // === MERGE VERTICAL (LEVEL 1 + LEVEL 2) FOR COLS WITHOUT HORIZONTAL MERGE ===
+                // Merge cols 1-3, 4-6, 7-8 (single headers that span 2 rows)
+                ws.Cells[$"A{level1Row}:A{level2Row}"].Merge = true;
+                ws.Cells[$"B{level1Row}:B{level2Row}"].Merge = true;
+                ws.Cells[$"C{level1Row}:C{level2Row}"].Merge = true;
+                ws.Cells[$"D{level1Row}:D{level2Row}"].Merge = true;
+                ws.Cells[$"E{level1Row}:E{level2Row}"].Merge = true;
+                ws.Cells[$"F{level1Row}:F{level2Row}"].Merge = true;
+                ws.Cells[$"G{level1Row}:G{level2Row}"].Merge = true;
+                ws.Cells[$"H{level1Row}:H{level2Row}"].Merge = true;
+                
+                // Merge total column (W/Y) vertically
+                string totalColLetter = GetColumnLetter(totalCol);
+                ws.Cells[$"{totalColLetter}{level1Row}:{totalColLetter}{level2Row}"].Merge = true;
+                
+                row++;
+
+                // === DATA ROWS ===
+                ws.Cells[row, 1].Value = 1;
+                ws.Cells[row, 2].Value = 1;
+                ws.Cells[row, 3].Value = "Khu vực 1";
+                ws.Cells[row, 4].Value = 1000;
+                ws.Cells[row, 5].Value = 950;
+                ws.Cells[row, 6].Value = 95.00M;
+                ws.Cells[row, 7].Value = 950;
+                ws.Cells[row, 8].Value = 900;
+                ws.Cells[row, 9].Value = 50;
+                ws.Cells[row, 10].Value = 5.56M;
+                ws.Cells[row, 11].Value = 850;
+                ws.Cells[row, 12].Value = 94.44M;
+                ws.Cells[row, 13].Value = 400;
+                ws.Cells[row, 14].Value = 200;
+                ws.Cells[row, 15].Value = 150;
+                ws.Cells[row, 16].Value = 100;
+                ws.Cells[row, 17].Value = 50;
+                
+                // UCV votes - dynamic based on level
+                if (ucvCount == 5)
+                {
+                    ws.Cells[row, 18].Value = 400;
+                    ws.Cells[row, 19].Value = 200;
+                    ws.Cells[row, 20].Value = 150;
+                    ws.Cells[row, 21].Value = 100;
+                    ws.Cells[row, 22].Value = 50;
+                    ws.Cells[row, 23].Value = 2000;
+                }
+                else if (ucvCount == 7)
+                {
+                    ws.Cells[row, 18].Value = 400;
+                    ws.Cells[row, 19].Value = 200;
+                    ws.Cells[row, 20].Value = 150;
+                    ws.Cells[row, 21].Value = 100;
+                    ws.Cells[row, 22].Value = 75;
+                    ws.Cells[row, 23].Value = 60;
+                    ws.Cells[row, 24].Value = 15;
+                    ws.Cells[row, 25].Value = 3000;
+                }
+
+                for (int col = 1; col <= maxCol; col++)
+                {
+                    ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    ws.Cells[row, col].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                }
+                row++;
+
+                // Row 2 (template)
+                ws.Cells[row, 1].Value = 2;
+                ws.Cells[row, 2].Value = 2;
+                for (int col = 1; col <= maxCol; col++)
+                {
+                    ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                }
+                row++;
+
+                // Dots row
+                ws.Cells[row, 1].Value = "...";
+                ws.Cells[row, 2].Value = "...";
+                for (int col = 1; col <= maxCol; col++)
+                {
+                    ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                }
+                row++;
+
+                // TOTAL ROW
+                ws.Cells[row, 1].Value = "Tổng";
+                ws.Cells[row, 4].Value = 1000;
+                ws.Cells[row, 5].Value = 950;
+                ws.Cells[row, 6].Value = 95.00M;
+                ws.Cells[row, 7].Value = 950;
+                ws.Cells[row, 8].Value = 900;
+                ws.Cells[row, 9].Value = 50;
+                ws.Cells[row, 10].Value = 5.56M;
+                ws.Cells[row, 11].Value = 850;
+                ws.Cells[row, 12].Value = 94.44M;
+                ws.Cells[row, 13].Value = 400;
+                ws.Cells[row, 14].Value = 200;
+                ws.Cells[row, 15].Value = 150;
+                ws.Cells[row, 16].Value = 100;
+                ws.Cells[row, 17].Value = 50;
+                
+                // Totals for UCV columns
+                if (ucvCount == 5)
+                {
+                    ws.Cells[row, 18].Value = 400;
+                    ws.Cells[row, 19].Value = 200;
+                    ws.Cells[row, 20].Value = 150;
+                    ws.Cells[row, 21].Value = 100;
+                    ws.Cells[row, 22].Value = 50;
+                    ws.Cells[row, 23].Value = 2000;
+                }
+                else if (ucvCount == 7)
+                {
+                    ws.Cells[row, 18].Value = 400;
+                    ws.Cells[row, 19].Value = 200;
+                    ws.Cells[row, 20].Value = 150;
+                    ws.Cells[row, 21].Value = 100;
+                    ws.Cells[row, 22].Value = 75;
+                    ws.Cells[row, 23].Value = 60;
+                    ws.Cells[row, 24].Value = 15;
+                    ws.Cells[row, 25].Value = 3000;
+                }
+
+                ws.Cells[row, 1].Style.Font.Bold = true;
+                for (int col = 1; col <= maxCol; col++)
+                {
+                    ws.Cells[row, col].Style.Font.Bold = true;
+                    ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    ws.Cells[row, col].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                }
+                row += 2;
+
+                // === VERIFICATION SECTION ===
+                ws.Cells[row, 1].Value = "KIỂM TRA TẠI TỔ BẦU CỬ";
+                ws.Cells[row, 1].Style.Font.Bold = true;
+                ws.Cells[row, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(198, 239, 206));
+                row++;
+
+                ws.Cells[row, 1].Value = "Kiểm tra lúc ..... giờ ...... ngày ...... tháng .... năm 2026 và đã nhị";
+                row++;
+                ws.Cells[row, 1].Value = "Biên bản kết quả kiểm phiếu của Tổ bầu cử .............................";
+                row++;
+                ws.Cells[row, 1].Value = "Biên bản kiểm kế việc sử dụng phiếu bầu cử .............................";
+                row += 1;
+
+                // === CALCULATION SECTION ===
+                int calcRow = row;
+                
+                ws.Cells[calcRow, 8].Value = "Số phiếu bầu 05 đại biểu:";
+                ws.Cells[calcRow, 9].Value = 400;
+                ws.Cells[calcRow, 10].Value = "x";
+                ws.Cells[calcRow, 11].Value = 5;
+                ws.Cells[calcRow, 12].Value = "=";
+                ws.Cells[calcRow, 13].Value = 2000;
+                calcRow++;
+
+                ws.Cells[calcRow, 8].Value = "Số phiếu bầu 04 đại biểu:";
+                ws.Cells[calcRow, 9].Value = 200;
+                ws.Cells[calcRow, 10].Value = "x";
+                ws.Cells[calcRow, 11].Value = 4;
+                ws.Cells[calcRow, 12].Value = "=";
+                ws.Cells[calcRow, 13].Value = 800;
+                calcRow++;
+
+                ws.Cells[calcRow, 8].Value = "Số phiếu bầu 03 đại biểu:";
+                ws.Cells[calcRow, 9].Value = 150;
+                ws.Cells[calcRow, 10].Value = "x";
+                ws.Cells[calcRow, 11].Value = 3;
+                ws.Cells[calcRow, 12].Value = "=";
+                ws.Cells[calcRow, 13].Value = 450;
+                calcRow++;
+
+                ws.Cells[calcRow, 8].Value = "Số phiếu bầu 02 đại biểu:";
+                ws.Cells[calcRow, 9].Value = 100;
+                ws.Cells[calcRow, 10].Value = "x";
+                ws.Cells[calcRow, 11].Value = 2;
+                ws.Cells[calcRow, 12].Value = "=";
+                ws.Cells[calcRow, 13].Value = 200;
+                calcRow++;
+
+                ws.Cells[calcRow, 8].Value = "Số phiếu bầu 01 đại biểu:";
+                ws.Cells[calcRow, 9].Value = 50;
+                ws.Cells[calcRow, 10].Value = "x";
+                ws.Cells[calcRow, 11].Value = 1;
+                ws.Cells[calcRow, 12].Value = "=";
+                ws.Cells[calcRow, 13].Value = 50;
+                calcRow++;
+
+                ws.Cells[calcRow, 11].Value = "Cộng:";
+                ws.Cells[calcRow, 11].Style.Font.Bold = true;
+                ws.Cells[calcRow, 13].Value = 3500;
+                ws.Cells[calcRow, 13].Style.Font.Bold = true;
+                calcRow += 2;
+
+                // === SIGNATURE SECTION ===
+                ws.Cells[calcRow, 2].Value = "NGƯỜI KIỂM TRA";
+                ws.Cells[calcRow, 2].Style.Font.Bold = true;
+                ws.Cells[calcRow, 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[calcRow, 2].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                ws.Cells[calcRow, 8].Value = "TỔ TRƯỞNG TỔ BẦU CỬ SỐ ......";
+                ws.Cells[calcRow, 8].Style.Font.Bold = true;
+                ws.Cells[calcRow, 8].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[calcRow, 8].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                calcRow += 3;
+
+                ws.Cells[calcRow, 2].Value = "(Ký, ghi họ tên)";
+                ws.Cells[calcRow, 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                ws.Cells[calcRow, 8].Value = "(Ký và ghi họ tên, đông dấu)";
+                ws.Cells[calcRow, 8].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                // === SET COLUMN WIDTHS ===
+                ws.Column(1).Width = 14;
+                ws.Column(2).Width = 14;
+                ws.Column(3).Width = 15;
+                ws.Column(4).Width = 20;
+                ws.Column(5).Width = 18;
+                ws.Column(6).Width = 12;
+                ws.Column(7).Width = 15;
+                ws.Column(8).Width = 15;
+                for (int i = 9; i <= maxCol; i++)
+                {
+                    ws.Column(i).Width = 13;
+                }
+
+                return package.GetAsByteArray();
+            }
         }
     }
 }

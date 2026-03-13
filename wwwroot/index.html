@@ -492,7 +492,7 @@
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                     <h2 style="margin: 0;">📋 SỐ LIỆU BẦU CỬ</h2>
-                    <button class="btn" style="background: #d97706; color: white; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600;">💾 Lưu lại</button>
+                    <button class="btn btn-success" style="padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600;" onclick="exportOfficialFormWithLevel()">📋 Xuất Biểu Kiểm Phiếu</button>
                 </div>
 
                 <div style="border-top: 2px solid #e5e7eb; padding-top: 20px;">
@@ -648,6 +648,86 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Bảng Kiểm Phiếu Chính Thức -->
+                    <div style="margin-top: 50px; border: 2px solid #333; padding: 30px; background: white;">
+                        <!-- Header Section -->
+                        <div style="margin-bottom: 25px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin-bottom: 20px;">
+                                <div>
+                                    <div style="font-weight: 600;">Xã/Phường: <input type="text" id="officialWardName" style="border: none; border-bottom: 1px solid #333; width: 200px; padding: 2px;"></div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">TỔ BẦU CỬ: <input type="text" id="officialUnitName" style="border: none; border-bottom: 1px solid #333; width: 200px; padding: 2px;"></div>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin: 20px 0;">
+                                <h2 style="font-weight: 700; font-size: 16px; margin: 10px 0;">BẢNG TỔNG HỢP KIỂM PHIẾU BẦU CỬ ĐẠI BIỂU HỘI ĐỒNG NHÂN DÂN TỈNH/CẤP XÃ NHIỆM KỲ 2026-2031</h2>
+                                <p style="font-size: 13px; margin: 5px 0;">TẠI TỔ BẦU CỬ SỐ <span id="officialUnitNum">1</span> ĐƠN VỊ BẦU CỬ HỘI ĐỒNG NHÂN DÂN TỈNH/CẤP XÃ SỐ: <span id="officialUnitCode">1</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Main Table -->
+                        <div style="overflow-x: auto; margin-bottom: 30px; border: 1px solid #333;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                <thead>
+                                    <tr style="border: 1px solid #333;">
+                                        <th colspan="4" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Thông Tin Tổ - Khu Vực</th>
+                                        <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Cử Tri</th>
+                                        <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phiếu Chi</th>
+                                        <th colspan="4" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phiếu Hợp Lệ / Không Hợp Lệ</th>
+                                        <th colspan="5" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">Ứng Cử Viên</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Tổng</th>
+                                    </tr>
+                                    <tr style="border: 1px solid #333;">
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Stt</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Xã/Phường</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Tổ</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Kv</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Tổng</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Tỷ % (ĐS)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phát</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Thu</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỷ % (Thu)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">KHL</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỷ % (KHL)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">HL</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỷ % (HL)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">ỨC1</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">ỨC2</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">ỨC3</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">ỨC4</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">ỨC5</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Cộng</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="officialTableBody">
+                                    <!-- Data rows will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                    <tr style="border: 1px solid #333; font-weight: 600; background: #f0f0f0;">
+                                        <td colspan="4" style="border: 1px solid #333; padding: 6px; text-align: right;">Tổng</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVoters">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRate">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalIssued">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalReceived">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalReceivedRate">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalid">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidRate">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValid">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidRate">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand1">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand2">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand3">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand4">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand5">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalSum">0</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -757,6 +837,14 @@
                     <p style="margin-bottom: 20px; color: #666;">Tải file Excel chứa tiến độ bầu cử theo giờ</p>
                     <button class="btn btn-success" style="width: 100%;" onclick="exportProgressWithLevel()">
                         ⬇️ Tải File Excel
+                    </button>
+                </div>
+
+                <div class="card" style="text-align: center;">
+                    <h3 style="margin-bottom: 15px;">📁 Xuất Tổng Hợp Toàn Bộ</h3>
+                    <p style="margin-bottom: 20px; color: #666;">Tải file Excel chứa 4 bảng đầy đủ (tổng hợp + chi tiết + ứng viên + trúng/thất cử)</p>
+                    <button class="btn btn-success" style="width: 100%;" onclick="exportComprehensiveWithLevel()">
+                        ⬇️ Tải Tổng Hợp Toàn Bộ
                     </button>
                 </div>
             </div>
@@ -2489,6 +2577,50 @@
             window.location.href = `${API_BASE}/export-progress?level=${encodeURIComponent(selectedLevel)}`; // summary same endpoint
         }
 
+        function exportOfficialFormWithLevel() {
+            const level = document.querySelector('[data-level]')?.dataset.level || 'Cấp xã';
+            const fileName = `BangTongHopKiemPhieu_${new Date().toISOString().slice(0,10)}.xlsx`;
+            
+            fetch(`${API_BASE}/export-official-form?level=${encodeURIComponent(level)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => console.error('Lỗi xuất file:', error));
+        }
+
+        function exportComprehensiveWithLevel() {
+            const level = document.querySelector('[data-level]')?.dataset.level || 'Cấp xã';
+            const fileName = `SoLieuBauCu_${new Date().toISOString().slice(0,10)}.xlsx`;
+            
+            fetch(`${API_BASE}/export-comprehensive?level=${encodeURIComponent(level)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => console.error('Lỗi xuất file:', error));
+        }
+
         // Clear Progress Data
         async function clearProgressData() {
             if (!confirm('⚠️ Bạn chắc chắn muốn xóa TẤT CẢ dữ liệu tiến độ bầu cử? Hành động này không thể hoàn tác!')) {
@@ -2721,6 +2853,7 @@
 
                     // Populate area details table
                     populateAreaDetailsTable(unitNum, areas, ballotData);
+                    populateOfficialBallotTable(unitNum, areas, ballotData);
                 } else {
                     console.log('No records found for this unit');
                     clearGroupDataFields();
@@ -2937,6 +3070,125 @@
             // Clear unit selection
             window.currentSelectedUnit = null;
             console.log('Cleared window data including unit selection');
+        }
+
+        // Populate official ballot verification table
+        function populateOfficialBallotTable(unitNum, areas, ballotData) {
+            const tbody = document.getElementById('officialTableBody');
+            tbody.innerHTML = '';
+
+            // Update header fields
+            document.getElementById('officialUnitName').value = `Đơn vị ${unitNum}`;
+            document.getElementById('officialUnitNum').textContent = unitNum;
+            document.getElementById('officialUnitCode').textContent = unitNum;
+
+            let totalVoters = 0, totalIssued = 0, totalReceived = 0, totalValid = 0, totalInvalid = 0;
+            const candTotals = [0, 0, 0, 0, 0];
+            let rowNum = 1;
+
+            // Get area records
+            areas.forEach((areaNum, idx) => {
+                const record = ballotData.find(r => r.districtName === `Tổ ${unitNum} - Khu Vực ${areaNum}`);
+                if (!record) return;
+
+                const issued = record.issuedBallots || 0;
+                const received = record.receivedBallots || 0;
+                const valid = record.validBallots || 0;
+                const invalid = record.invalidBallots || 0;
+
+                totalVoters += issued;
+                totalIssued += issued;
+                totalReceived += received;
+                totalValid += valid;
+                totalInvalid += invalid;
+
+                // Calculate percentages
+                const votersRate = issued > 0 ? ((issued / issued) * 100).toFixed(1) : '0.0';
+                const receivedRate = issued > 0 ? ((received / issued) * 100).toFixed(1) : '0.0';
+                const invalidRate = received > 0 ? ((invalid / received) * 100).toFixed(1) : '0.0';
+                const validRate = received > 0 ? ((valid / received) * 100).toFixed(1) : '0.0';
+
+                // Get candidate votes (up to 5 candidates only)
+                const candVotes = [];
+                for (let i = 1; i <= 5; i++) {
+                    const votes = record[`candidate${i}Votes`] || 0;
+                    candVotes.push(votes);
+                    candTotals[i-1] += votes;
+                }
+
+                const totalCandVotes = candVotes.reduce((a, b) => a + b, 0);
+
+                // Create row
+                const row = document.createElement('tr');
+                row.style.border = '1px solid #333';
+                const cells = [
+                    rowNum,                          // Stt
+                    'Xã Văn',                        // Xã/Phường
+                    unitNum,                         // Tổ
+                    areaNum,                         // Khu vực
+                    issued,                          // Tổng cử tri
+                    votersRate + '%',                // Tỷ % ĐS
+                    issued,                          // Phát
+                    received,                        // Thu
+                    receivedRate + '%',              // Tỷ % Thu
+                    invalid,                         // KHL
+                    invalidRate + '%',               // Tỷ % KHL
+                    valid,                           // HL
+                    validRate + '%',                 // Tỷ % HL
+                    candVotes[0],                    // ỨC1
+                    candVotes[1],                    // ỨC2
+                    candVotes[2],                    // ỨC3
+                    candVotes[3],                    // ỨC4
+                    candVotes[4],                    // ỨC5
+                    totalCandVotes                   // Tổng
+                ];
+
+                // Build HTML cells
+                let cellHTML = '';
+                const bgColors = [
+                    '#e0e0e0', '#e0e0e0', '#e0e0e0', '#e0e0e0',  // Stt, Xã, Tổ, KV
+                    '#c6efce', '#c6efce',                          // Cử tri + Tỷ %
+                    '#ffff99', '#ffff99', '#ffff99',               // Phát, Thu, Tỷ %
+                    '#ffff99', '#ffff99',                          // KHL, Tỷ % KHL
+                    '#ffff99', '#ffff99',                          // HL, Tỷ % HL
+                    '#ffe5e5', '#ffe5e5', '#ffe5e5', '#ffe5e5',   // ỨC1-4
+                    '#ffe5e5',                                     // ỨC5
+                    '#e0e0e0'                                      // Tổng
+                ];
+
+                cells.forEach((cell, idx) => {
+                    const textAlign = (idx === 0 || idx === 1 || idx === 2 || idx === 3) ? 'left' : 'center';
+                    cellHTML += `<td style="border: 1px solid #333; padding: 6px; text-align: ${textAlign}; background: ${bgColors[idx]}; font-size: 11px;">${cell}</td>`;
+                });
+
+                row.innerHTML = cellHTML;
+                tbody.appendChild(row);
+                rowNum++;
+            });
+
+            // Calculate totals percentages
+            const totalVotersRate = totalIssued > 0 ? '100.0' : '0.0';
+            const totalReceivedRate = totalIssued > 0 ? ((totalReceived / totalIssued) * 100).toFixed(1) : '0.0';
+            const totalInvalidRate = totalReceived > 0 ? ((totalInvalid / totalReceived) * 100).toFixed(1) : '0.0';
+            const totalValidRate = totalReceived > 0 ? ((totalValid / totalReceived) * 100).toFixed(1) : '0.0';
+
+            // Update totals
+            document.getElementById('totalVoters').textContent = totalVoters;
+            document.getElementById('totalVotersRate').textContent = totalVotersRate + '%';
+            document.getElementById('totalIssued').textContent = totalIssued;
+            document.getElementById('totalReceived').textContent = totalReceived;
+            document.getElementById('totalReceivedRate').textContent = totalReceivedRate + '%';
+            document.getElementById('totalValid').textContent = totalValid;
+            document.getElementById('totalValidRate').textContent = totalValidRate + '%';
+            document.getElementById('totalInvalid').textContent = totalInvalid;
+            document.getElementById('totalInvalidRate').textContent = totalInvalidRate + '%';
+
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`totalCand${i+1}`).textContent = candTotals[i];
+            }
+
+            const totalSum = candTotals.reduce((a, b) => a + b, 0);
+            document.getElementById('totalSum').textContent = totalSum;
         }
         
         // Export group data to Excel

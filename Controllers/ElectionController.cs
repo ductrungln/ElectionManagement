@@ -96,6 +96,56 @@ namespace ElectionManagement.Controllers
             }
         }
 
+        // GET: api/election/export-comprehensive
+        [HttpGet("export-comprehensive")]
+        public async Task<IActionResult> ExportComprehensive([FromQuery] string level)
+        {
+            try
+            {
+                var resultsQuery = _context.ElectionResults.AsQueryable();
+                var progressQuery = _context.ElectionProgresses.AsQueryable();
+                
+                if (!string.IsNullOrWhiteSpace(level))
+                {
+                    resultsQuery = resultsQuery.Where(r => r.Level == level);
+                    progressQuery = progressQuery.Where(p => p.Level == level);
+                }
+                
+                var results = await resultsQuery.OrderBy(r => r.Stt).ToListAsync();
+                var progress = await progressQuery.OrderBy(p => p.Stt).ToListAsync();
+                
+                // Allow export even with no data to show form structure
+                var fileBytes = await _excelService.ExportComprehensiveElectionResults(results, progress, level ?? "");
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"SoLieuBauCu_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Lỗi xuất file: {ex.Message}" });
+            }
+        }
+
+        // GET: api/election/export-official-form
+        [HttpGet("export-official-form")]
+        public async Task<IActionResult> ExportOfficialForm([FromQuery] string level, [FromQuery] string area = "")
+        {
+            try
+            {
+                var query = _context.ElectionResults.AsQueryable();
+                if (!string.IsNullOrWhiteSpace(level)) 
+                    query = query.Where(r => r.Level == level);
+                
+                var results = await query.OrderBy(r => r.Stt).ToListAsync();
+                
+                // Allow export even with no data to show form structure
+                var fileBytes = await _excelService.ExportOfficialBallotVerificationForm(results, level ?? "", area);
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BangTongHopKiemPhieu_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Lỗi xuất file: {ex.Message}" });
+            }
+        }
+
         // GET: api/election/export-results
         [HttpGet("export-results")]
         public async Task<IActionResult> ExportResults([FromQuery] string level)
