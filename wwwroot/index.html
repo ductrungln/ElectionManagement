@@ -3122,6 +3122,8 @@
                     candTotals[i-1] += votes;
                 }
 
+                // Remove UCV 5 (index 4) from the display for provincial level
+                const displayCandVotes = candVotes.filter((v, idx) => idx !== 4);
                 const totalCandVotes = candVotes.reduce((a, b) => a + b, 0);
 
                 // Create row
@@ -3141,7 +3143,7 @@
                     invalidRate + '%',               // Tỷ % KHL
                     valid,                           // HL
                     validRate + '%',                 // Tỷ % HL
-                    ...candVotes,                    // Candidate votes (5 or 7)
+                    ...displayCandVotes,             // Candidate votes (excluding UCV 5, so 1,2,3,4,6,7)
                     totalCandVotes                   // Tổng
                 ];
 
@@ -3155,8 +3157,8 @@
                     '#ffff99', '#ffff99'                           // HL, Tỷ % HL
                 ];
                 
-                // Build candidate background colors (red for all candidates)
-                const candBgColors = Array(candidateCount).fill('#ffe5e5');
+                // Build candidate background colors (red for all except UCV 5, which is removed)
+                const candBgColors = Array(displayCandVotes.length).fill('#ffe5e5');
                 
                 // Combine colors
                 const bgColors = [...baseBgColors, ...candBgColors, '#e0e0e0'];  // Last is Total
@@ -3189,6 +3191,9 @@
             document.getElementById('totalInvalidRate').textContent = totalInvalidRate + '%';
 
             for (let i = 0; i < candidateCount; i++) {
+                // Skip UCV 5 (index 4) in display
+                if (i === 4) continue;
+                
                 const totalCandEl = document.getElementById(`totalCand${i+1}`);
                 if (totalCandEl) {
                     totalCandEl.textContent = candTotals[i];
