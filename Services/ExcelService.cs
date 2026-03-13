@@ -1330,14 +1330,8 @@ namespace ElectionManagement.Services
                 
                 Console.WriteLine($"[DEBUG] Before clearing - Original level: '{level}'");
                 Console.WriteLine($"[DEBUG] Before clearing - levelLower: '{levelLower}'");
-                Console.WriteLine($"[DEBUG] Contains 'xã': {levelLower.Contains("xã")}");
-                Console.WriteLine($"[DEBUG] Contains 'xa': {levelLower.Contains("xa")}");
-                Console.WriteLine($"[DEBUG] Contains 'quốc hội': {levelLower.Contains("quốc hội")}");
-                Console.WriteLine($"[DEBUG] Contains 'quochoi': {levelLower.Contains("quochoi")}");
-                Console.WriteLine($"[DEBUG] Contains 'tỉnh': {levelLower.Contains("tỉnh")}");
-                Console.WriteLine($"[DEBUG] Contains 'tinh': {levelLower.Contains("tinh")}");
 
-                if (levelLower.Contains("xã") || levelLower.Contains("xa"))
+                if (levelLower.Contains("xa"))
                 {
                     Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - CLEARING CELLS =====");
                     // Clear specific cells for XÃ (commune) level
@@ -1357,7 +1351,7 @@ namespace ElectionManagement.Services
                     ws.Cells["W11"].Value = null;
                     ws.Cells["W12"].Value = null;
                 }
-                else if (levelLower.Contains("quốc hội") || levelLower.Contains("quochoi"))
+                else if (levelLower.Contains("quochoi"))
                 {
                     Console.WriteLine("[DEBUG] ===== MATCHED: QUỐC HỘI LEVEL - CLEARING CELLS =====");
                     // Clear specific cells for QUỐC HỘI (national) level
@@ -1378,9 +1372,9 @@ namespace ElectionManagement.Services
                     ws.Cells["W12"].Value = null;
                 }
                 // TINH (provincial) level - giữ nguyên tất cả, không xóa
-                else if (levelLower.Contains("tỉnh") || levelLower.Contains("tinh"))
+                else if (levelLower.Contains("tinh"))
                 {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: TỈNH/TINH (PROVINCIAL) LEVEL - NOT CLEARING =====");
+                    Console.WriteLine("[DEBUG] ===== MATCHED: TỈNH (PROVINCIAL) LEVEL - NOT CLEARING =====");
                 }
                 else
                 {
