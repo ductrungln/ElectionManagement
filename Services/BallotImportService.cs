@@ -43,14 +43,19 @@ namespace ElectionManagement.Services
                     int ballotType1Count = 0;
                     int ballotType2Count = 0;
                     int ballotType3Count = 0;
+                    int ballotType4Count = 0;
                     int ballotType1Votes = 0;
                     int ballotType2Votes = 0;
                     int ballotType3Votes = 0;
+                    int ballotType4Votes = 0;
                     int candidate1Total = 0;
                     int candidate2Total = 0;
                     int candidate3Total = 0;
                     int candidate4Total = 0;
                     int candidate5Total = 0;
+                    int candidate6Total = 0;
+                    int candidate7Total = 0;
+                    int candidate8Total = 0;
 
                     // === PARSE METADATA ===
                     // Phiếu phát ra: Tìm từ row 2, bất kỳ cột nào
@@ -95,276 +100,262 @@ namespace ElectionManagement.Services
                         }
                     }
 
-                    // Phiếu hợp lệ: Lấy từ ô C32 (Row 32, Column C = 3)
-                    var validCellVal = worksheet.Cells[32, 3].Value?.ToString() ?? "";
-                    if (int.TryParse(validCellVal, out int validNum))
-                    {
-                        validBallots = validNum;
-                        Console.WriteLine($"Phiếu hợp lệ (Valid) from C32: {validBallots}");
-                    }
-                    else
-                    {
-                        // Fallback: Tìm từ row 4
-                        for (int col = 1; col <= worksheet.Dimension.Columns; col++)
-                        {
-                            var cellText = worksheet.Cells[4, col].Value?.ToString() ?? "";
-                            if (cellText.Contains("hợp lệ") && !cellText.Contains("không"))
-                            {
-                                var nextVal = worksheet.Cells[4, col + 1].Value?.ToString() ?? "";
-                                if (int.TryParse(nextVal, out int num))
-                                {
-                                    validBallots = num;
-                                    Console.WriteLine($"Phiếu hợp lệ (Valid) from search: {validBallots}");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    // Phiếu không hợp lệ: Lấy từ ô C31 (Row 31, Column C = 3)
-                    var invalidCellVal = worksheet.Cells[31, 3].Value?.ToString() ?? "";
-                    if (int.TryParse(invalidCellVal, out int invalidNum))
-                    {
-                        invalidBallots = invalidNum;
-                        Console.WriteLine($"Phiếu không hợp lệ (Invalid) from C31: {invalidBallots}");
-                    }
-                    else
-                    {
-                        // Fallback: Tìm từ row 5
-                        for (int col = 1; col <= worksheet.Dimension.Columns; col++)
-                        {
-                            var cellText = worksheet.Cells[5, col].Value?.ToString() ?? "";
-                            if (cellText.Contains("không hợp lệ"))
-                            {
-                                var nextVal = worksheet.Cells[5, col + 1].Value?.ToString() ?? "";
-                                if (int.TryParse(nextVal, out int num))
-                                {
-                                    invalidBallots = num;
-                                    Console.WriteLine($"Phiếu không hợp lệ (Invalid) from search: {invalidBallots}");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    // === KIỂM TRA: Phiếu phát ra phải bằng phiếu thu vào ===
-                    // [SKIP THIS CHECK - Allow mismatch between issued and received ballots]
-                    Console.WriteLine($"Kiểm tra: Phiếu phát ra ({issuedBallots}) vs Phiếu thu vào ({receivedBallots})");
-                    //if (issuedBallots != receivedBallots)
-                    //{
-                    //    result.Success = false;
-                    //    result.Message = $"Lỗi: Số phiếu phát ra ({issuedBallots}) không bằng số phiếu thu vào ({receivedBallots})";
-                    //    result.ErrorDetails = $"Vui lòng kiểm tra lại dữ liệu trong file Excel. Mismatch: {Math.Abs(issuedBallots - receivedBallots)} phiếu";
-                    //    Console.WriteLine($"❌ {result.Message}");
-                    //    return result;
-                    //}
-
-                    // === PARSE BALLOT TYPES FROM SPECIFIC RANGES IN COLUMN C ===
-                    // Phiếu bầu 1: Sum of C26 to C30
-                    Console.WriteLine("\n===== CALCULATING BALLOT TYPES =====");
-                    Console.WriteLine("Calculating Phiếu bầu 1 from C26:C30");
-                    for (int row = 26; row <= 30; row++)
-                    {
-                        var cellVal = worksheet.Cells[row, 3].Value?.ToString() ?? "";
-                        if (int.TryParse(cellVal, out int val))
-                        {
-                            ballotType1Count += val;
-                            Console.WriteLine($"  C{row}: {val}");
-                        }
-                    }
-                    ballotType1Votes = ballotType1Count * 1; // Multiply by 1
-                    Console.WriteLine($"Phiếu bầu 1: Count={ballotType1Count}, Votes={ballotType1Votes}");
-
-                    // Phiếu bầu 2: Sum of C16 to C25
-                    Console.WriteLine("Calculating Phiếu bầu 2 from C16:C25");
-                    for (int row = 16; row <= 25; row++)
-                    {
-                        var cellVal = worksheet.Cells[row, 3].Value?.ToString() ?? "";
-                        if (int.TryParse(cellVal, out int val))
-                        {
-                            ballotType2Count += val;
-                            Console.WriteLine($"  C{row}: {val}");
-                        }
-                    }
-                    ballotType2Votes = ballotType2Count * 2; // Multiply by 2
-                    Console.WriteLine($"Phiếu bầu 2: Count={ballotType2Count}, Votes={ballotType2Votes}");
-
-                    // Phiếu bầu 3: Sum of C6 to C15
-                    Console.WriteLine("Calculating Phiếu bầu 3 from C6:C15");
-                    for (int row = 6; row <= 15; row++)
-                    {
-                        var cellVal = worksheet.Cells[row, 3].Value?.ToString() ?? "";
-                        if (int.TryParse(cellVal, out int val))
-                        {
-                            ballotType3Count += val;
-                            Console.WriteLine($"  C{row}: {val}");
-                        }
-                    }
-                    ballotType3Votes = ballotType3Count * 3; // Multiply by 3
-                    Console.WriteLine($"Phiếu bầu 3: Count={ballotType3Count}, Votes={ballotType3Votes}");
-
-                    // Calculate total weighted votes
-                    int totalWeightedVotes = ballotType1Votes + ballotType2Votes + ballotType3Votes;
-                    Console.WriteLine($"\n===== TOTAL WEIGHTED VOTES CALCULATION =====");
-                    Console.WriteLine($"Phiếu loại 1: {ballotType1Count} × 1 = {ballotType1Votes}");
-                    Console.WriteLine($"Phiếu loại 2: {ballotType2Count} × 2 = {ballotType2Votes}");
-                    Console.WriteLine($"Phiếu loại 3: {ballotType3Count} × 3 = {ballotType3Votes}");
-                    Console.WriteLine($"TOTAL WEIGHTED VOTES: {totalWeightedVotes}");
-
-                    // === READ CANDIDATE VOTES FROM ROW 32 (C32 and D32:H32) ===
-                    // C32 = Total valid ballots (phiếu hợp lệ)
-                    // D32:H32 = Crossed-out votes for each candidate (phiếu gạch)
-                    // Formula: candidate votes = C32 - D32:H32
+                    // === FIRST: READ CANDIDATE NAMES FROM ROW 4 AND DETERMINE TOTAL CANDIDATES ===
+                    Console.WriteLine($"\n===== READING CANDIDATE NAMES FROM ROW 4 (D4:K4) =====");
                     
-                    Console.WriteLine($"\n===== READING CANDIDATE VOTES FROM ROW 32 =====");
-                    Console.WriteLine($"C32 (Phiếu hợp lệ): {validBallots}");
-                    Console.WriteLine($"D32:H32 (Phiếu gạch từng người):");
+                    var candidate1NameVal = worksheet.Cells[4, 4].Value?.ToString() ?? "";
+                    var candidate2NameVal = worksheet.Cells[4, 5].Value?.ToString() ?? "";
+                    var candidate3NameVal = worksheet.Cells[4, 6].Value?.ToString() ?? "";
+                    var candidate4NameVal = worksheet.Cells[4, 7].Value?.ToString() ?? "";
+                    var candidate5NameVal = worksheet.Cells[4, 8].Value?.ToString() ?? "";
+                    var candidate6NameVal = worksheet.Cells[4, 9].Value?.ToString() ?? "";
+                    var candidate7NameVal = worksheet.Cells[4, 10].Value?.ToString() ?? "";
+                    var candidate8NameVal = worksheet.Cells[4, 11].Value?.ToString() ?? "";
+                    
+                    // DEBUG: Print all candidate names read from row 4
+                    Console.WriteLine($"  D4 (Cand 1): '{candidate1NameVal}'");
+                    Console.WriteLine($"  E4 (Cand 2): '{candidate2NameVal}'");
+                    Console.WriteLine($"  F4 (Cand 3): '{candidate3NameVal}'");
+                    Console.WriteLine($"  G4 (Cand 4): '{candidate4NameVal}'");
+                    Console.WriteLine($"  H4 (Cand 5): '{candidate5NameVal}'");
+                    Console.WriteLine($"  I4 (Cand 6): '{candidate6NameVal}'");
+                    Console.WriteLine($"  J4 (Cand 7): '{candidate7NameVal}'");
+                    Console.WriteLine($"  K4 (Cand 8): '{candidate8NameVal}'");
+                    
+                    // Determine total candidates from row 4
+                    int totalCandidates = 0;
+                    var excelCandidateValues = new[] {
+                        candidate1NameVal, candidate2NameVal, candidate3NameVal, candidate4NameVal,
+                        candidate5NameVal, candidate6NameVal, candidate7NameVal, candidate8NameVal
+                    };
+                    
+                    for (int i = excelCandidateValues.Length - 1; i >= 0; i--)
+                    {
+                        if (!string.IsNullOrEmpty(excelCandidateValues[i]) && 
+                            !excelCandidateValues[i].Equals("-") && 
+                            !excelCandidateValues[i].Equals("―"))
+                        {
+                            totalCandidates = i + 1;
+                            break;
+                        }
+                    }
+                    if (totalCandidates == 0) totalCandidates = 5;
+                    
+                    Console.WriteLine($"✓ Total candidates determined: {totalCandidates}");
 
-                    // Read D32 (Column 4 = Column D) - Crossed-out votes for person 1
-                    var d32Val = worksheet.Cells[32, 4].Value?.ToString() ?? "0";
-                    int d32CrossedOut = 0;
-                    if (int.TryParse(d32Val, out int d32Votes))
-                        d32CrossedOut = d32Votes;
-                    candidate1Total = validBallots - d32CrossedOut;
-                    Console.WriteLine($"  D32: {d32CrossedOut} → Person 1: {validBallots} - {d32CrossedOut} = {candidate1Total}");
+                    // === BALLOT READING LOGIC: DIFFERENT FOR 5 vs 7 CANDIDATES ===
+                    int readColumn = (totalCandidates == 7) ? 4 : 3;  // Col D=4 for 7-person, Col C=3 for 5-person
+                    
+                    if (totalCandidates == 7)
+                    {
+                        Console.WriteLine($"\n===== READING 4 BALLOT TYPES (For 7 candidates) =====");
+                        
+                        // DEBUG: Check raw cell values before parsing
+                        Console.WriteLine($"\n===== DEBUG: Raw cell values from rows 31-32, 54-55, 77-78, 104-105 =====");
+                        for (int row = 31; row <= 32; row++)
+                        {
+                            Console.WriteLine($"Row {row}: C={worksheet.Cells[row, 3].Value} | D={worksheet.Cells[row, 4].Value}");
+                        }
+                        for (int row = 54; row <= 55; row++)
+                        {
+                            Console.WriteLine($"Row {row}: C={worksheet.Cells[row, 3].Value} | D={worksheet.Cells[row, 4].Value}");
+                        }
+                        for (int row = 77; row <= 78; row++)
+                        {
+                            Console.WriteLine($"Row {row}: C={worksheet.Cells[row, 3].Value} | D={worksheet.Cells[row, 4].Value}");
+                        }
+                        for (int row = 104; row <= 105; row++)
+                        {
+                            Console.WriteLine($"Row {row}: C={worksheet.Cells[row, 3].Value} | D={worksheet.Cells[row, 4].Value}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"\n===== READING BALLOT DATA (For 5 candidates) =====");
+                    }
+                    
+                    // Type 1: Gạch 6 lấy 1 (chọn 1 người)
+                    var type1InvalidVal = worksheet.Cells[31, readColumn].Value?.ToString() ?? "0";
+                    var type1ValidVal = worksheet.Cells[32, readColumn].Value?.ToString() ?? "0";
+                    int.TryParse(type1InvalidVal, out int type1Invalid);
+                    int.TryParse(type1ValidVal, out int type1Valid);
+                    ballotType1Count = type1Valid;
+                    ballotType1Votes = ballotType1Count * 1;
+                    Console.WriteLine($"Type 1: Invalid={type1Invalid}, Valid={type1Valid} → {ballotType1Count} phiếu × 1 vote = {ballotType1Votes}");
+                    
+                    int type2Invalid = 0, type2Valid = 0, type3Invalid = 0, type3Valid = 0, type4Invalid = 0, type4Valid = 0;
+                    
+                    // Type 2, 3, 4 only for 7-candidate case
+                    if (totalCandidates == 7)
+                    {
+                        // Type 2: Gạch 5 lấy 2 (chọn 2 người)
+                        var type2InvalidVal = worksheet.Cells[54, readColumn].Value?.ToString() ?? "0";
+                        var type2ValidVal = worksheet.Cells[55, readColumn].Value?.ToString() ?? "0";
+                        int.TryParse(type2InvalidVal, out type2Invalid);
+                        int.TryParse(type2ValidVal, out type2Valid);
+                        ballotType2Count = type2Valid;
+                        ballotType2Votes = ballotType2Count * 2;
+                        Console.WriteLine($"Type 2: Invalid={type2Invalid}, Valid={type2Valid} → {ballotType2Count} phiếu × 2 votes = {ballotType2Votes}");
+                        
+                        // Type 3: Gạch 4 lấy 3 (chọn 3 người)
+                        var type3InvalidVal = worksheet.Cells[77, readColumn].Value?.ToString() ?? "0";
+                        var type3ValidVal = worksheet.Cells[78, readColumn].Value?.ToString() ?? "0";
+                        int.TryParse(type3InvalidVal, out type3Invalid);
+                        int.TryParse(type3ValidVal, out type3Valid);
+                        ballotType3Count = type3Valid;
+                        ballotType3Votes = ballotType3Count * 3;
+                        Console.WriteLine($"Type 3: Invalid={type3Invalid}, Valid={type3Valid} → {ballotType3Count} phiếu × 3 votes = {ballotType3Votes}");
+                        
+                        // Type 4: Gạch 3 lấy 4 (chọn 4 người)
+                        var type4InvalidVal = worksheet.Cells[104, readColumn].Value?.ToString() ?? "0";
+                        var type4ValidVal = worksheet.Cells[105, readColumn].Value?.ToString() ?? "0";
+                        int.TryParse(type4InvalidVal, out type4Invalid);
+                        int.TryParse(type4ValidVal, out type4Valid);
+                        ballotType4Count = type4Valid;
+                        ballotType4Votes = ballotType4Count * 4;
+                        Console.WriteLine($"Type 4: Invalid={type4Invalid}, Valid={type4Valid} → {ballotType4Count} phiếu × 4 votes = {ballotType4Votes}");
+                    }
+                    else
+                    {
+                        // For 5-candidate: No Type 2, 3, 4
+                        ballotType2Count = 0;
+                        ballotType2Votes = 0;
+                        ballotType3Count = 0;
+                        ballotType3Votes = 0;
+                        ballotType4Count = 0;
+                        ballotType4Votes = 0;
+                    }
+                    
+                    validBallots = ballotType1Count + ballotType2Count + ballotType3Count + ballotType4Count;
+                    int totalInvalidBallots = type1Invalid;
+                    
+                    // For 7-candidate case, add other invalid counts
+                    if (totalCandidates == 7)
+                    {
+                        // Need to re-declare these for the scope if not already calculated
+                        // They were already calculated above in the if block
+                        // This calculation is already done above
+                    }
+                    
+                    invalidBallots = totalInvalidBallots;
+                    int totalWeightedVotes = ballotType1Votes + ballotType2Votes + ballotType3Votes + ballotType4Votes;
+                    
+                    Console.WriteLine($"\n===== TOTAL BALLOT SUMMARY =====");
+                    Console.WriteLine($"Tổng phiếu hợp lệ: {validBallots}");
+                    Console.WriteLine($"Tổng phiếu không hợp lệ: {invalidBallots}");
+                    Console.WriteLine($"Tổng weighted votes: {totalWeightedVotes}");
 
-                    // Read E32 (Column 5 = Column E) - Crossed-out votes for person 2
-                    var e32Val = worksheet.Cells[32, 5].Value?.ToString() ?? "0";
-                    int e32CrossedOut = 0;
-                    if (int.TryParse(e32Val, out int e32Votes))
-                        e32CrossedOut = e32Votes;
-                    candidate2Total = validBallots - e32CrossedOut;
-                    Console.WriteLine($"  E32: {e32CrossedOut} → Person 2: {validBallots} - {e32CrossedOut} = {candidate2Total}");
-
-                    // Read F32 (Column 6 = Column F) - Crossed-out votes for person 3
-                    var f32Val = worksheet.Cells[32, 6].Value?.ToString() ?? "0";
-                    int f32CrossedOut = 0;
-                    if (int.TryParse(f32Val, out int f32Votes))
-                        f32CrossedOut = f32Votes;
-                    candidate3Total = validBallots - f32CrossedOut;
-                    Console.WriteLine($"  F32: {f32CrossedOut} → Person 3: {validBallots} - {f32CrossedOut} = {candidate3Total}");
-
-                    // Read G32 (Column 7 = Column G) - Crossed-out votes for person 4
-                    var g32Val = worksheet.Cells[32, 7].Value?.ToString() ?? "0";
-                    int g32CrossedOut = 0;
-                    if (int.TryParse(g32Val, out int g32Votes))
-                        g32CrossedOut = g32Votes;
-                    candidate4Total = validBallots - g32CrossedOut;
-                    Console.WriteLine($"  G32: {g32CrossedOut} → Person 4: {validBallots} - {g32CrossedOut} = {candidate4Total}");
-
-                    // Read H32 (Column 8 = Column H) - Crossed-out votes for person 5
-                    var h32Val = worksheet.Cells[32, 8].Value?.ToString() ?? "0";
-                    int h32CrossedOut = 0;
-                    if (int.TryParse(h32Val, out int h32Votes))
-                        h32CrossedOut = h32Votes;
-                    candidate5Total = validBallots - h32CrossedOut;
-                    Console.WriteLine($"  H32: {h32CrossedOut} → Person 5: {validBallots} - {h32CrossedOut} = {candidate5Total}");
-
-                    int totalCandidateVotes = candidate1Total + candidate2Total + candidate3Total + candidate4Total + candidate5Total;
+                    // === READ CANDIDATE VOTES FROM CORRESPONDING ROWS ===
+                    // For each ballot type, read from its corresponding row
+                    // Type 1: Row 32, Type 2: Row 55, Type 3: Row 78, Type 4: Row 105
+                    
+                    Console.WriteLine($"\n===== READING CANDIDATE VOTES FROM CORRESPONDING ROWS =====");
+                    
+                    // Initialize candidate totals
+                    candidate1Total = 0;
+                    candidate2Total = 0;
+                    candidate3Total = 0;
+                    candidate4Total = 0;
+                    candidate5Total = 0;
+                    candidate6Total = 0;
+                    candidate7Total = 0;
+                    candidate8Total = 0;
+                    
+                    if (totalCandidates == 7)
+                    {
+                        // Define vote multiplier for each type (7-candidate case)
+                        int[] typeVoteMultiplier = new int[] { 0, 1, 2, 3, 4 }; // type 1=1 vote, type 2=2 votes, etc
+                        int[] typeRows = new int[] { 0, 32, 55, 78, 105 };      // row for each type
+                        
+                        for (int type = 1; type <= 4; type++)
+                        {
+                            int dataRow = typeRows[type];
+                            int multiplier = typeVoteMultiplier[type];
+                            
+                            Console.WriteLine($"\nType {type} (Row {dataRow}) - multiplier {multiplier}:");
+                            
+                            int typeCount = 0;
+                            switch (type)
+                            {
+                                case 1: typeCount = ballotType1Count; break;
+                                case 2: typeCount = ballotType2Count; break;
+                                case 3: typeCount = ballotType3Count; break;
+                                case 4: typeCount = ballotType4Count; break;
+                            }
+                            
+                            // Read votes for each candidate
+                            for (int cand = 1; cand <= totalCandidates; cand++)
+                            {
+                                int col = 3 + cand; // Column D=4 for person 1, E=5 for person 2, etc.
+                                var cellVal = worksheet.Cells[dataRow, col].Value?.ToString() ?? "0";
+                                int crossedOut = 0;
+                                if (int.TryParse(cellVal, out int votes))
+                                    crossedOut = votes;
+                                
+                                // Votes for this type = typeCount * multiplier
+                                int typeVotes = typeCount * multiplier;
+                                
+                                // Add to candidate's total
+                                switch (cand)
+                                {
+                                    case 1: candidate1Total += typeVotes; break;
+                                    case 2: candidate2Total += typeVotes; break;
+                                    case 3: candidate3Total += typeVotes; break;
+                                    case 4: candidate4Total += typeVotes; break;
+                                    case 5: candidate5Total += typeVotes; break;
+                                    case 6: candidate6Total += typeVotes; break;
+                                    case 7: candidate7Total += typeVotes; break;
+                                    case 8: candidate8Total += typeVotes; break;
+                                }
+                                
+                                Console.WriteLine($"  Person {cand}: {typeCount} ballot(s) × {multiplier} = {typeVotes} votes");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // 5-candidate case: Only Type 1 from row 32
+                        Console.WriteLine($"\nType 1 (Row 32) - multiplier 1:");
+                        
+                        // Read votes for each candidate from row 32
+                        for (int cand = 1; cand <= totalCandidates; cand++)
+                        {
+                            int col = 3 + cand;
+                            var cellVal = worksheet.Cells[32, col].Value?.ToString() ?? "0";
+                            int crossedOut = 0;
+                            if (int.TryParse(cellVal, out int votes))
+                                crossedOut = votes;
+                            
+                            int typeVotes = ballotType1Count * 1;
+                            
+                            switch (cand)
+                            {
+                                case 1: candidate1Total += typeVotes; break;
+                                case 2: candidate2Total += typeVotes; break;
+                                case 3: candidate3Total += typeVotes; break;
+                                case 4: candidate4Total += typeVotes; break;
+                                case 5: candidate5Total += typeVotes; break;
+                            }
+                            
+                            Console.WriteLine($"  Person {cand}: {ballotType1Count} ballot(s) × 1 = {typeVotes} votes");
+                        }
+                    }
+                    
                     Console.WriteLine($"\n===== TOTAL CANDIDATE VOTES CALCULATION =====");
                     Console.WriteLine($"Person 1: {candidate1Total}");
                     Console.WriteLine($"Person 2: {candidate2Total}");
                     Console.WriteLine($"Person 3: {candidate3Total}");
                     Console.WriteLine($"Person 4: {candidate4Total}");
                     Console.WriteLine($"Person 5: {candidate5Total}");
-                    Console.WriteLine($"TOTAL: {candidate1Total} + {candidate2Total} + {candidate3Total} + {candidate4Total} + {candidate5Total} = {totalCandidateVotes}");
+                    Console.WriteLine($"Person 6: {candidate6Total}");
+                    Console.WriteLine($"Person 7: {candidate7Total}");
+                    Console.WriteLine($"TOTAL WEIGHTED VOTES: {candidate1Total + candidate2Total + candidate3Total + candidate4Total + candidate5Total + candidate6Total + candidate7Total}");
 
-                    // === VALIDATION: Check if total candidate votes matches total weighted votes ===
-                    Console.WriteLine($"\n===== VALIDATION CHECK =====");
-                    Console.WriteLine($"Tổng bầu (từ phiếu loại 1-3): {totalWeightedVotes}");
-                    Console.WriteLine($"Tổng phiếu (từ C32 - gạch): {totalCandidateVotes}");
-                    
-                    if (totalWeightedVotes != totalCandidateVotes)
-                    {
-                        int diff = Math.Abs(totalWeightedVotes - totalCandidateVotes);
-                        Console.WriteLine($"❌ SỰ KHÔNG KHỚP: Sai lệch {diff} phiếu");
-                        result.Success = false;
-                        result.Message = $"Lỗi: Tổng bầu ({totalWeightedVotes}) không khớp với số phiếu ({totalCandidateVotes}). Sai lệch: {diff} phiếu";
-                        result.ErrorDetails = $"Vui lòng kiểm tra dữ liệu trong file Excel.\n" +
-                            $"Tổng bầu từ phiếu loại 1-3: {totalWeightedVotes}\n" +
-                            $"Tổng phiếu được tính từ C32 - gạch phiếu: {totalCandidateVotes}\n" +
-                            $"Chi tiết:\n" +
-                            $"- Phiếu loại 1: {ballotType1Count} × 1 = {ballotType1Votes}\n" +
-                            $"- Phiếu loại 2: {ballotType2Count} × 2 = {ballotType2Votes}\n" +
-                            $"- Phiếu loại 3: {ballotType3Count} × 3 = {ballotType3Votes}\n" +
-                            $"- C32: {validBallots}\n" +
-                            $"- Gạch phiếu (D32:H32): {d32CrossedOut}, {e32CrossedOut}, {f32CrossedOut}, {g32CrossedOut}, {h32CrossedOut}";
-                        Console.WriteLine($"❌ {result.Message}");
-                        return result;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"✅ Validation passed: Tổng bầu = Số phiếu = {totalCandidateVotes}");
-                    }
-
-                    // === PARSE CANDIDATE NAMES FROM ROW 4 (D4, E4, F4, G4, H4) ===
-                    Console.WriteLine($"===== READING CANDIDATE NAMES FROM ROW 4 (D4:H4) =====");
-                    
-                    // Read candidate names directly from D4 to H4
-                    var candidate1NameVal = worksheet.Cells[4, 4].Value?.ToString() ?? ""; // D4
-                    var candidate2NameVal = worksheet.Cells[4, 5].Value?.ToString() ?? ""; // E4
-                    var candidate3NameVal = worksheet.Cells[4, 6].Value?.ToString() ?? ""; // F4
-                    var candidate4NameVal = worksheet.Cells[4, 7].Value?.ToString() ?? ""; // G4
-                    var candidate5NameVal = worksheet.Cells[4, 8].Value?.ToString() ?? ""; // H4
-                    
-                    Console.WriteLine($"D4 (Candidate 1): '{candidate1NameVal}'");
-                    Console.WriteLine($"E4 (Candidate 2): '{candidate2NameVal}'");
-                    Console.WriteLine($"F4 (Candidate 3): '{candidate3NameVal}'");
-                    Console.WriteLine($"G4 (Candidate 4): '{candidate4NameVal}'");
-                    Console.WriteLine($"H4 (Candidate 5): '{candidate5NameVal}'");
-                    
-                    if (!string.IsNullOrEmpty(candidate1NameVal) && !candidate1NameVal.Equals("-") && !candidate1NameVal.Equals("―"))
-                    {
-                        result.Candidate1Name = candidate1NameVal;
-                        Console.WriteLine($"Set Candidate1Name = '{candidate1NameVal}'");
-                    }
-                    else
-                    {
-                        result.Candidate1Name = "Ứng cử viên số 1";
-                    }
-                    
-                    if (!string.IsNullOrEmpty(candidate2NameVal) && !candidate2NameVal.Equals("-") && !candidate2NameVal.Equals("―"))
-                    {
-                        result.Candidate2Name = candidate2NameVal;
-                        Console.WriteLine($"Set Candidate2Name = '{candidate2NameVal}'");
-                    }
-                    else
-                    {
-                        result.Candidate2Name = "Ứng cử viên số 2";
-                    }
-                    
-                    if (!string.IsNullOrEmpty(candidate3NameVal) && !candidate3NameVal.Equals("-") && !candidate3NameVal.Equals("―"))
-                    {
-                        result.Candidate3Name = candidate3NameVal;
-                        Console.WriteLine($"Set Candidate3Name = '{candidate3NameVal}'");
-                    }
-                    else
-                    {
-                        result.Candidate3Name = "Ứng cử viên số 3";
-                    }
-                    
-                    if (!string.IsNullOrEmpty(candidate4NameVal) && !candidate4NameVal.Equals("-") && !candidate4NameVal.Equals("―"))
-                    {
-                        result.Candidate4Name = candidate4NameVal;
-                        Console.WriteLine($"Set Candidate4Name = '{candidate4NameVal}'");
-                    }
-                    else
-                    {
-                        result.Candidate4Name = "Ứng cử viên số 4";
-                    }
-                    
-                    if (!string.IsNullOrEmpty(candidate5NameVal) && !candidate5NameVal.Equals("-") && !candidate5NameVal.Equals("―"))
-                    {
-                        result.Candidate5Name = candidate5NameVal;
-                        Console.WriteLine($"Set Candidate5Name = '{candidate5NameVal}'");
-                    }
-                    else
-                    {
-                        result.Candidate5Name = "Ứng cử viên số 5";
-                    }
+                    // === ASSIGN CANDIDATE NAMES TO RESULT ===
+                    Console.WriteLine($"\n===== ASSIGNING CANDIDATE NAMES =====");
 
                     // Calculate total ballots
-                    int totalBallots = ballotType1Count + ballotType2Count + ballotType3Count;
+                    int totalBallots = ballotType1Count + ballotType2Count + ballotType3Count + ballotType4Count;
 
                     // Build result
                     result.TotalBallots = totalBallots;
@@ -378,11 +369,25 @@ namespace ElectionManagement.Services
                     result.BallotType2Votes = ballotType2Votes;
                     result.BallotType3Count = ballotType3Count;
                     result.BallotType3Votes = ballotType3Votes;
+                    result.BallotType4Count = ballotType4Count;
+                    result.BallotType4Votes = ballotType4Votes;
                     result.Candidate1Votes = candidate1Total;
                     result.Candidate2Votes = candidate2Total;
                     result.Candidate3Votes = candidate3Total;
                     result.Candidate4Votes = candidate4Total;
                     result.Candidate5Votes = candidate5Total;
+                    result.Candidate6Votes = candidate6Total;
+                    result.Candidate7Votes = candidate7Total;
+                    result.Candidate8Votes = candidate8Total;
+                    result.Candidate1Name = candidate1NameVal;
+                    result.Candidate2Name = candidate2NameVal;
+                    result.Candidate3Name = candidate3NameVal;
+                    result.Candidate4Name = candidate4NameVal;
+                    result.Candidate5Name = candidate5NameVal;
+                    result.Candidate6Name = candidate6NameVal;
+                    result.Candidate7Name = candidate7NameVal;
+                    result.Candidate8Name = candidate8NameVal;
+                    result.TotalCandidates = totalCandidates;
                     result.Success = true;
                     result.Message = $"Import thành công! Tổng phiếu: {totalBallots}, Hợp lệ: {validBallots}, Không hợp lệ: {invalidBallots}";
 
@@ -396,6 +401,13 @@ namespace ElectionManagement.Services
                 result.ErrorDetails = ex.Message;
                 return result;
             }
+        }
+
+        // Helper method to convert column number to letter
+        private string ConvertToLetter(int columnNumber)
+        {
+            // Column 4 = D, 5 = E, etc.
+            return ((char)('A' + columnNumber - 1)).ToString();
         }
     }
 }

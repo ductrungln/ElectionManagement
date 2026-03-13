@@ -505,18 +505,8 @@
                             <div style="margin-bottom: 20px;">
                                 <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Đơn vị bầu cử</label>
                                 <div style="position: relative;">
-                                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
-                                        <!-- options will be populated dynamically or left empty -->
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Khu vực -->
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Khu vực</label>
-                                <div style="position: relative;">
-                                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
-                                        <!-- khu vực list (empty by default) -->
+                                    <select id="unitSelect" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
+                                        <option value="">-- Chọn đơn vị --</option>
                                     </select>
                                 </div>
                             </div>
@@ -527,7 +517,8 @@
                                 <div style="position: relative;">
                                     <select style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
                                         <option>Bầu cử lần 1</option>
-                                        <option>Bầu cử lần 2</option>
+                                        <option>Bầu cử thêm</option>
+                                        <option>Bầu cử lại</option>
                                     </select>
                                 </div>
                             </div>
@@ -537,6 +528,11 @@
                                 <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Tên biên bản</label>
                                 <input type="text" value="" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
+                            
+                            <!-- Export Button -->
+                            <div style="margin-bottom: 20px;">
+                                <button onclick="exportGroupDataToExcel()" class="btn btn-success" style="width: 100%; padding: 10px 12px; border: none; border-radius: 6px; font-size: 14px; background: #10b981; color: white; cursor: pointer; font-weight: 600;">💾 Xuất File Excel</button>
+                            </div>
                         </div>
 
                         <!-- Right Column: Statistics in 2 columns -->
@@ -544,62 +540,112 @@
                             <!-- Row 1 -->
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tổng số ứng cử</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataTotalCandidates" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tổng số được bầu</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataTotalVotes" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
 
                             <!-- Row 2 -->
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tổng số cử tri</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataTotalVoters" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS khu vực bổ phiếu</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataRecountAreas" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
 
                             <!-- Row 3 -->
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS cử tri tham gia bổ phiếu</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataRecountVoters" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tỷ lệ tham gia bổ phiếu</label>
-                                <input type="text" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="text" id="groupDataRecountRate" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
 
                             <!-- Row 4 -->
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS phiếu phát ra</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataIssuedBallots" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS phiếu thu vào</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataReceivedBallots" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
 
                             <!-- Row 5 -->
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS không hợp lệ</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataInvalidBallots" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tỷ lệ không hợp lệ</label>
-                                <input type="text" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="text" id="groupDataInvalidRate" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
 
                             <!-- Row 6 -->
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS phiếu hợp lệ</label>
-                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="number" id="groupDataValidBallots" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
                             <div>
                                 <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tỷ lệ phiếu hợp lệ</label>
-                                <input type="text" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                                <input type="text" id="groupDataValidRate" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Chi tiết theo khu vực -->
+                    <div style="margin-top: 40px;">
+                        <h3 id="areaDetailsTitle" style="margin-bottom: 20px; color: #1f2937;">📊 Chi Tiết Theo Khu Vực</h3>
+                        <div class="table-container" style="overflow-x: auto;">
+                            <table id="areaDetailsTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                <thead>
+                                    <tr style="background-color: #f3f4f6; border-bottom: 2px solid #d1d5db;">
+                                        <th style="padding: 12px; text-align: left; border: 1px solid #d1d5db;">Tổ</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Phiếu Phát</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Phiếu Thu</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Phiếu HĐ</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Phiếu KHĐ</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Được Bầu</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS KV Bỏ Phiếu</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Tỷ Lệ Thu %</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Tỷ Lệ KHĐ %</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Tỷ Lệ HĐ %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="areaDetailsTableBody">
+                                    <!-- Rows will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Kết quả bầu cử theo ứng viên -->
+                    <div style="margin-top: 40px;">
+                        <h3 id="candidateResultsTitle" style="margin-bottom: 20px; color: #1f2937;">📋 Kết Quả Bầu Cử Theo Ứng Viên</h3>
+                        <div class="table-container" style="overflow-x: auto;">
+                            <table id="candidateResultsTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                <thead>
+                                    <tr style="background-color: #f3f4f6; border-bottom: 2px solid #d1d5db;">
+                                        <th style="padding: 12px; text-align: left; border: 1px solid #d1d5db;">Họ và tên</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Số phiếu lần 1</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Tỷ lệ %</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">bầu cử lần 1</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Số phiếu bầu cử thêm, bầu cử lại</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Tỷ lệ % bầu cử lại</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">bầu cử thêm, bầu cử lại</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Kết quả trúng cử</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="candidateResultsTableBody">
+                                    <!-- Rows will be populated by JavaScript -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -728,36 +774,6 @@
                 </div>
             </div>
 
-            <!-- Import Excel Form -->
-            <div id="ballotImportFormContainer" style="display: none; margin-bottom: 20px;">
-                <div class="card">
-                    <h3 style="margin-bottom: 20px;">📤 Import Dữ Liệu Kiểm Phiếu từ Excel</h3>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <p style="color: #666; margin-bottom: 10px;"><strong>Cấu trúc file Excel yêu cầu:</strong></p>
-                        <ul style="margin-left: 20px; color: #666;">
-                            <li>Dòng 1: Header (STT, Ứng cử viên 1-5)</li>
-                            <li>Dòng 2+: Dữ liệu phiếu bầu</li>
-                            <li>Giá trị: 1 hoặc số > 0 = được bầu, rỗng = không bầu</li>
-                            <li>Mỗi phiếu tối đa 3 người được chọn (hợp lệ)</li>
-                        </ul>
-                    </div>
-
-                    <div id="ballotUploadArea" class="upload-area" style="margin-bottom: 20px; border: 2px dashed #2563EB;" ondrop="handleBallotFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="document.getElementById('ballotFileInput').click()">
-                        <p style="margin: 0; color: #2563EB; font-weight: 600;">📁 Kéo thả file Excel vào đây hoặc click để chọn</p>
-                        <small style="color: #999;">File: .xlsx, .xls</small>
-                        <input type="file" id="ballotFileInput" style="display: none;" accept=".xlsx,.xls" onchange="handleBallotFileSelect(event)">
-                    </div>
-
-                    <div id="ballotFileList" style="margin-bottom: 20px;"></div>
-
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-success" onclick="importBallotFile()" style="flex: 1;">✅ Import</button>
-                        <button class="btn btn-secondary" onclick="hideBallotImportForm()">❌ Hủy</button>
-                    </div>
-                </div>
-            </div>
-
             <div id="verificationFormContainer" style="display: none; margin-bottom: 20px;">
                 <div class="card">
                     <h3 style="margin-bottom: 20px; text-align: center; color: #2B4F8C;">📋 KIỂM TRA KẾT QUẢ PHIẾU BẦU 5 BẦU 3</h3>
@@ -789,6 +805,18 @@
                         </div>
                         <div style="background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 8px; text-align: center;">
                             <strong>Khu vực được chọn: <span id="selectedVerifArea" style="color: var(--success);">Chưa chọn</span></strong>
+                        </div>
+                    </div>
+
+                    <!-- Import Excel Form -->
+                    <div id="ballotImportFormContainer" style="display: none; margin-bottom: 20px;">
+                        <div style="padding: 20px; background: #f0f7ff; border-radius: 8px;">
+                            <input type="file" id="ballotFileInput" style="width: 100%; padding: 10px; border: 2px solid #2563EB; border-radius: 6px; cursor: pointer;" accept=".xlsx,.xls" onchange="handleBallotFileSelect(event)">
+                        </div>
+                        <div id="ballotFileList" style="margin: 15px 0;"></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-success" onclick="importBallotFile()" style="flex: 1;">✅ Import</button>
+                            <button class="btn btn-secondary" onclick="hideBallotImportForm()">❌ Hủy</button>
                         </div>
                     </div>
 
@@ -851,42 +879,25 @@
                             <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt3_votes" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
                         </tr>
                         <tr style="background-color: #D3D3D3;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Phiếu bầu 4</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt4_count" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt4_votes" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #D3D3D3;">
                             <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Tổng</td>
                             <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5; font-weight: 600;" id="verif_ballot_total">1000</td>
                             <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5; font-weight: 600;" id="verif_ballot_sum">2750</td>
                         </tr>
 
-                        <!-- Section 4: KẾT QUẢ KIỂM PHIẾU (LIGHT GRAY) -->
+                        <!-- Section 4: KẾT QUẢ KIỂM PHIẾU (LIGHT GRAY) - DYNAMIC -->
                         <tr style="background-color: #E8E8E8;">
                             <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng Cử Viên</td>
                             <td style="border: 1px solid #333; padding: 12px; font-weight: 600; text-align: center;">Tên</td>
                             <td style="border: 1px solid #333; padding: 12px; font-weight: 600; text-align: center;">Số Phiếu</td>
                         </tr>
-                        <tr style="background-color: #E8E8E8;">
-                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 1</td>
-                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name1" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand1" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                        </tr>
-                        <tr style="background-color: #E8E8E8;">
-                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 2</td>
-                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name2" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand2" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                        </tr>
-                        <tr style="background-color: #E8E8E8;">
-                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 3</td>
-                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name3" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand3" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                        </tr>
-                        <tr style="background-color: #E8E8E8;">
-                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 4</td>
-                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name4" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand4" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                        </tr>
-                        <tr style="background-color: #E8E8E8;">
-                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 5</td>
-                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name5" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand5" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
-                        </tr>
+                        <tbody id="verifCandidateRows">
+                            <!-- Candidate rows will be dynamically generated here -->
+                        </tbody>
                         <tr style="background-color: #E8E8E8;">
                             <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Tổng</td>
                             <td style="border: 1px solid #333; padding: 8px; font-weight: 600;"></td>
@@ -929,9 +940,10 @@
         <div id="logs" class="content">
             <div class="card" style="margin-bottom: 20px;">
                 <h2 style="margin-bottom: 15px;">📝 Lịch Sử Nhập Dữ Liệu</h2>
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn btn-success" onclick="loadLogs()">🔄 Tải Lại</button>
-                    <button class="btn btn-danger" onclick="clearLogsData()">🗑️ Xóa Tất Cả</button>
+                    <button class="btn btn-danger" onclick="clearLogsData()">🗑️ Xóa Lịch Sử</button>
+                    <button class="btn" style="background: #dc2626; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#b91c1c'" onmouseout="this.style.background='#dc2626'" onclick="deleteAllData()">⚠️ Xóa Tất Cả Dữ Liệu</button>
                 </div>
             </div>
             <div class="table-container">
@@ -964,12 +976,38 @@
 
         // Level selection logic
         let selectedLevel = 'xa';
+        
+        // Initialize selectedUnitByLevel from sessionStorage on page load
+        if (!window.selectedUnitByLevel) {
+            const saved = sessionStorage.getItem('selectedUnitByLevel');
+            window.selectedUnitByLevel = saved ? JSON.parse(saved) : {};
+        }
+        
         document.querySelectorAll('.level-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                const previousLevel = selectedLevel; // Save old level
                 selectedLevel = btn.getAttribute('data-level');
                 console.log('Selected level:', selectedLevel);
+                
+                // Save last selected unit for this previous level (before clearing)
+                if (window.currentSelectedUnit) {
+                    if (!window.selectedUnitByLevel) window.selectedUnitByLevel = {};
+                    window.selectedUnitByLevel[previousLevel] = window.currentSelectedUnit;
+                    // PERSIST to sessionStorage so it survives page reload
+                    sessionStorage.setItem('selectedUnitByLevel', JSON.stringify(window.selectedUnitByLevel));
+                    console.log(`Saved unit ${window.currentSelectedUnit} for level "${previousLevel}"`);
+                    console.log('selectedUnitByLevel:', window.selectedUnitByLevel);
+                }
+                
+                // Clear groups tab display when level changes
+                console.log('Level changed - clearing groups tab display...');
+                clearGroupsDisplay();
+                
+                // Clear current unit selection when level changes
+                window.currentSelectedUnit = null;
+                console.log('Cleared unit selection for new level');
                 
                 // RESET old data when level changes
                 allResultsData = [];
@@ -978,6 +1016,13 @@
                 currentSelectedArea = null;
                 
                 // RESET UI
+                // Reset dropdown "Đơn vị bầu cử" back to default
+                const unitDropdown = document.getElementById('selectedUnit');
+                if (unitDropdown) {
+                    unitDropdown.value = '';
+                    console.log('Reset unit dropdown to default');
+                }
+                
                 const groupNameEl = document.getElementById('selectedGroupName');
                 if (groupNameEl) groupNameEl.textContent = 'Chưa chọn';
                 const areaButtonsContainer = document.getElementById('areaButtonsContainer');
@@ -996,34 +1041,87 @@
                 const label = { xa: 'Xã', tinh: 'Tỉnh', quochoi: 'Quốc hội' }[selectedLevel] || selectedLevel;
                 document.getElementById('currentLevel').textContent = 'Cấp: ' + label;
                 
-                // reload current tab data when level changes
-                const activeTab = document.querySelector('.nav-btn.active')?.getAttribute('data-tab');
-                if (activeTab === 'dashboard') loadDashboard();
-                else if (activeTab === 'results') loadResults();
-                else if (activeTab === 'groups') loadResults();
-                else if (activeTab === 'progress') loadProgress();
-                else if (activeTab === 'verification') loadVerificationData();
-                else if (activeTab === 'logs') loadLogs();
+                // Reload data for current active tab without page reload
+                setTimeout(() => {
+                    if (window.currentActiveTab === 'dashboard') {
+                        loadDashboard();
+                    } else if (window.currentActiveTab === 'progress') {
+                        loadProgress();
+                    } else if (window.currentActiveTab === 'verification') {
+                        loadVerificationData();
+                    } else if (window.currentActiveTab === 'logs') {
+                        loadLogs();
+                    } else if (window.currentActiveTab === 'groups') {
+                        clearAreaDetailsTable();
+                    }
+                }, 100);
             });
         });
 
         // Tab Navigation
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-                
-                btn.classList.add('active');
-                const tabName = btn.getAttribute('data-tab');
-                document.getElementById(tabName).classList.add('active');
-                
-                if (tabName === 'dashboard') loadDashboard();
-                else if (tabName === 'results') loadResults();
-                else if (tabName === 'groups') loadResults();
-                else if (tabName === 'progress') loadProgress();
-                else if (tabName === 'verification') loadVerificationData();
-                else if (tabName === 'logs') loadLogs();
-            });
+        // Track current active tab globally
+        window.currentActiveTab = 'dashboard';
+        
+        // Use event delegation for tab buttons - works even if DOM changes
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.nav-btn');
+            if (!btn) return;
+            
+            const previousTab = window.currentActiveTab;
+            const tabName = btn.getAttribute('data-tab');
+            
+            console.log(`Switching from "${previousTab}" to "${tabName}"`);
+            
+            // Remove active from all buttons and contents
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            
+            // Add active to clicked button
+            btn.classList.add('active');
+            const tabElement = document.getElementById(tabName);
+            if (tabElement) {
+                tabElement.classList.add('active');
+            }
+            
+            // Update current tab
+            window.currentActiveTab = tabName;
+            
+            // Load appropriate content (data persists across tabs)
+            if (tabName === 'dashboard') {
+                console.log('Loading dashboard...');
+                loadDashboard();
+            }
+            else if (tabName === 'results') {
+                console.log('Loading results...');
+                loadResults();
+            }
+            else if (tabName === 'groups') {
+                console.log('Loading groups tab...');
+                // Check if we have a unit saved for current level
+                const savedUnit = window.selectedUnitByLevel?.[selectedLevel];
+                if (savedUnit && !window.currentSelectedUnit) {
+                    console.log(`Auto-reloading data for unit ${savedUnit} at level "${selectedLevel}"...`);
+                    window.currentSelectedUnit = savedUnit;
+                    loadAggregatedUnitData(savedUnit);
+                } else if (!window.currentSelectedUnit) {
+                    console.log(`Loading groups list for level "${selectedLevel}"...`);
+                    loadResults(); // Load groups/areas list for current level
+                } else {
+                    console.log(`Data already loaded for unit ${window.currentSelectedUnit}`);
+                }
+            }
+            else if (tabName === 'progress') {
+                console.log('Loading progress...');
+                loadProgress();
+            }
+            else if (tabName === 'verification') {
+                console.log('Loading verification...');
+                loadVerificationData();
+            }
+            else if (tabName === 'logs') {
+                console.log('Loading logs...');
+                loadLogs();
+            }
         });
 
         // File Upload
@@ -1448,11 +1546,27 @@
         }
 
         function displayVerifAreaButtons(groupNum) {
-            const areas = groupAreaMapping[groupNum] || [];
+            // Always use hardcoded mapping for display
+            // Dynamic loading is not reliable yet
             const container = document.getElementById('verifAreaContainer');
             const buttonsDiv = document.getElementById('verifAreaButtons');
             
+            console.log(`[DEBUG] displayVerifAreaButtons(${groupNum}): using hardcoded mapping`);
+            
+            // Always use groupAreaMapping (hardcoded areas by group)
+            const areas = groupAreaMapping[groupNum] || [];
+            
+            console.log(`[DEBUG] displayVerifAreaButtons(${groupNum}): areas =`, areas);
+            
             buttonsDiv.innerHTML = '';
+            if (!areas || areas.length === 0) {
+                console.log(`[DEBUG] No areas found for group ${groupNum}`);
+                buttonsDiv.innerHTML = '<p style="color: #999;">Chưa có khu vực nào</p>';
+                container.style.display = 'block';
+                return;
+            }
+            
+            console.log(`[DEBUG] Creating ${areas.length} area buttons...`);
             areas.forEach(areaNum => {
                 const btn = document.createElement('button');
                 btn.className = 'btn btn-primary';
@@ -1461,18 +1575,67 @@
                 btn.textContent = `Khu Vực ${areaNum}`;
                 btn.onclick = () => selectVerifArea(areaNum);
                 buttonsDiv.appendChild(btn);
+                console.log(`[DEBUG] Added button for area ${areaNum}`);
             });
             
             container.style.display = 'block';
+            console.log(`[DEBUG] displayVerifAreaButtons(${groupNum}): completed with ${areas.length} buttons`);
+        }
+
+        // Get area numbers for a specific group from actual verification data
+        async function getAreasForGroup(groupNum) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`);
+                const allData = await response.json();
+                console.log(`[DEBUG] getAreasForGroup(${groupNum}): fetched data count =`, allData.length);
+                
+                // Extract area numbers from district names like "Tổ 1 - Khu Vực 1"
+                const groupDistricts = allData.filter(d => {
+                    return d.districtName && d.districtName.includes(`Tổ ${groupNum}`);
+                });
+                
+                console.log(`[DEBUG] getAreasForGroup(${groupNum}): filtered districts =`, groupDistricts);
+                
+                // Extract unique area numbers
+                const areaSet = new Set();
+                groupDistricts.forEach(d => {
+                    const match = d.districtName.match(/Khu Vực (\d+)/);
+                    if (match) {
+                        areaSet.add(parseInt(match[1]));
+                    }
+                });
+                
+                // Sort areas numerically
+                const areas = Array.from(areaSet).sort((a, b) => a - b);
+                console.log(`[DEBUG] getAreasForGroup(${groupNum}): extracted areas =`, areas);
+                
+                // If no data found, use default areas from mapping
+                if (areas.length === 0) {
+                    const defaultAreas = groupAreaMapping[groupNum] || [];
+                    console.log(`[DEBUG] No saved data found for group ${groupNum}, using default areas:`, defaultAreas);
+                    return defaultAreas;
+                }
+                
+                console.log(`[DEBUG] Returning areas from saved data:`, areas);
+                return areas;
+            } catch (error) {
+                console.error('[DEBUG] Error getting areas:', error);
+                // Fallback to hardcoded mapping
+                const defaultAreas = groupAreaMapping[groupNum] || [];
+                console.log(`[DEBUG] Error occurred, fallback to default areas:`, defaultAreas);
+                return defaultAreas;
+            }
         }
 
         function selectVerifArea(areaNum) {
             selectedVerifAreaNum = areaNum;
-            document.getElementById('selectedVerifArea').textContent = `Khu Vực ${areaNum}`;
+            const levelMaxBallots = maxBallotsPerLevel[selectedLevel] || {};
+            const maxBallots = levelMaxBallots[areaNum] || '?';
+            document.getElementById('selectedVerifArea').textContent = `Khu Vực ${areaNum} (Tối đa: ${maxBallots} phiếu)`;
             
             // Update area button styles
             document.querySelectorAll('#verifAreaButtons button').forEach(btn => {
-                const btnNum = parseInt(btn.textContent.replace('Khu Vực ', ''));
+                const btnNum = parseInt(btn.textContent.replace('Khu Vực ', '').trim());
                 if (btnNum === areaNum) {
                     btn.style.background = '#10b981';
                     btn.style.color = 'white';
@@ -1484,22 +1647,68 @@
                 }
             });
             
+            console.log(`[AREA SELECTED] Level ${selectedLevel}, Area ${areaNum} with max ${maxBallots} ballots`);
+            
+            
             // Automatically show import form when area is selected
             showBallotImportForm();
         }
 
         function showVerificationForm() {
             document.getElementById('verificationFormContainer').style.display = 'block';
+            
+            // Generate candidate rows based on selected level
+            let totalCandidates = 5;
+            if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
+                totalCandidates = 7;
+            }
+            generateCandidateRows(totalCandidates);
+            
             // Thêm event listener cho tính toán tự động
             setTimeout(() => initVerificationFormListeners(), 100);
         }
 
+        // Generate dynamic candidate rows based on number of candidates
+        function generateCandidateRows(totalCandidates) {
+            const tbody = document.getElementById('verifCandidateRows');
+            tbody.innerHTML = '';
+            
+            for (let i = 1; i <= totalCandidates; i++) {
+                const row = document.createElement('tr');
+                row.style.backgroundColor = '#E8E8E8';
+                row.innerHTML = `
+                    <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số ${i}</td>
+                    <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name${i}" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                    <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand${i}" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            // Store the current candidate count
+            window.currentCandidateCount = totalCandidates;
+        }
+
+        // Debounce function to prevent excessive recalculation
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func(...args), delay);
+            };
+        }
+
+        const debouncedCalculate = debounce(calculateVerificationTotals, 50);
+
         function initVerificationFormListeners() {
+            // Remove old listeners mỗi khi reinitialize
+            // This prevents duplicate listeners when importing new files
+            window.verificationListenersInitialized = false;
+            
             // Kiểm tra phiếu phát ra vs phiếu thu vào
             ['verif_issued', 'verif_received'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.addEventListener('input', calculateVerificationTotals);
+                    el.addEventListener('input', debouncedCalculate);
                 }
             });
             
@@ -1507,94 +1716,198 @@
             ['verif_valid', 'verif_invalid'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.addEventListener('input', calculateVerificationTotals);
+                    el.addEventListener('input', debouncedCalculate);
                 }
             });
             
             // Tính tổng phiếu bầu
             ['verif_bt1_count', 'verif_bt2_count', 'verif_bt3_count',
-             'verif_bt1_votes', 'verif_bt2_votes', 'verif_bt3_votes'].forEach(id => {
+             'verif_bt1_votes', 'verif_bt2_votes', 'verif_bt3_votes',
+             'verif_bt4_count', 'verif_bt4_votes'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.addEventListener('input', calculateVerificationTotals);
+                    el.addEventListener('input', debouncedCalculate);
                 }
             });
             
-            // Tính tổng kết quả kiểm phiếu
-            ['verif_cand1', 'verif_cand2', 'verif_cand3', 'verif_cand4', 'verif_cand5'].forEach(id => {
-                const el = document.getElementById(id);
+            // Tính tổng kết quả kiểm phiếu - dynamically add listeners for all candidate fields
+            const candidateCount = window.currentCandidateCount || 5;
+            for (let i = 1; i <= candidateCount; i++) {
+                const candId = `verif_cand${i}`;
+                const el = document.getElementById(candId);
                 if (el) {
-                    el.addEventListener('input', calculateVerificationTotals);
+                    el.addEventListener('input', debouncedCalculate);
                 }
-            });
+            }
             
+            window.verificationListenersInitialized = true;
             calculateVerificationTotals();
         }
 
+        // Max ballot counts for each polling area by administrative level
+        // Each level can have different polling areas and max ballots
+        const maxBallotsPerLevel = {
+            // XÃ level (District) - 5 candidates
+            xa: {
+                1: 1433, 2: 2225, 3: 1982, 4: 1904, 5: 2065,
+                6: 1295, 7: 1290, 8: 1440, 9: 1332, 10: 921,
+                11: 828, 12: 1296, 13: 1385, 14: 789, 15: 2008,
+                16: 1385, 17: 1431, 18: 1172, 19: 1081, 20: 1646,
+                21: 1426, 22: 1267
+            },
+            // TỈNH level (Provincial) - 7 candidates
+            tinh: {
+                1: 1433, 2: 2225, 3: 1982, 4: 1904, 5: 2065,
+                6: 1295, 7: 1290, 8: 1440, 9: 1332, 10: 921,
+                11: 828, 12: 1296, 13: 1385, 14: 789, 15: 2008,
+                16: 1385, 17: 1431, 18: 1172, 19: 1081, 20: 1646,
+                21: 1426, 22: 1267
+            },
+            // QUỐC HỘI level (National Assembly) - 5 candidates, same as XÃ
+            quochoi: {
+                1: 1433, 2: 2225, 3: 1982, 4: 1904, 5: 2065,
+                6: 1295, 7: 1290, 8: 1440, 9: 1332, 10: 921,
+                11: 828, 12: 1296, 13: 1385, 14: 789, 15: 2008,
+                16: 1385, 17: 1431, 18: 1172, 19: 1081, 20: 1646,
+                21: 1426, 22: 1267
+            }
+        };
+
         function calculateVerificationTotals() {
-            const issued = parseInt(document.getElementById('verif_issued').value) || 0;
-            const received = parseInt(document.getElementById('verif_received').value) || 0;
+            // Add null checks for form elements
+            const issuedEl = document.getElementById('verif_issued');
+            const receivedEl = document.getElementById('verif_received');
+            const validEl = document.getElementById('verif_valid');
+            const invalidEl = document.getElementById('verif_invalid');
+            const total1El = document.getElementById('verif_total1');
+            
+            if (!issuedEl || !receivedEl || !validEl || !invalidEl || !total1El) {
+                return; // Form not fully loaded yet
+            }
+            
+            const issued = parseInt(issuedEl.value) || 0;
+            const received = parseInt(receivedEl.value) || 0;
+            
+            // === KIỂM TRA MAX BALLOT LIMITS ===
+            // Get area number from selectedVerifAreaNum and current level
+            if (selectedVerifAreaNum && issued > 0) {
+                const levelMaxBallots = maxBallotsPerLevel[selectedLevel] || {};
+                const maxBallots = levelMaxBallots[selectedVerifAreaNum];
+                if (maxBallots && issued > maxBallots) {
+                    alert(`❌ LỖI: Khu vực ${selectedVerifAreaNum} (cấp ${selectedLevel.toUpperCase()}) có tối đa ${maxBallots} phiếu!\n\nBạn nhập: ${issued} phiếu phát ra.\n\nVui lòng kiểm tra lại!`);
+                    issuedEl.value = '';
+                    issuedEl.focus();
+                    return;
+                }
+            }
+            
+            if (selectedVerifAreaNum && received > 0) {
+                const levelMaxBallots = maxBallotsPerLevel[selectedLevel] || {};
+                const maxBallots = levelMaxBallots[selectedVerifAreaNum];
+                if (maxBallots && received > maxBallots) {
+                    alert(`❌ LỖI: Khu vực ${selectedVerifAreaNum} (cấp ${selectedLevel.toUpperCase()}) có tối đa ${maxBallots} phiếu!\n\nBạn nhập: ${received} phiếu thu vào.\n\nVui lòng kiểm tra lại!`);
+                    receivedEl.value = '';
+                    receivedEl.focus();
+                    return;
+                }
+            }
+            
+            console.log(`[VALIDATION] Level ${selectedLevel}, Area ${selectedVerifAreaNum}: issued=${issued}, received=${received}`);
+            
             
             // Tính tổng phiếu hợp lệ + phiếu không hợp lệ
-            const valid = parseInt(document.getElementById('verif_valid').value) || 0;
-            const invalid = parseInt(document.getElementById('verif_invalid').value) || 0;
+            const valid = parseInt(validEl.value) || 0;
+            const invalid = parseInt(invalidEl.value) || 0;
             const totalValidInvalid = valid + invalid;
-            document.getElementById('verif_total1').textContent = totalValidInvalid;
+            total1El.textContent = totalValidInvalid;
             
             // === KIỂM TRA 1: Phiếu phát ra >= phiếu thu vào ===
             const checkIssuedEl = document.getElementById('check_issued');
-            if (issued > 0 && received > 0) {
-                if (issued >= received) {
-                    checkIssuedEl.textContent = 'Dữ liệu đã khớp';
-                    checkIssuedEl.style.color = 'green';
+            if (checkIssuedEl) {
+                if (issued > 0 && received > 0) {
+                    if (issued >= received) {
+                        checkIssuedEl.textContent = 'Dữ liệu đã khớp';
+                        checkIssuedEl.style.color = 'green';
+                    } else {
+                        checkIssuedEl.textContent = '⚠️ Lỗi';
+                        checkIssuedEl.style.color = 'red';
+                    }
                 } else {
-                    checkIssuedEl.textContent = '⚠️ Lỗi';
-                    checkIssuedEl.style.color = 'red';
+                    checkIssuedEl.textContent = '';
                 }
-            } else {
-                checkIssuedEl.textContent = '';
             }
             
             // === KIỂM TRA 2: Tổng (phiếu hợp lệ + không hợp lệ) = phiếu thu vào ===
             const checkValidEl = document.getElementById('check_valid');
-            if (received > 0) {
-                if (totalValidInvalid === received) {
-                    checkValidEl.textContent = 'Dữ liệu đã khớp';
-                    checkValidEl.style.color = 'green';
+            if (checkValidEl) {
+                if (received > 0) {
+                    if (totalValidInvalid === received) {
+                        checkValidEl.textContent = 'Dữ liệu đã khớp';
+                        checkValidEl.style.color = 'green';
+                    } else {
+                        checkValidEl.textContent = `⚠️ Lỗi (${totalValidInvalid} ≠ ${received})`;
+                        checkValidEl.style.color = 'red';
+                    }
                 } else {
-                    checkValidEl.textContent = `⚠️ Lỗi (${totalValidInvalid} ≠ ${received})`;
-                    checkValidEl.style.color = 'red';
+                    checkValidEl.textContent = '';
                 }
-            } else {
-                checkValidEl.textContent = '';
             }
             
             // Tính tổng số lượng phiếu bầu
-            const bt1Count = parseInt(document.getElementById('verif_bt1_count').value) || 0;
-            const bt2Count = parseInt(document.getElementById('verif_bt2_count').value) || 0;
-            const bt3Count = parseInt(document.getElementById('verif_bt3_count').value) || 0;
+            const bt1CountEl = document.getElementById('verif_bt1_count');
+            const bt2CountEl = document.getElementById('verif_bt2_count');
+            const bt3CountEl = document.getElementById('verif_bt3_count');
+            const bt4CountEl = document.getElementById('verif_bt4_count');
+            const bt1VotesEl = document.getElementById('verif_bt1_votes');
+            const bt2VotesEl = document.getElementById('verif_bt2_votes');
+            const bt3VotesEl = document.getElementById('verif_bt3_votes');
+            const bt4VotesEl = document.getElementById('verif_bt4_votes');
+            const ballotTotalEl = document.getElementById('verif_ballot_total');
+            const ballotSumEl = document.getElementById('verif_ballot_sum');
             
-            // Auto-calculate Tổng Bầu: bt1 × 1, bt2 × 2, bt3 × 3
+            if (!bt1CountEl || !bt2CountEl || !bt3CountEl || !bt1VotesEl || !bt2VotesEl || !bt3VotesEl || !ballotTotalEl || !ballotSumEl) {
+                return; // Form not fully loaded yet
+            }
+            
+            const bt1Count = parseInt(bt1CountEl.value) || 0;
+            const bt2Count = parseInt(bt2CountEl.value) || 0;
+            const bt3Count = parseInt(bt3CountEl.value) || 0;
+            const bt4Count = (bt4CountEl ? (parseInt(bt4CountEl.value) || 0) : 0);
+            
+            // Auto-calculate Tổng Bầu: bt1 × 1, bt2 × 2, bt3 × 3, bt4 × 4 (for 7 candidates)
             const bt1Votes = bt1Count * 1;
             const bt2Votes = bt2Count * 2;
             const bt3Votes = bt3Count * 3;
+            const bt4Votes = bt4Count * 4;
             
             // Set calculated values
-            document.getElementById('verif_bt1_votes').value = bt1Votes;
-            document.getElementById('verif_bt2_votes').value = bt2Votes;
-            document.getElementById('verif_bt3_votes').value = bt3Votes;
+            bt1VotesEl.value = bt1Votes;
+            bt2VotesEl.value = bt2Votes;
+            bt3VotesEl.value = bt3Votes;
+            if (bt4VotesEl) {
+                bt4VotesEl.value = bt4Votes;
+            }
             
-            // Update display totals
-            document.getElementById('verif_ballot_total').textContent = bt1Count + bt2Count + bt3Count;
-            document.getElementById('verif_ballot_sum').textContent = bt1Votes + bt2Votes + bt3Votes;
+            // Update display totals - include bt4 if it exists (7 candidates)
+            const totalBallots = (bt4CountEl) ? (bt1Count + bt2Count + bt3Count + bt4Count) : (bt1Count + bt2Count + bt3Count);
+            const totalVotes = (bt4VotesEl) ? (bt1Votes + bt2Votes + bt3Votes + bt4Votes) : (bt1Votes + bt2Votes + bt3Votes);
+            ballotTotalEl.textContent = totalBallots;
+            ballotSumEl.textContent = totalVotes;
             
-            // Tính tổng kết quả kiểm phiếu các ngành
-            const cand1 = parseInt(document.getElementById('verif_cand1').value) || 0;
-            const cand2 = parseInt(document.getElementById('verif_cand2').value) || 0;
-            const cand3 = parseInt(document.getElementById('verif_cand3').value) || 0;
-            const cand4 = parseInt(document.getElementById('verif_cand4').value) || 0;
-            const cand5 = parseInt(document.getElementById('verif_cand5').value) || 0;
-            document.getElementById('verif_cand_total').textContent = cand1 + cand2 + cand3 + cand4 + cand5;
+            // Tính tổng kết quả kiểm phiếu các ngành - Dynamic based on candidate count
+            let totalCandidateVotes = 0;
+            const candidateCount = window.currentCandidateCount || 5;
+            for (let i = 1; i <= candidateCount; i++) {
+                const candEl = document.getElementById('verif_cand' + i);
+                if (candEl) {
+                    const candVotes = parseInt(candEl.value) || 0;
+                    totalCandidateVotes += candVotes;
+                }
+            }
+            const candTotalEl = document.getElementById('verif_cand_total');
+            if (candTotalEl) {
+                candTotalEl.textContent = totalCandidateVotes;
+            }
         }
 
         function hideVerificationForm() {
@@ -1619,17 +1932,18 @@
             document.getElementById('verif_bt2_votes').value = '';
             document.getElementById('verif_bt3_count').value = '';
             document.getElementById('verif_bt3_votes').value = '';
-            // Clear candidate votes
-            document.getElementById('verif_cand1').value = '';
-            document.getElementById('verif_cand2').value = '';
-            document.getElementById('verif_cand3').value = '';
-            document.getElementById('verif_cand4').value = '';
-            document.getElementById('verif_cand5').value = '';
-            document.getElementById('verif_cand_name1').value = '';
-            document.getElementById('verif_cand_name2').value = '';
-            document.getElementById('verif_cand_name3').value = '';
-            document.getElementById('verif_cand_name4').value = '';
-            document.getElementById('verif_cand_name5').value = '';
+            const bt4CountEl = document.getElementById('verif_bt4_count');
+            const bt4VotesEl = document.getElementById('verif_bt4_votes');
+            if (bt4CountEl) bt4CountEl.value = '';
+            if (bt4VotesEl) bt4VotesEl.value = '';
+            // Clear candidate votes - Dynamic based on candidate count
+            const candidateCount = window.currentCandidateCount || 5;
+            for (let i = 1; i <= candidateCount; i++) {
+                const candVotesEl = document.getElementById('verif_cand' + i);
+                const candNameEl = document.getElementById('verif_cand_name' + i);
+                if (candVotesEl) candVotesEl.value = '';
+                if (candNameEl) candNameEl.value = '';
+            }
             // Reset button styles
             document.querySelectorAll('#verificationFormContainer button').forEach(btn => {
                 if (btn.textContent.trim() !== '💾 Lưu Dữ Liệu' && btn.textContent.trim() !== '❌ Hủy') {
@@ -1637,10 +1951,36 @@
                     btn.style.color = '';
                 }
             });
+            
+            // Reset ballot file input for next import
+            selectedBallotFile = null;
+            const ballotFileInput = document.getElementById('ballotFileInput');
+            if (ballotFileInput) {
+                ballotFileInput.value = '';
+                document.getElementById('ballotFileList').innerHTML = '';
+            }
         }
 
         async function saveVerificationData() {
+            console.log('[SAVE DEBUG] saveVerificationData() called - TIME:', new Date().toLocaleTimeString());
+            
+            // Prevent double submission
+            if (window.isSavingVerification) {
+                console.log('[SAVE DEBUG] BLOCKED: Save already in progress, ignoring double click');
+                return;
+            }
+            window.isSavingVerification = true;
+            
+            // Disable save button to prevent multiple clicks
+            const saveBtn = document.querySelector('button[onclick="saveVerificationData()"]');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                console.log('[SAVE DEBUG] Save button disabled to prevent double-click');
+            }
+            
             if (!selectedVerifGroupNum || !selectedVerifAreaNum) {
+                window.isSavingVerification = false;
+                if (saveBtn) saveBtn.disabled = false;
                 alert('Vui lòng chọn tổ và khu vực trước khi lưu dữ liệu!');
                 return;
             }
@@ -1657,17 +1997,17 @@
                 ballotType2Votes: parseInt(document.getElementById('verif_bt2_votes').value) || 0,
                 ballotType3Count: parseInt(document.getElementById('verif_bt3_count').value) || 0,
                 ballotType3Votes: parseInt(document.getElementById('verif_bt3_votes').value) || 0,
-                candidate1Votes: parseInt(document.getElementById('verif_cand1').value) || 0,
-                candidate2Votes: parseInt(document.getElementById('verif_cand2').value) || 0,
-                candidate3Votes: parseInt(document.getElementById('verif_cand3').value) || 0,
-                candidate4Votes: parseInt(document.getElementById('verif_cand4').value) || 0,
-                candidate5Votes: parseInt(document.getElementById('verif_cand5').value) || 0,
-                candidate1Name: document.getElementById('verif_cand_name1').value || '',
-                candidate2Name: document.getElementById('verif_cand_name2').value || '',
-                candidate3Name: document.getElementById('verif_cand_name3').value || '',
-                candidate4Name: document.getElementById('verif_cand_name4').value || '',
-                candidate5Name: document.getElementById('verif_cand_name5').value || ''
+                ballotType4Count: parseInt(document.getElementById('verif_bt4_count')?.value || '0') || 0,
+                ballotType4Votes: parseInt(document.getElementById('verif_bt4_votes')?.value || '0') || 0
             };
+            
+            // Add candidate data dynamically
+            const candidateCount = window.currentCandidateCount || 5;
+            for (let i = 1; i <= candidateCount; i++) {
+                data[`candidate${i}Votes`] = parseInt(document.getElementById('verif_cand' + i).value) || 0;
+                data[`candidate${i}Name`] = document.getElementById('verif_cand_name' + i).value || '';
+            }
+            data.totalCandidates = candidateCount;
 
             try {
                 // Kiểm tra xem dữ liệu của tổ này đã tồn tại chưa
@@ -1686,22 +2026,35 @@
                     data.id = existingRecord.id;
                 }
 
+                console.log(`[SAVE DEBUG] About to send ${method} request to:`, url);
+                console.log('[SAVE DEBUG] Data being sent:', data);
+                
                 const response = await fetch(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
+                
+                console.log(`[SAVE DEBUG] ${method} response received - Status: ${response.status}, OK: ${response.ok}`);
 
                 if (response.ok) {
+                    console.log('[SAVE DEBUG] Save successful, calling loadVerificationData()');
                     alert('Lưu dữ liệu thành công!');
+                    window.isSavingVerification = false;
+                    if (saveBtn) saveBtn.disabled = false;
                     hideVerificationForm();
                     loadVerificationData();
                 } else {
+                    console.log('[SAVE DEBUG] Save failed - response not OK');
                     alert('Lỗi khi lưu dữ liệu!');
+                    window.isSavingVerification = false;
+                    if (saveBtn) saveBtn.disabled = false;
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('[SAVE DEBUG] Error caught:', error);
                 alert('Lỗi: ' + error.message);
+                window.isSavingVerification = false;
+                if (saveBtn) saveBtn.disabled = false;
             }
         }
 
@@ -1761,16 +2114,31 @@
                     document.getElementById('verif_bt2_votes').value = record.ballotType2Votes || '';
                     document.getElementById('verif_bt3_count').value = record.ballotType3Count || '';
                     document.getElementById('verif_bt3_votes').value = record.ballotType3Votes || '';
-                    document.getElementById('verif_cand1').value = record.candidate1Votes || '';
-                    document.getElementById('verif_cand2').value = record.candidate2Votes || '';
-                    document.getElementById('verif_cand3').value = record.candidate3Votes || '';
-                    document.getElementById('verif_cand4').value = record.candidate4Votes || '';
-                    document.getElementById('verif_cand5').value = record.candidate5Votes || '';
-                    document.getElementById('verif_cand_name1').value = record.candidate1Name || '';
-                    document.getElementById('verif_cand_name2').value = record.candidate2Name || '';
-                    document.getElementById('verif_cand_name3').value = record.candidate3Name || '';
-                    document.getElementById('verif_cand_name4').value = record.candidate4Name || '';
-                    document.getElementById('verif_cand_name5').value = record.candidate5Name || '';
+                    const bt4CountEl = document.getElementById('verif_bt4_count');
+                    const bt4VotesEl = document.getElementById('verif_bt4_votes');
+                    if (bt4CountEl) bt4CountEl.value = record.ballotType4Count || '';
+                    if (bt4VotesEl) bt4VotesEl.value = record.ballotType4Votes || '';
+                    
+                    // Generate candidate rows based on current level
+                    // District level (cấp xã): 5 candidates
+                    // Provincial level (cấp tỉnh): 7 candidates
+                    let candidateCount = 5;
+                    if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
+                        candidateCount = 7;
+                    }
+                    generateCandidateRows(candidateCount);
+                    
+                    // Load candidate data dynamically
+                    for (let i = 1; i <= candidateCount; i++) {
+                        const candVotesKey = `candidate${i}Votes`;
+                        const candNameKey = `candidate${i}Name`;
+                        
+                        const candVotesEl = document.getElementById('verif_cand' + i);
+                        const candNameEl = document.getElementById('verif_cand_name' + i);
+                        
+                        if (candVotesEl) candVotesEl.value = record[candVotesKey] || '';
+                        if (candNameEl) candNameEl.value = record[candNameKey] || '';
+                    }
                     
                     // Recalculate verification totals
                     calculateVerificationTotals();
@@ -1828,7 +2196,9 @@
         function hideBallotImportForm() {
             document.getElementById('ballotImportFormContainer').style.display = 'none';
             selectedBallotFile = null;
+            document.getElementById('ballotFileInput').value = '';
             document.getElementById('ballotFileList').innerHTML = '';
+            console.log('[DEBUG] Ballot import form hidden and file input reset');
         }
 
         function handleBallotFileDrop(event) {
@@ -1867,11 +2237,17 @@
 
         function removeBallotFile() {
             selectedBallotFile = null;
-            document.getElementById('ballotFileInput').value = '';
+            // Reset file input to allow selecting same file again
+            const fileInput = document.getElementById('ballotFileInput');
+            fileInput.value = '';
+            // Trigger change event to ensure it's properly cleared
+            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
             document.getElementById('ballotFileList').innerHTML = '';
+            console.log('[DEBUG] Ballot file removed and input reset');
         }
 
         async function importBallotFile() {
+            console.log('[DEBUG] importBallotFile() called');
             if (!selectedBallotFile) {
                 alert('Vui lòng chọn file Excel!');
                 return;
@@ -1881,10 +2257,12 @@
             formData.append('file', selectedBallotFile);
 
             try {
-                const response = await fetch('http://localhost:5000/api/ballotverification/import-ballot', {
+                console.log('[DEBUG] About to fetch POST to import-ballot');
+                const response = await fetch(`http://localhost:5000/api/ballotverification/import-ballot?level=${encodeURIComponent(selectedLevel)}`, {
                     method: 'POST',
                     body: formData
                 });
+                console.log('[DEBUG] POST response received');
 
                 const result = await response.json();
 
@@ -1903,38 +2281,88 @@
                     candidate4Name: data.candidate4Name,
                     candidate5Name: data.candidate5Name
                 });
-                alert(`✅ Import thành công!\n\nTổng phiếu: ${data.totalBallots}\nPhiếu hợp lệ: ${data.validBallots}\nPhiếu không hợp lệ: ${data.invalidBallots}`);
 
-                // Auto-fill form với dữ liệu vừa import
+                // VALIDATION: Check if received ballots exceed the area limit
+                const levelMaxBallots = maxBallotsPerLevel[selectedLevel] || {};
+                const maxBallots = levelMaxBallots[selectedVerifAreaNum];
+                const receivedBallots = data.receivedBallots || 0;
+
+                if (maxBallots && receivedBallots > maxBallots) {
+                    alert(`❌ LỖI: Phiếu nhận trong file (${receivedBallots}) vượt quá giới hạn của Khu Vực ${selectedVerifAreaNum} cấp ${selectedLevel.toUpperCase()}!\nGiới hạn: ${maxBallots} phiếu.\n\nVui lòng chọn file khác hoặc kiểm tra lại dữ liệu.`);
+                    console.log('[VALIDATION FAILED] Import rejected - received ballots exceed limit');
+                    
+                    // Reset file input for user to try again
+                    selectedBallotFile = null;
+                    const fileInput = document.getElementById('ballotFileInput');
+                    if (fileInput) {
+                        fileInput.value = '';
+                        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    document.getElementById('ballotFileList').innerHTML = '';
+                    console.log('[DEBUG] File input reset - user can select another file');
+                    return;
+                }
+
+                alert(`✅ Import thành công!\n\nPhiếu phát hành: ${data.issuedbBallots}\nPhiếu nhận: ${receivedBallots}\nPhiếu hợp lệ: ${data.validBallots}\nPhiếu không hợp lệ: ${data.invalidBallots}`);
+
+                // AUTO-FILL the verification form with imported data
+                console.log('[DEBUG] Auto-filling form with imported data...');
+                
+                // Hide the import form modal
+                hideBallotImportForm();
+                
+                // Ensure verification form is shown
                 showVerificationForm();
-                selectToGroup('Tổ 1'); // Default chọn Tổ 1
                 
-                document.getElementById('verif_issued').value = data.issuedBallots;
-                document.getElementById('verif_received').value = data.receivedBallots;
-                document.getElementById('verif_valid').value = data.validBallots;
-                document.getElementById('verif_invalid').value = data.invalidBallots;
-                document.getElementById('verif_bt1_count').value = data.ballotType1Count;
-                document.getElementById('verif_bt1_votes').value = data.ballotType1Votes;
-                document.getElementById('verif_bt2_count').value = data.ballotType2Count;
-                document.getElementById('verif_bt2_votes').value = data.ballotType2Votes;
-                document.getElementById('verif_bt3_count').value = data.ballotType3Count;
-                document.getElementById('verif_bt3_votes').value = data.ballotType3Votes;
-                document.getElementById('verif_cand1').value = data.candidate1Votes;
-                document.getElementById('verif_cand2').value = data.candidate2Votes;
-                document.getElementById('verif_cand3').value = data.candidate3Votes;
-                document.getElementById('verif_cand4').value = data.candidate4Votes;
-                document.getElementById('verif_cand5').value = data.candidate5Votes;
-                document.getElementById('verif_cand_name1').value = data.candidate1Name || '';
-                document.getElementById('verif_cand_name2').value = data.candidate2Name || '';
-                document.getElementById('verif_cand_name3').value = data.candidate3Name || '';
-                document.getElementById('verif_cand_name4').value = data.candidate4Name || '';
-                document.getElementById('verif_cand_name5').value = data.candidate5Name || '';
-                
-                // Tính toán tổng
-                calculateVerificationTotals();
-
-                // Clear import form
-                setTimeout(() => hideBallotImportForm(), 500);
+                // Fill in issued and received ballots
+                setTimeout(() => {
+                    const issuedEl = document.getElementById('verif_issued');
+                    const receivedEl = document.getElementById('verif_received');
+                    const validEl = document.getElementById('verif_valid');
+                    const invalidEl = document.getElementById('verif_invalid');
+                    
+                    if (issuedEl) issuedEl.value = data.issuedBallots || 0;
+                    if (receivedEl) receivedEl.value = receivedBallots || 0;
+                    if (validEl) validEl.value = data.validBallots || 0;
+                    if (invalidEl) invalidEl.value = data.invalidBallots || 0;
+                    
+                    // Fill in ballot type counts and votes
+                    const bt1CountEl = document.getElementById('verif_bt1_count');
+                    const bt2CountEl = document.getElementById('verif_bt2_count');
+                    const bt3CountEl = document.getElementById('verif_bt3_count');
+                    const bt4CountEl = document.getElementById('verif_bt4_count');
+                    
+                    if (bt1CountEl) bt1CountEl.value = data.ballotType1Count || 0;
+                    if (bt2CountEl) bt2CountEl.value = data.ballotType2Count || 0;
+                    if (bt3CountEl) bt3CountEl.value = data.ballotType3Count || 0;
+                    if (bt4CountEl) bt4CountEl.value = data.ballotType4Count || 0;
+                    
+                    // Fill in candidate names and votes
+                    const candidateCount = window.currentCandidateCount || 5;
+                    for (let i = 1; i <= candidateCount; i++) {
+                        const candNameEl = document.getElementById(`verif_cand_name${i}`);
+                        const candVotesEl = document.getElementById(`verif_cand${i}`);
+                        
+                        if (candNameEl) candNameEl.value = data[`candidate${i}Name`] || '';
+                        if (candVotesEl) candVotesEl.value = data[`candidate${i}Votes`] || 0;
+                    }
+                    
+                    console.log('[DEBUG] Form auto-filled with imported data');
+                    console.log('Data filled:', {
+                        issued: data.issuedBallots,
+                        received: receivedBallots,
+                        valid: data.validBallots,
+                        invalid: data.invalidBallots,
+                        bt1Count: data.ballotType1Count,
+                        bt2Count: data.ballotType2Count,
+                        bt3Count: data.ballotType3Count,
+                        bt4Count: data.ballotType4Count
+                    });
+                    
+                    // Trigger calculation to update totals
+                    calculateVerificationTotals();
+                    
+                }, 300);
 
             } catch (error) {
                 console.error('Error:', error);
@@ -2097,6 +2525,48 @@
             }
         }
 
+        // Delete All Election Data
+        async function deleteAllData() {
+            if (!confirm('⚠️ CẢNH BÁO: Bạn sắp xóa TẤT CẢ DỮ LIỆU BẦU CỬ! Điều này sẽ xóa:\n✗ Tất cả phiếu bầu\n✗ Tất cả khoá cử tri\n✗ Tất cả kết quả bầu cử\n✗ Tất cả nhân viên\n✗ Tất cả biểu mẫu\n\nHành động này KHÔNG THỂ hoàn tác!\n\nNhập "XÓA" để xác nhận:')) {
+                return;
+            }
+
+            const userConfirm = prompt('Nhập "XÓA" (IN HOA) để xác nhận xóa tất cả dữ liệu:');
+            if (userConfirm !== 'XÓA') {
+                alert('❌ Xác nhận không đúng. Hành động bị hủy.');
+                return;
+            }
+
+            try {
+                // Show loading
+                const loadingDiv = document.createElement('div');
+                loadingDiv.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;';
+                loadingDiv.innerHTML = '<div style="background: white; padding: 30px; border-radius: 10px; text-align: center;"><div style="font-size: 24px;">⏳ Đang xóa dữ liệu...</div><p style="margin-top: 10px; color: #666;">Vui lòng chờ...</p></div>';
+                document.body.appendChild(loadingDiv);
+
+                const response = await fetch(`${API_BASE}/election/clear-all-data`, {
+                    method: 'DELETE'
+                });
+                
+                loadingDiv.remove();
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('✅ ' + data.message);
+                    // Refresh data without page reload
+                    loadDashboard();
+                    loadLogs();
+                    // Clear other tab data
+                    loadProgress();
+                    loadVerificationData();
+                } else {
+                    alert('❌ Lỗi: Không thể xóa dữ liệu. Mã lỗi: ' + response.status);
+                }
+            } catch (error) {
+                alert('❌ Lỗi: ' + error.message);
+            }
+        }
+
         // ===== GROUP AND AREA MANAGEMENT =====
         
         const groupAreaMapping = {
@@ -2114,6 +2584,431 @@
 
         let currentSelectedGroup = null;
         let currentSelectedArea = null;
+
+        // Initialize Unit Dropdown
+        function initializeUnitAreaDropdowns() {
+            const unitSelect = document.getElementById('unitSelect');
+            
+            if (!unitSelect) return;
+            
+            // Populate units 1-10
+            for (let i = 1; i <= 10; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Đơn vị ${i}`;
+                unitSelect.appendChild(option);
+            }
+            
+            // Handle unit selection - load aggregated data for all areas in unit
+            unitSelect.addEventListener('change', (e) => {
+                const unitNum = parseInt(e.target.value);
+                
+                if (unitNum) {
+                    console.log(`Selected: Unit ${unitNum}`);
+                    // Fetch aggregated data from all areas in this unit
+                    loadAggregatedUnitData(unitNum);
+                }
+            });
+        }
+        
+        // Load aggregated data from all ballot verification records for a unit
+        async function loadAggregatedUnitData(unitNum) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`);
+                const ballotData = await response.json();
+                
+                // Get all areas for this unit
+                const areas = groupAreaMapping[unitNum] || [];
+                console.log(`Unit ${unitNum} has areas:`, areas);
+                
+                // Find records matching this unit and all its areas
+                const unitRecords = ballotData.filter(r => {
+                    for (let areaNum of areas) {
+                        if (r.districtName === `Tổ ${unitNum} - Khu Vực ${areaNum}`) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+                
+                console.log(`Found ${unitRecords.length} records for Unit ${unitNum}`, unitRecords);
+                
+                if (unitRecords.length > 0) {
+                    // Aggregate data from all records
+                    let totalVoters = 0;
+                    let totalIssuedBallots = 0;
+                    let totalReceivedBallots = 0;
+                    let totalValidBallots = 0;
+                    let totalInvalidBallots = 0;
+                    
+                    // Set total candidates based on level
+                    // District level (cấp xã): 5 candidates, elect 3
+                    // Provincial level (cấp tỉnh): 7 candidates, elect 4
+                    let totalCandidates = 5;
+                    let electedCount = 3;
+                    
+                    if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
+                        totalCandidates = 7;
+                        electedCount = 4;
+                    }
+                    
+                    // Count candidate votes
+                    const candidateVoteCounts = {};
+                    for (let i = 1; i <= totalCandidates; i++) {
+                        candidateVoteCounts[i] = 0;
+                    }
+                    
+                    unitRecords.forEach(record => {
+                        totalIssuedBallots += record.issuedBallots || 0;
+                        totalReceivedBallots += record.receivedBallots || 0;
+                        totalValidBallots += record.validBallots || 0;
+                        totalInvalidBallots += record.invalidBallots || 0;
+                        
+                        for (let i = 1; i <= totalCandidates; i++) {
+                            if (record[`candidate${i}Votes`]) {
+                                candidateVoteCounts[i] += record[`candidate${i}Votes`];
+                            }
+                        }
+                    });
+                    
+                    totalVoters = totalIssuedBallots;
+                    
+                    // Populate the fields
+                    document.getElementById('groupDataTotalVoters').value = totalVoters;
+                    document.getElementById('groupDataTotalCandidates').value = totalCandidates; // Tổng số ứng cử
+                    document.getElementById('groupDataTotalVotes').value = electedCount; // Tổng số được bầu
+                    document.getElementById('groupDataIssuedBallots').value = totalIssuedBallots;
+                    document.getElementById('groupDataReceivedBallots').value = totalReceivedBallots;
+                    document.getElementById('groupDataValidBallots').value = totalValidBallots;
+                    document.getElementById('groupDataInvalidBallots').value = totalInvalidBallots;
+                    
+                    // Number of voting areas by unit (TS khu vực bỏ phiếu)
+                    const unitVotingAreas = {
+                        1: 2, 2: 2, 3: 2, 4: 2, 5: 3,
+                        6: 3, 7: 2, 8: 2, 9: 2, 10: 2
+                    };
+                    document.getElementById('groupDataRecountAreas').value = unitVotingAreas[unitNum] || '';
+                    document.getElementById('groupDataRecountVoters').value = totalReceivedBallots; // TS cử tri tham gia bằng phiếu thu vào
+                    
+                    // Tính tỷ lệ tham gia bỏ phiếu = (phiếu thu vào / phiếu phát ra) * 100%
+                    if (totalIssuedBallots > 0) {
+                        const participationRate = ((totalReceivedBallots / totalIssuedBallots) * 100).toFixed(1);
+                        document.getElementById('groupDataRecountRate').value = participationRate + '%';
+                    }
+                    
+                    // Tính tỷ lệ phiếu hợp lệ
+                    if (totalReceivedBallots > 0) {
+                        const validRate = ((totalValidBallots / totalReceivedBallots) * 100).toFixed(1);
+                        document.getElementById('groupDataValidRate').value = validRate + '%';
+                        
+                        const invalidRate = ((totalInvalidBallots / totalReceivedBallots) * 100).toFixed(1);
+                        document.getElementById('groupDataInvalidRate').value = invalidRate + '%';
+                    }
+                    
+                    // Store current unit for export
+                    window.currentSelectedUnit = unitNum;
+                    window.currentUnitAggregatedData = {
+                        unitNum,
+                        totalVoters,
+                        totalCandidates,
+                        electedCount,
+                        totalIssuedBallots,
+                        totalReceivedBallots,
+                        totalValidBallots,
+                        totalInvalidBallots,
+                        areas
+                    };
+
+                    // Populate area details table
+                    populateAreaDetailsTable(unitNum, areas, ballotData);
+                } else {
+                    console.log('No records found for this unit');
+                    clearGroupDataFields();
+                    clearAreaDetailsTable();
+                }
+            } catch (error) {
+                console.error('Error loading aggregated unit data:', error);
+                clearGroupDataFields();
+                clearAreaDetailsTable();
+            }
+        }
+        
+        // Clear all group data fields
+        function clearGroupDataFields() {
+            document.getElementById('groupDataTotalCandidates').value = '';
+            document.getElementById('groupDataTotalVotes').value = '';
+            document.getElementById('groupDataTotalVoters').value = '';
+            document.getElementById('groupDataRecountAreas').value = '';
+            document.getElementById('groupDataRecountVoters').value = '';
+            document.getElementById('groupDataRecountRate').value = '';
+            document.getElementById('groupDataIssuedBallots').value = '';
+            document.getElementById('groupDataReceivedBallots').value = '';
+            document.getElementById('groupDataInvalidBallots').value = '';
+            document.getElementById('groupDataInvalidRate').value = '';
+            document.getElementById('groupDataValidBallots').value = '';
+            document.getElementById('groupDataValidRate').value = '';
+        }
+        
+        // Populate area details table
+        function populateAreaDetailsTable(unitNum, areas, ballotData) {
+            // Update title with unit name
+            document.getElementById('areaDetailsTitle').textContent = `📊 Chi Tiết Theo Khu Vực - Đơn Vị ${unitNum}`;
+            
+            const tbody = document.getElementById('areaDetailsTableBody');
+            tbody.innerHTML = ''; // Clear existing rows
+            
+            // Get records for each area in the unit
+            areas.forEach(areaNum => {
+                const areaRecord = ballotData.find(r => r.districtName === `Tổ ${unitNum} - Khu Vực ${areaNum}`);
+                
+                if (areaRecord) {
+                    const issuedBallots = areaRecord.issuedBallots || 0;
+                    const receivedBallots = areaRecord.receivedBallots || 0;
+                    const validBallots = areaRecord.validBallots || 0;
+                    const invalidBallots = areaRecord.invalidBallots || 0;
+                    
+                    // Calculate total votes
+                    let totalVotes = 0;
+                    if (areaRecord.candidate1Votes) totalVotes += areaRecord.candidate1Votes;
+                    if (areaRecord.candidate2Votes) totalVotes += areaRecord.candidate2Votes;
+                    if (areaRecord.candidate3Votes) totalVotes += areaRecord.candidate3Votes;
+                    if (areaRecord.candidate4Votes) totalVotes += areaRecord.candidate4Votes;
+                    if (areaRecord.candidate5Votes) totalVotes += areaRecord.candidate5Votes;
+                    if (areaRecord.candidate6Votes) totalVotes += areaRecord.candidate6Votes;
+                    if (areaRecord.candidate7Votes) totalVotes += areaRecord.candidate7Votes;
+                    
+                    // Calculate rates
+                    const receivedRate = receivedBallots > 0 ? ((receivedBallots / issuedBallots) * 100).toFixed(1) : 0;
+                    const invalidRate = receivedBallots > 0 ? ((invalidBallots / receivedBallots) * 100).toFixed(1) : 0;
+                    const validRate = receivedBallots > 0 ? ((validBallots / receivedBallots) * 100).toFixed(1) : 0;
+                    
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid #d1d5db';
+                    row.innerHTML = `
+                        <td style="padding: 10px; border: 1px solid #d1d5db;">Khu Vực ${areaNum}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${issuedBallots}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${receivedBallots}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${validBallots}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${invalidBallots}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${totalVotes}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">1</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${receivedRate}%</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${invalidRate}%</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${validRate}%</td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+            
+            // Populate candidate results table
+            populateCandidateResultsTable(unitNum, ballotData);
+        }
+        
+        // Populate candidate results table
+        function populateCandidateResultsTable(unitNum, ballotData) {
+            // Update title with unit name
+            document.getElementById('candidateResultsTitle').textContent = `📋 Kết Quả Bầu Cử Theo Ứng Viên - Đơn Vị ${unitNum}`;
+            
+            const areas = groupAreaMapping[unitNum] || [];
+            const tbody = document.getElementById('candidateResultsTableBody');
+            tbody.innerHTML = ''; // Clear existing rows
+            
+            // Get totalCandidates and electedCount from aggregated data
+            const totalCandidates = window.currentUnitAggregatedData?.totalCandidates || 5;
+            const electedCount = window.currentUnitAggregatedData?.electedCount || Math.ceil(totalCandidates / 2);
+            
+            // Initialize candidate votes object
+            const candidateVotes = {};
+            const candidateReElectionVotes = {}; // For re-election votes (future use)
+            for (let i = 1; i <= totalCandidates; i++) {
+                candidateVotes[i] = 0;
+                candidateReElectionVotes[i] = 0;
+            }
+            
+            let totalReceivedBallots = 0;
+            let hasReElectionData = false;
+            
+            // Aggregate candidate votes from all areas
+            areas.forEach(areaNum => {
+                const areaRecord = ballotData.find(r => r.districtName === `Tổ ${unitNum} - Khu Vực ${areaNum}`);
+                
+                if (areaRecord) {
+                    for (let i = 1; i <= totalCandidates; i++) {
+                        if (areaRecord[`candidate${i}Votes`]) {
+                            candidateVotes[i] += areaRecord[`candidate${i}Votes`];
+                        }
+                        // Check for re-election votes if they exist in the future
+                        if (areaRecord[`candidate${i}ReElectionVotes`]) {
+                            candidateReElectionVotes[i] += areaRecord[`candidate${i}ReElectionVotes`];
+                            hasReElectionData = true;
+                        }
+                    }
+                    totalReceivedBallots += areaRecord.receivedBallots || 0;
+                }
+            });
+            
+            // Create candidate data objects with percentages
+            const candidateData = [];
+            for (let i = 1; i <= totalCandidates; i++) {
+                const votes = candidateVotes[i] || 0;
+                const percentage = totalReceivedBallots > 0 ? ((votes / totalReceivedBallots) * 100).toFixed(1) : 0;
+                candidateData.push({
+                    candidateNum: i,
+                    votes: votes,
+                    percentage: percentage
+                });
+            }
+            
+            // Sort by percentage descending to find top elected candidates
+            const sortedCandidates = [...candidateData].sort((a, b) => b.percentage - a.percentage);
+            const topElectedSet = new Set(sortedCandidates.slice(0, electedCount).map(c => c.candidateNum));
+            
+            // Create rows for each candidate
+            for (let i = 1; i <= totalCandidates; i++) {
+                const votes = candidateVotes[i] || 0;
+                const percentage = totalReceivedBallots > 0 ? ((votes / totalReceivedBallots) * 100).toFixed(1) : 0;
+                const isElected = topElectedSet.has(i);
+                
+                // Round 1 result
+                const round1ResultText = isElected ? 'Trúng cử' : 'Không trúng cử';
+                const round1ResultStyle = isElected ? 'background-color: #d1fae5; color: #065f46; font-weight: bold;' : 'background-color: #fee2e2; color: #7f1d1d; font-weight: bold;';
+                
+                // Final elected result:
+                // If there's re-election data, it will be determined from re-election
+                // If no re-election data, use round 1 result
+                const finalStatusText = hasReElectionData ? '' : round1ResultText;
+                const finalStatusStyle = hasReElectionData ? '' : round1ResultStyle;
+                
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid #d1d5db';
+                row.innerHTML = `
+                    <td style="padding: 10px; border: 1px solid #d1d5db;">Người ${i}</td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${votes}</td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;">${percentage}%</td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db; ${round1ResultStyle}">${round1ResultText}</td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;"></td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;"></td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db;"></td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #d1d5db; ${finalStatusStyle}">${finalStatusText}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Clears only table displays (for level changing - keeps unit selection for reload)
+        function clearGroupsDisplay() {
+            console.log('=== clearGroupsDisplay() called ===');
+            
+            // Clear table titles
+            document.getElementById('areaDetailsTitle').textContent = '';
+            const tbody = document.getElementById('areaDetailsTableBody');
+            tbody.innerHTML = '';
+            console.log('Cleared areaDetailsTable');
+            
+            document.getElementById('candidateResultsTitle').textContent = '';
+            const candidateTbody = document.getElementById('candidateResultsTableBody');
+            candidateTbody.innerHTML = '';
+            console.log('Cleared candidateResultsTable');
+            
+            // Clear form fields
+            document.getElementById('groupDataTotalVoters').value = '';
+            document.getElementById('groupDataTotalCandidates').value = '';
+            document.getElementById('groupDataTotalVotes').value = '';
+            document.getElementById('groupDataIssuedBallots').value = '';
+            document.getElementById('groupDataReceivedBallots').value = '';
+            document.getElementById('groupDataValidBallots').value = '';
+            document.getElementById('groupDataInvalidBallots').value = '';
+            document.getElementById('groupDataValidRate').value = '';
+            document.getElementById('groupDataInvalidRate').value = '';
+            console.log('Cleared all form fields');
+            
+            // Clear aggregated data (will be reloaded from API if user returns to same level+unit)
+            window.currentUnitAggregatedData = null;
+            console.log('Cleared aggregated data');
+        }
+        
+        // Clear area details table and candidate results table and form fields completely
+        function clearAreaDetailsTable() {
+            console.log('=== clearAreaDetailsTable() called ===');
+            
+            // First clear display
+            clearGroupsDisplay();
+            
+            // Clear unit selection
+            window.currentSelectedUnit = null;
+            console.log('Cleared window data including unit selection');
+        }
+        
+        // Export group data to Excel
+        function exportGroupDataToExcel() {
+            if (!window.currentUnitAggregatedData) {
+                alert('Vui lòng chọn đơn vị bầu cử trước!');
+                return;
+            }
+            
+            const data = window.currentUnitAggregatedData;
+            let htmlContent = `
+            <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse;">
+                <tr style="background-color: #E7E6E6;">
+                    <td colspan="2" style="font-weight: bold; text-align: center; font-size: 14px;">SỐ LIỆU QUẢN LÝ ĐƠN VỊ BẦU CỬ - TỔNG HỢP</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #D3D3D3;">Đơn vị</td>
+                    <td>Đơn vị ${data.unitNum}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #D3D3D3;">Khu vực bao gồm</td>
+                    <td>${data.areas.join(', ')}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #C6EFCE;">Tổng số cử tri</td>
+                    <td style="background-color: #FFE5E5;">${data.totalVoters}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #FFFF99;">Tổng số phiếu phát ra</td>
+                    <td style="background-color: #FFE5E5;">${data.totalIssuedBallots}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #FFFF99;">Tổng số phiếu thu vào</td>
+                    <td style="background-color: #FFE5E5;">${data.totalReceivedBallots}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #FFFF99;">Tổng số phiếu hợp lệ</td>
+                    <td style="background-color: #FFE5E5;">${data.totalValidBallots}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #FFFF99;">Tổng số phiếu không hợp lệ</td>
+                    <td style="background-color: #FFE5E5;">${data.totalInvalidBallots}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #E8E8E8;">Tổng số được bầu</td>
+                    <td style="background-color: #FFE5E5;">${data.totalVotes}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #E8E8E8;">Tổng ứng cử viên được bầu</td>
+                    <td style="background-color: #FFE5E5;">${data.totalCandidateVotes}</td>
+                </tr>
+            </table>
+            `;
+            
+            const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `Dan-vị-${data.unitNum}-${new Date().getTime()}.xls`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Initialize when page load completes
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                initializeUnitAreaDropdowns();
+                clearAreaDetailsTable();
+            }, 500);
+        });
 
         function selectGroup(groupNum) {
             currentSelectedGroup = groupNum;
@@ -2193,7 +3088,7 @@
             const districtName = `Tổ ${groupNum} - Khu Vực ${areaNum}`;
             
             // Fetch real data from API
-            fetch('http://localhost:5000/api/ballotverification')
+            fetch(`http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`)
                 .then(response => response.json())
                 .then(data => {
                     // Find the record matching this group and area
@@ -2332,7 +3227,9 @@
                     
                     console.log(`[DEBUG] Tổ ${groupNum} - Found ${groupRecords.length} records (level=${selectedLevel}):`, groupRecords);
                     groupRecords.forEach((rec, idx) => {
-                        console.log(`  Record ${idx}: ${rec.districtName} - C1=${rec.candidate1Votes}, C2=${rec.candidate2Votes}, C3=${rec.candidate3Votes}, C4=${rec.candidate4Votes}, C5=${rec.candidate5Votes}`);
+                        console.log(`  Record ${idx}: ${rec.districtName}`);
+                        console.log(`    Candidate votes: C1=${rec.candidate1Votes}, C2=${rec.candidate2Votes}, C3=${rec.candidate3Votes}, C4=${rec.candidate4Votes}, C5=${rec.candidate5Votes}, C6=${rec.candidate6Votes}, C7=${rec.candidate7Votes}`);
+                        console.log(`    Candidate names: N1='${rec.candidate1Name}', N2='${rec.candidate2Name}', N3='${rec.candidate3Name}', N4='${rec.candidate4Name}', N5='${rec.candidate5Name}', N6='${rec.candidate6Name}', N7='${rec.candidate7Name}'`);
                     });
                     
                     // Build summary rows for each area in this group
@@ -2363,38 +3260,38 @@
                         }
                     });
                     
-                    // Aggregate candidate votes across all areas
-                    const candidatesData = [
-                        { stt: 1, votes: 0, name: '' },
-                        { stt: 2, votes: 0, name: '' },
-                        { stt: 3, votes: 0, name: '' },
-                        { stt: 4, votes: 0, name: '' },
-                        { stt: 5, votes: 0, name: '' }
-                    ];
+                    // Set total candidates based on level
+                    // District level (cấp xã): 5 candidates, elect 3
+                    // Provincial level (cấp tỉnh): 7 candidates, elect 4
+                    let totalCandidates = 5;
+                    let electedCount = 3;
+                    
+                    if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
+                        totalCandidates = 7;
+                        electedCount = 4;
+                    }
+                    
+                    // Aggregate candidate votes across all areas - based on total candidates
+                    const candidatesData = [];
+                    for (let i = 1; i <= totalCandidates; i++) {
+                        candidatesData.push({ stt: i, votes: 0, name: '' });
+                    }
                     
                     // Sum candidate votes from all areas
                     groupRecords.forEach(record => {
-                        candidatesData[0].votes += record.candidate1Votes || 0;
-                        candidatesData[1].votes += record.candidate2Votes || 0;
-                        candidatesData[2].votes += record.candidate3Votes || 0;
-                        candidatesData[3].votes += record.candidate4Votes || 0;
-                        candidatesData[4].votes += record.candidate5Votes || 0;
-                        
-                        // Get candidate names from first record that has them
-                        if (!candidatesData[0].name && record.candidate1Name) {
-                            candidatesData[0].name = record.candidate1Name;
-                        }
-                        if (!candidatesData[1].name && record.candidate2Name) {
-                            candidatesData[1].name = record.candidate2Name;
-                        }
-                        if (!candidatesData[2].name && record.candidate3Name) {
-                            candidatesData[2].name = record.candidate3Name;
-                        }
-                        if (!candidatesData[3].name && record.candidate4Name) {
-                            candidatesData[3].name = record.candidate4Name;
-                        }
-                        if (!candidatesData[4].name && record.candidate5Name) {
-                            candidatesData[4].name = record.candidate5Name;
+                        console.log(`[DEBUG] Processing record: ${record.districtName}`, record);
+                        for (let i = 1; i <= totalCandidates; i++) {
+                            const votesKey = `candidate${i}Votes`;
+                            const nameKey = `candidate${i}Name`;
+                            
+                            if (record[votesKey]) {
+                                candidatesData[i - 1].votes += record[votesKey];
+                            }
+                            
+                            // Get candidate names from first record that has them
+                            if (!candidatesData[i - 1].name && record[nameKey]) {
+                                candidatesData[i - 1].name = record[nameKey];
+                            }
                         }
                     });
                     
@@ -2405,6 +3302,8 @@
                         }
                     });
                     
+                    console.log(`[DEBUG] candidatesData after aggregation:`, candidatesData);
+                    
                     // Sort candidates by votes (descending) to determine ranking
                     const sortedCandidates = [...candidatesData].sort((a, b) => b.votes - a.votes);
                     
@@ -2413,7 +3312,7 @@
                         return {
                             ...candidate,
                             rank: idx + 1,
-                            result: idx < 3 ? '✓ Trúng cử' : '✗ Không trúng cử'
+                            result: idx < electedCount ? '✓ Trúng cử' : '✗ Không trúng cử'
                         };
                     });
                     

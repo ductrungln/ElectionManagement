@@ -46,7 +46,8 @@ namespace ElectionManagement
             // Services
             services.AddScoped<IExcelService, ExcelService>();
             services.AddScoped<IDashboardService, DashboardService>();
-            services.AddScoped<BallotImportService>();
+            services.AddScoped<BallotImportService5Candidates>();
+            services.AddScoped<BallotImportService7Candidates>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
