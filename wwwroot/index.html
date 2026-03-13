@@ -2591,7 +2591,7 @@
         }
 
         function exportOfficialFormWithLevel() {
-            const level = document.querySelector('[data-level]')?.dataset.level || 'Cấp xã';
+            const level = selectedLevel || 'xa';
             const fileName = `BangTongHopKiemPhieu_${new Date().toISOString().slice(0,10)}.xlsx`;
             
             fetch(`${API_BASE}/export-official-form?level=${encodeURIComponent(level)}`)
@@ -2613,7 +2613,7 @@
         }
 
         function exportComprehensiveWithLevel() {
-            const level = document.querySelector('[data-level]')?.dataset.level || 'Cấp xã';
+            const level = selectedLevel || 'xa';
             const fileName = `SoLieuBauCu_${new Date().toISOString().slice(0,10)}.xlsx`;
             
             fetch(`${API_BASE}/export-comprehensive?level=${encodeURIComponent(level)}`)

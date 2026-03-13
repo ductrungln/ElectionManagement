@@ -1350,6 +1350,10 @@ namespace ElectionManagement.Services
                     ws.Cells["W10"].Value = null;
                     ws.Cells["W11"].Value = null;
                     ws.Cells["W12"].Value = null;
+                    ws.Cells["H19"].Value = null;
+                    ws.Cells["J19"].Value = null;
+                    ws.Cells["K19"].Value = null;
+                    ws.Cells["L19"].Value = null;
                 }
                 else if (levelLower.Contains("quochoi"))
                 {
