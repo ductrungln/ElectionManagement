@@ -3383,6 +3383,14 @@
                             { stt: 5, name: record.candidate5Name || 'Ứng cử viên số 5', votes: record.candidate5Votes || 0 }
                         ];
                         
+                        // Add candidates 6 and 7 for provincial level (Tỉnh)
+                        if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
+                            candidatesData.push(
+                                { stt: 6, name: record.candidate6Name || 'Ứng cử viên số 6', votes: record.candidate6Votes || 0 },
+                                { stt: 7, name: record.candidate7Name || 'Ứng cử viên số 7', votes: record.candidate7Votes || 0 }
+                            );
+                        }
+                        
                         candidatesTable.innerHTML = `<thead>
                             <tr>
                                 <th>STT</th>
