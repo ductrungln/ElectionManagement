@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Shop - EcommerceApp";
+}
+
+<!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">🛒 EcommerceApp</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">🏠 Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/shop">🛍️ Cửa hàng</a></li>
+                <li class="nav-item"><a class="nav-link" href="/cart">🛒 Giỏ hàng</a></li>
+                <li class="nav-item"><a class="nav-link" href="/account/login">👤 Tài khoản</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin/dashboard">⚙️ Admin</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h1>Cửa hàng</h1>
+    
+    <div class="row">
+        <div class="col-md-3">
+            <h5>Bộ lọc</h5>
+            <div class="mb-3">
+                <label>Giá</label>
+                <input type="range" class="form-range" min="0" max="5000000" id="priceFilter">
+                <small id="priceValue">0 - 5,000,000 VND</small>
+            </div>
+            <div>
+                <button class="btn btn-primary btn-sm">Lọc</button>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5>Sắp xếp:</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                    <select class="form-select form-select-sm">
+                        <option value="newest">Mới nhất</option>
+                        <option value="price_asc">Giá thấp đến cao</option>
+                        <option value="price_desc">Giá cao đến thấp</option>
+                        <option value="best_selling">Bán chạy</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row" id="productsContainer">
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <img src="/images/placeholder.jpg" class="card-img-top" alt="Product">
+                        <div class="card-body">
+                            <h5 class="card-title">Tên sản phẩm</h5>
+                            <p class="card-text">
+                                <del>1,000,000 VND</del>
+                                <span class="text-danger fw-bold">800,000 VND</span>
+                            </p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-info btn-sm">Chi tiết</button>
+                                <button class="btn btn-primary btn-sm">Thêm giỏ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

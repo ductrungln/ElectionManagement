@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div id="imageCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/placeholder.jpg" class="d-block w-100" alt="Product Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <h1>Tên sản phẩm</h1>
+            
+            <div class="mb-3">
+                <span class="badge bg-success">Còn hàng (50)</span>
+            </div>
+            
+            <div class="mb-3">
+                <span class="text-muted"><del>1,000,000 VND</del></span>
+                <h3 class="text-danger">800,000 VND <span class="badge bg-danger">-20%</span></h3>
+            </div>
+            
+            <div class="mb-3">
+                <div class="stars">
+                    ⭐⭐⭐⭐⭐ (12 đánh giá)
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg">🛒 Thêm vào giỏ hàng</button>
+                <button class="btn btn-outline-danger btn-lg">❤️ Yêu thích</button>
+            </div>
+        </div>
+    </div>
+</div>
