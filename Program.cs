@@ -27,57 +27,8 @@ namespace ElectionManagement
                     context.Database.EnsureCreated();
                     Console.WriteLine("[INFO] Database ensured/created at application startup");
 
-                    // add Level columns if they don't exist (SQLite doesn't support IF NOT EXISTS in ALTER TABLE)
-                    try
-                    {
-                        var conn = context.Database.GetDbConnection();
-                        conn.Open();
-                        using (var cmd = conn.CreateCommand())
-                        {
-                            // helper function to check column
-                            Func<string, string, bool> hasCol = (table, col) =>
-                            {
-                                cmd.CommandText = $"PRAGMA table_info('{table}')";
-                                using var reader = cmd.ExecuteReader();
-                                while (reader.Read())
-                                {
-                                    if (reader.GetString(1).Equals(col, StringComparison.OrdinalIgnoreCase))
-                                        return true;
-                                }
-                                return false;
-                            };
-
-                            if (!hasCol("ElectionResults", "Level"))
-                            {
-                                cmd.CommandText = "ALTER TABLE ElectionResults ADD COLUMN Level TEXT";
-                                cmd.ExecuteNonQuery();
-                                Console.WriteLine("[INFO] Added Level column to ElectionResults");
-                            }
-                            if (!hasCol("ElectionProgresses", "Level"))
-                            {
-                                cmd.CommandText = "ALTER TABLE ElectionProgresses ADD COLUMN Level TEXT";
-                                cmd.ExecuteNonQuery();
-                                Console.WriteLine("[INFO] Added Level column to ElectionProgresses");
-                            }
-                            if (!hasCol("ImportLogs", "Level"))
-                            {
-                                cmd.CommandText = "ALTER TABLE ImportLogs ADD COLUMN Level TEXT";
-                                cmd.ExecuteNonQuery();
-                                Console.WriteLine("[INFO] Added Level column to ImportLogs");
-                            }
-                            if (!hasCol("BallotVerifications", "Level"))
-                            {
-                                cmd.CommandText = "ALTER TABLE BallotVerifications ADD COLUMN Level TEXT";
-                                cmd.ExecuteNonQuery();
-                                Console.WriteLine("[INFO] Added Level column to BallotVerifications");
-                            }
-                        }
-                        conn.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("[ERROR] Checking/adding Level columns failed: " + ex);
-                    }
+                    // Columns are now handled by migration - no additional setup needed
+                    Console.WriteLine("[INFO] Database schema is ready");
                 }
             }
             catch (Exception ex)

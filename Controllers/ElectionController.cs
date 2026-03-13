@@ -296,5 +296,32 @@ namespace ElectionManagement.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { message = "Xóa lịch sử import thành công" });
         }
+
+        // DELETE: api/election/clear-all-data (Xóa tất cả dữ liệu bầu cử)
+        [HttpDelete("clear-all-data")]
+        public async Task<IActionResult> ClearAllData()
+        {
+            try
+            {
+                // Delete all tables
+                _context.ElectionResults.RemoveRange(_context.ElectionResults);
+                _context.ElectionProgresses.RemoveRange(_context.ElectionProgresses);
+                _context.ImportLogs.RemoveRange(_context.ImportLogs);
+                _context.BallotVerifications.RemoveRange(_context.BallotVerifications);
+                
+                // Delete other election-related entities if they exist
+                // Add more DbSets if needed based on your database schema
+                
+                await _context.SaveChangesAsync();
+                
+                Console.WriteLine("[DELETE-ALL] Đã xóa tất cả dữ liệu bầu cử thành công");
+                return Ok(new { message = "✅ Đã xóa tất cả dữ liệu bầu cử thành công!" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DELETE-ALL] Lỗi: {ex.Message}");
+                return StatusCode(500, new { message = "❌ Lỗi khi xóa dữ liệu: " + ex.Message });
+            }
+        }
     }
 }
