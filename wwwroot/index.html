@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Bầu Cử</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .nav button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: var(--dark);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav button.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .nav button:hover:not(.active) {
+            background: var(--light);
+            transform: translateY(-2px);
+        }
+
+        /* Level selector above main navigation */
+        .level-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .level-nav button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: var(--dark);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .level-nav button.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .level-nav button:hover:not(.active) {
+            background: var(--light);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+
+        .card h3 {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .card .detail {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* File Upload */
+        .upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(37, 99, 235, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: #1d4ed8;
+        }
+
+        .upload-area.dragover {
+            background: rgba(37, 99, 235, 0.2);
+            border-color: #1d4ed8;
+        }
+
+        .upload-area p {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .upload-area small {
+            display: block;
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            overflow-x: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: var(--light);
+            border-bottom: 2px solid var(--border);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+            color: #047857;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+
+        .alert-info {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: var(--primary);
+            color: #1e40af;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(37, 99, 235, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Charts */
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: var(--light);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            .card .value {
+                font-size: 24px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Hệ Thống Quản Lý Bầu Cử</h1>
+            <p>Quản lý dữ liệu bầu cử - Thống kê kết quả - Xuất nhập dữ liệu</p>
+        </header>
+        <p id="currentLevel" style="font-size:16px; color:var(--dark); margin-bottom:20px; font-weight:600;">Cấp: Xã</p>
+
+        <!-- level selector (xã, tỉnh, quốc hội) -->
+        <div class="level-nav">
+            <button class="level-btn active" data-level="xa">Xã</button>
+            <button class="level-btn" data-level="tinh">Tỉnh</button>
+            <button class="level-btn" data-level="quochoi">Quốc hội</button>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" data-tab="dashboard">📈 Dashboard</button>
+            <button class="nav-btn" data-tab="groups">👥 Quản Lý Tổ</button>
+            <button class="nav-btn" data-tab="progress">⏱️ Tiến Độ</button>
+            <button class="nav-btn" data-tab="verification">🔍 Kiểm Tra Phiếu</button>
+            <button class="nav-btn" data-tab="export">💾 Xuất Dữ Liệu</button>
+            <button class="nav-btn" data-tab="logs">📝 Lịch Sử</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="content active">
+            <div class="card-grid">
+                <div class="card">
+                    <h3>🏘️ Tổng Khu Vực</h3>
+                    <div class="value" id="totalDistricts">--</div>
+                    <div class="detail">Số khu vực bầu cử</div>
+                </div>
+                <div class="card">
+                    <h3>👥 Tổng Cử Tri</h3>
+                    <div class="value" id="totalVoters">--</div>
+                    <div class="detail">Người có quyền bầu cử</div>
+                </div>
+                <div class="card">
+                    <h3>🗳️ Đã Bình Chọn</h3>
+                    <div class="value" id="votedCount">--</div>
+                    <div class="detail">Phiếu thu về</div>
+                </div>
+                <div class="card">
+                    <h3>📊 Tỷ Lệ Tham Gia</h3>
+                    <div class="value" id="turnoutPercentage">--</div>
+                    <div class="detail">% cử tri đã tham gia</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>🎯 Kết Quả Ứng Cử Viên</h3>
+                <div id="candidateResults"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="loadDashboard()" style="margin-top: 20px;">🔄 Cập Nhật</button>
+        </div>
+
+        <!-- Groups Management Tab -->
+        <div id="groups" class="content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="margin: 0;">📋 SỐ LIỆU BẦU CỬ</h2>
+                    <button class="btn" style="background: #d97706; color: white; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600;">💾 Lưu lại</button>
+                </div>
+
+                <div style="border-top: 2px solid #e5e7eb; padding-top: 20px;">
+                    <h3 style="color: #374151; font-size: 16px; margin-bottom: 20px; font-weight: 600;">SỐ LIỆU ĐƠN VỊ BẦU CỬ</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <!-- Left Column: Dropdowns -->
+                        <div>
+                            <!-- Đơn vị bầu cử -->
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Đơn vị bầu cử</label>
+                                <div style="position: relative;">
+                                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
+                                        <!-- options will be populated dynamically or left empty -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Khu vực -->
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Khu vực</label>
+                                <div style="position: relative;">
+                                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
+                                        <!-- khu vực list (empty by default) -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Lần bầu cử -->
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Lần bầu cử</label>
+                                <div style="position: relative;">
+                                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;">
+                                        <option>Bầu cử lần 1</option>
+                                        <option>Bầu cử lần 2</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Tên biên bản -->
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Tên biên bản</label>
+                                <input type="text" value="" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Statistics in 2 columns -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px 30px;">
+                            <!-- Row 1 -->
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tổng số ứng cử</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tổng số được bầu</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+
+                            <!-- Row 2 -->
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tổng số cử tri</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS khu vực bổ phiếu</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+
+                            <!-- Row 3 -->
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS cử tri tham gia bổ phiếu</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tỷ lệ tham gia bổ phiếu</label>
+                                <input type="text" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+
+                            <!-- Row 4 -->
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS phiếu phát ra</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS phiếu thu vào</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+
+                            <!-- Row 5 -->
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS không hợp lệ</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tỷ lệ không hợp lệ</label>
+                                <input type="text" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+
+                            <!-- Row 6 -->
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">TS phiếu hợp lệ</label>
+                                <input type="number" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+                            <div>
+                                <label style="display: block; color: #6b7280; font-size: 13px; margin-bottom: 5px;">Tỷ lệ phiếu hợp lệ</label>
+                                <input type="text" value="" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Tab -->
+
+        <!-- Progress Tab -->
+        <div id="progress" class="content">
+            <div class="card" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 20px;">📤 Nhập Tiến Độ Bầu Cử</h2>
+
+                <h3 style="margin-bottom: 15px;">1. Nhập Tiến Độ Bầu Cử</h3>
+                <div style="margin-bottom: 15px; color: #666;">
+                    <p><strong>Cấu trúc file Excel:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Dòng 1: Header với các cột: <code>STT</code>, <code>Tên khu vực</code>, <code>Đơn vị</code>, <code>Tổng cử tri</code>, sau đó là các cột tiến độ theo giờ (ví dụ 9:00, 11:30, 15:00, 19:00, 22:00).</li>
+                        <li>Các dòng tiếp theo: dữ liệu số; giờ có thể biến động nhưng sẽ được đọc tuần tự.</li>
+                        <li>Không cần cung cấp cột tỷ lệ – hệ thống tự tính từ tổng cử tri và tổng đi bầu.</li>
+                    </ul>
+                </div>
+                <div class="upload-area" id="uploadArea1" ondrop="handleDrop(event, 1)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="openFileDialog(1)">
+                    <p>💾 Kéo thả file Excel tại đây</p>
+                    <small>hoặc nhấp để chọn file (.xlsx) - Có thể chọn nhiều file</small>
+                    <input type="file" id="file1" accept=".xlsx" multiple style="display: none;" onchange="handleFileSelect(event, 1)">
+                </div>
+                <div id="fileList1" style="margin-top: 15px;"></div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 15px;" onclick="uploadFile(1)">📤 Nhập File Tiến Độ</button>
+                <div id="result1"></div>
+            </div>
+
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid var(--border);">
+
+            <div class="card" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 15px;">⏱️ Tiến Độ Bầu Cử - Chi Tiết Khu Vực</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="loadProgress()">🔄 Tải Lại</button>
+                    <button class="btn btn-primary" onclick="exportAreaDetailsToExcel()">⬇️ Xuất Excel Chi Tiết</button>
+                    <button class="btn btn-danger" onclick="clearProgressData()">🗑️ Xóa Tất Cả</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="progressTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên đơn vị</th>
+                            <th>Mô tả</th>
+                            <th>Tổng số cử tri</th>
+                            <th>Tổng số cử tri đi bầu</th>
+                            <th style="color: red;">Tỷ lệ</th>
+                            <th>9:00</th>
+                            <th>11:30</th>
+                            <th>15:00</th>
+                            <th>19:00</th>
+                            <th>22:00</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="12" style="text-align: center; color: #999;">Chưa có dữ liệu</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid var(--border);">
+
+            <div class="card" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 15px;">📊 Tổng Hợp Tiến Độ - 10 Tổ</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="exportSummaryWithLevel()">⬇️ Xuất Excel Tổng Hợp</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="progressSummaryTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tổ</th>
+                            <th>Tổng số cử tri</th>
+                            <th>Tổng số cử tri đi bầu</th>
+                            <th style="color: red;">Tỷ lệ</th>
+                            <th>9:00</th>
+                            <th>11:30</th>
+                            <th>15:00</th>
+                            <th>19:00</th>
+                            <th>22:00</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="11" style="text-align: center; color: #999;">Chưa có dữ liệu</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Export Tab -->
+        <div id="export" class="content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="card" style="text-align: center;">
+                    <h3 style="margin-bottom: 15px;">📊 Xuất Kết Quả Bầu Cử</h3>
+                    <p style="margin-bottom: 20px; color: #666;">Tải file Excel chứa toàn bộ kết quả bầu cử</p>
+                    <button class="btn btn-success" style="width: 100%;" onclick="exportResultsWithLevel()">
+                        ⬇️ Tải File Excel
+                    </button>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <h3 style="margin-bottom: 15px;">📈 Xuất Tiến Độ Bầu Cử</h3>
+                    <p style="margin-bottom: 20px; color: #666;">Tải file Excel chứa tiến độ bầu cử theo giờ</p>
+                    <button class="btn btn-success" style="width: 100%;" onclick="exportProgressWithLevel()">
+                        ⬇️ Tải File Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Tab -->
+        <div id="verification" class="content">
+            <div class="card" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 15px;">🔍 Kiểm Tra Kết Quả Phiếu Bầu</h2>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="loadVerificationData()">🔄 Tải Lại</button>
+                    <button class="btn btn-primary" onclick="showVerificationForm()">➕ Thêm Mới</button>
+                    <button class="btn btn-warning" onclick="showBallotImportForm()">📤 Import Excel</button>
+                    <button class="btn btn-danger" onclick="clearVerificationData()">🗑️ Xóa Tất Cả</button>
+                </div>
+            </div>
+
+            <!-- Import Excel Form -->
+            <div id="ballotImportFormContainer" style="display: none; margin-bottom: 20px;">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">📤 Import Dữ Liệu Kiểm Phiếu từ Excel</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #666; margin-bottom: 10px;"><strong>Cấu trúc file Excel yêu cầu:</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>Dòng 1: Header (STT, Ứng cử viên 1-5)</li>
+                            <li>Dòng 2+: Dữ liệu phiếu bầu</li>
+                            <li>Giá trị: 1 hoặc số > 0 = được bầu, rỗng = không bầu</li>
+                            <li>Mỗi phiếu tối đa 3 người được chọn (hợp lệ)</li>
+                        </ul>
+                    </div>
+
+                    <div id="ballotUploadArea" class="upload-area" style="margin-bottom: 20px; border: 2px dashed #2563EB;" ondrop="handleBallotFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="document.getElementById('ballotFileInput').click()">
+                        <p style="margin: 0; color: #2563EB; font-weight: 600;">📁 Kéo thả file Excel vào đây hoặc click để chọn</p>
+                        <small style="color: #999;">File: .xlsx, .xls</small>
+                        <input type="file" id="ballotFileInput" style="display: none;" accept=".xlsx,.xls" onchange="handleBallotFileSelect(event)">
+                    </div>
+
+                    <div id="ballotFileList" style="margin-bottom: 20px;"></div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="importBallotFile()" style="flex: 1;">✅ Import</button>
+                        <button class="btn btn-secondary" onclick="hideBallotImportForm()">❌ Hủy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="verificationFormContainer" style="display: none; margin-bottom: 20px;">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px; text-align: center; color: #2B4F8C;">📋 KIỂM TRA KẾT QUẢ PHIẾU BẦU 5 BẦU 3</h3>
+                    
+                    <!-- Chọn Tổ -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600;">Chọn Tổ (1-10):</label>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(1)">Tổ 1</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(2)">Tổ 2</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(3)">Tổ 3</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(4)">Tổ 4</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(5)">Tổ 5</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(6)">Tổ 6</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(7)">Tổ 7</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(8)">Tổ 8</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(9)">Tổ 9</button>
+                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="selectVerifGroup(10)">Tổ 10</button>
+                        </div>
+                        <div style="background: rgba(37, 99, 235, 0.1); padding: 12px; border-radius: 8px; text-align: center; margin-top: 10px;">
+                            <strong>Tổ được chọn: <span id="selectedVerifTo" style="color: var(--primary);">Chưa chọn</span></strong>
+                        </div>
+                    </div>
+
+                    <!-- Chọn Khu Vực (dynamic based on group) -->
+                    <div id="verifAreaContainer" style="margin-bottom: 20px; display: none; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600;">Chọn Khu Vực:</label>
+                        <div id="verifAreaButtons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 15px;">
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 8px; text-align: center;">
+                            <strong>Khu vực được chọn: <span id="selectedVerifArea" style="color: var(--success);">Chưa chọn</span></strong>
+                        </div>
+                    </div>
+
+                    <!-- Main Excel-style Table -->
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
+                        <!-- Section 1: DỮ LIỆU (GREEN) -->
+                        <tr style="background-color: #C6EFCE;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Dữ liệu</td>
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600; text-align: center;">Số lượng</td>
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600; text-align: center;">Kiểm tra</td>
+                        </tr>
+                        <tr style="background-color: #C6EFCE;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Số phiếu phát ra</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_issued" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px; font-weight: 600;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: center; background-color: #FFFF99; font-size: 12px;" id="check_issued">✓</td>
+                        </tr>
+                        <tr style="background-color: #C6EFCE;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Số phiếu thu vào</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_received" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px; font-weight: 600;"></td>
+                            <td style="border: 1px solid #333; padding: 12px; background-color: #C6EFCE;"></td>
+                        </tr>
+
+                        <!-- Section 2: PHIẾU HỢP LỆ - PHIẾU KHÔNG HỢP LỆ (YELLOW) -->
+                        <tr style="background-color: #FFFF99;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Phiếu hợp lệ</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_valid" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px; font-weight: 600;"></td>
+                            <td style="border: 1px solid #333; padding: 12px; background-color: #FFFF99;"></td>
+                        </tr>
+                        <tr style="background-color: #FFFF99;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Phiếu không hợp lệ</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_invalid" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px; font-weight: 600;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: center; background-color: #FFFF99;"></td>
+                        </tr>
+                        <tr style="background-color: #FFFF99;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Tổng</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5; font-weight: 600;" id="verif_total1">390</td>
+                            <td style="border: 1px solid #333; padding: 8px; text-align: center; background-color: #FFFF99; font-size: 12px;" id="check_valid">✓</td>
+                        </tr>
+
+
+                        <!-- Section 3: PHIẾU BẦU VÀ SỐ PHIẾU HỢP LỆ (GRAY) -->
+                        <tr style="background-color: #D3D3D3;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Loại Phiếu Bầu</td>
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600; text-align: center;">Số Lượng</td>
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600; text-align: center;">Tổng Bầu</td>
+                        </tr>
+                        <tr style="background-color: #D3D3D3;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Phiếu bầu 1</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt1_count" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt1_votes" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #D3D3D3;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Phiếu bầu 2</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt2_count" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt2_votes" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #D3D3D3;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Phiếu bầu 3</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt3_count" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_bt3_votes" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #D3D3D3;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Tổng</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5; font-weight: 600;" id="verif_ballot_total">1000</td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5; font-weight: 600;" id="verif_ballot_sum">2750</td>
+                        </tr>
+
+                        <!-- Section 4: KẾT QUẢ KIỂM PHIẾU (LIGHT GRAY) -->
+                        <tr style="background-color: #E8E8E8;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng Cử Viên</td>
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600; text-align: center;">Tên</td>
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600; text-align: center;">Số Phiếu</td>
+                        </tr>
+                        <tr style="background-color: #E8E8E8;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 1</td>
+                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name1" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand1" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #E8E8E8;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 2</td>
+                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name2" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand2" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #E8E8E8;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 3</td>
+                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name3" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand3" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #E8E8E8;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 4</td>
+                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name4" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand4" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #E8E8E8;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Ứng cử viên số 5</td>
+                            <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name5" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand5" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
+                        </tr>
+                        <tr style="background-color: #E8E8E8;">
+                            <td style="border: 1px solid #333; padding: 12px; font-weight: 600;">Tổng</td>
+                            <td style="border: 1px solid #333; padding: 8px; font-weight: 600;"></td>
+                            <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5; font-weight: 600;" id="verif_cand_total">2750</td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                        <button class="btn btn-success" onclick="saveVerificationData()" style="padding: 12px 30px;">💾 Lưu Dữ Liệu</button>
+                        <button class="btn btn-secondary" onclick="hideVerificationForm()" style="padding: 12px 30px;">❌ Hủy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="verificationTable">
+                    <thead>
+                        <tr>
+                            <th>Khu Vực</th>
+                            <th>Phát Ra</th>
+                            <th>Thu Vào</th>
+                            <th>Hợp Lệ</th>
+                            <th>Không Hợp Lệ</th>
+                            <th>ứC 1</th>
+                            <th>ứC 2</th>
+                            <th>ứC 3</th>
+                            <th>ứC 4</th>
+                            <th>ứC 5</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="11" style="text-align: center; color: #999;">Chưa có dữ liệu</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Logs Tab -->
+        <div id="logs" class="content">
+            <div class="card" style="margin-bottom: 20px;">
+                <h2 style="margin-bottom: 15px;">📝 Lịch Sử Nhập Dữ Liệu</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="loadLogs()">🔄 Tải Lại</button>
+                    <button class="btn btn-danger" onclick="clearLogsData()">🗑️ Xóa Tất Cả</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="logsTable">
+                    <thead>
+                        <tr>
+                            <th>Thời Gian</th>
+                            <th>File</th>
+                            <th>Loại</th>
+                            <th>Tổng Dòng</th>
+                            <th>Thành Công</th>
+                            <th>Lỗi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="6" style="text-align: center; color: #999;">Chưa có lịch sử</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 Hệ Thống Quản Lý Bầu Cử - Tất cả quyền được bảo lưu</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api/election';
+        let selectedFiles = { 1: [], 2: [] };
+
+        // Level selection logic
+        let selectedLevel = 'xa';
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedLevel = btn.getAttribute('data-level');
+                console.log('Selected level:', selectedLevel);
+                
+                // RESET old data when level changes
+                allResultsData = [];
+                selectedGroup = null;
+                currentSelectedGroup = null;
+                currentSelectedArea = null;
+                
+                // RESET UI
+                const groupNameEl = document.getElementById('selectedGroupName');
+                if (groupNameEl) groupNameEl.textContent = 'Chưa chọn';
+                const areaButtonsContainer = document.getElementById('areaButtonsContainer');
+                if (areaButtonsContainer) areaButtonsContainer.style.display = 'none';
+                const areaDataTableContainer = document.getElementById('areaDataTableContainer');
+                if (areaDataTableContainer) areaDataTableContainer.style.display = 'none';
+                const groupSummaryContainer = document.getElementById('groupSummaryContainer');
+                if (groupSummaryContainer) groupSummaryContainer.style.display = 'none';
+                
+                // Clear tables
+                const groupSummaryTable = document.getElementById('groupSummaryTable');
+                if (groupSummaryTable) groupSummaryTable.innerHTML = '<tr><td colspan="5" style="text-align: center;">Chưa chọn tổ</td></tr>';
+                const candidatesSummaryTable = document.getElementById('candidatesSummaryTable');
+                if (candidatesSummaryTable) candidatesSummaryTable.innerHTML = '<tr><td colspan="4" style="text-align: center;">Chưa chọn tổ</td></tr>';
+                
+                const label = { xa: 'Xã', tinh: 'Tỉnh', quochoi: 'Quốc hội' }[selectedLevel] || selectedLevel;
+                document.getElementById('currentLevel').textContent = 'Cấp: ' + label;
+                
+                // reload current tab data when level changes
+                const activeTab = document.querySelector('.nav-btn.active')?.getAttribute('data-tab');
+                if (activeTab === 'dashboard') loadDashboard();
+                else if (activeTab === 'results') loadResults();
+                else if (activeTab === 'groups') loadResults();
+                else if (activeTab === 'progress') loadProgress();
+                else if (activeTab === 'verification') loadVerificationData();
+                else if (activeTab === 'logs') loadLogs();
+            });
+        });
+
+        // Tab Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                const tabName = btn.getAttribute('data-tab');
+                document.getElementById(tabName).classList.add('active');
+                
+                if (tabName === 'dashboard') loadDashboard();
+                else if (tabName === 'results') loadResults();
+                else if (tabName === 'groups') loadResults();
+                else if (tabName === 'progress') loadProgress();
+                else if (tabName === 'verification') loadVerificationData();
+                else if (tabName === 'logs') loadLogs();
+            });
+        });
+
+        // File Upload
+        function openFileDialog(fileNum) {
+            document.getElementById(`file${fileNum}`).click();
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const uploadArea = e.currentTarget;
+            if (uploadArea && uploadArea.classList) {
+                uploadArea.classList.add('dragover');
+            }
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const uploadArea = e.currentTarget;
+            if (uploadArea && uploadArea.classList) {
+                uploadArea.classList.remove('dragover');
+            }
+        }
+
+        function handleDrop(e, fileNum) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const uploadArea = document.getElementById(`uploadArea${fileNum}`);
+            if (uploadArea) {
+                uploadArea.classList.remove('dragover');
+            }
+            
+            const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.xlsx'));
+            if (files.length > 0) {
+                selectedFiles[fileNum].push(...files);
+                updateFileList(fileNum);
+                console.log(`Added ${files.length} files to file${fileNum}`);
+            } else {
+                alert('Vui lòng kéo thả file Excel (.xlsx)!');
+            }
+        }
+
+        function handleFileSelect(e, fileNum) {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                selectedFiles[fileNum].push(...files);
+                updateFileList(fileNum);
+                console.log(`Selected ${files.length} files for file${fileNum}`);
+            }
+        }
+
+        function removeFile(fileNum, index) {
+            selectedFiles[fileNum].splice(index, 1);
+            updateFileList(fileNum);
+        }
+
+        function clearFileList(fileNum) {
+            selectedFiles[fileNum] = [];
+            updateFileList(fileNum);
+            document.getElementById(`file${fileNum}`).value = '';
+        }
+
+        function updateFileList(fileNum) {
+            const listDiv = document.getElementById(`fileList${fileNum}`);
+            const files = selectedFiles[fileNum];
+            if (files.length === 0) {
+                listDiv.innerHTML = '';
+                return;
+            }
+            listDiv.innerHTML = `<div style="background: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <strong>📁 Danh sách ${files.length} file:</strong>
+                    <button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="clearFileList(${fileNum})">Xóa tất cả</button>
+                </div>
+                <ul style="margin: 0; padding-left: 20px; font-size: 12px;">
+                    ${files.map((f, i) => `<li style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>${f.name} (${(f.size / 1024).toFixed(2)} KB)</span>
+                        <button type="button" style="background: #fee2e2; color: #991b1b; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 11px; margin-left: 8px;" onclick="removeFile(${fileNum}, ${i})">Xóa</button>
+                    </li>`).join('')}
+                </ul>
+            </div>`;
+        }
+
+        // Select group/tổ
+        let selectedGroup = null;
+        let allResultsData = [];
+        
+        function selectToGroup(to) {
+            selectedGroup = (selectedGroup === to) ? null : to;
+            const groupNameEl = document.getElementById('selectedGroupName');
+            if (groupNameEl) {
+                groupNameEl.textContent = selectedGroup ? to : 'Chưa chọn';
+            }
+            
+            // Update all group buttons styling
+            document.querySelectorAll('button.btn-primary').forEach(btn => {
+                const btnText = btn.textContent.trim();
+                if (selectedGroup && btnText === selectedGroup) {
+                    btn.style.background = '#10b981';
+                    btn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                } else if (btnText.startsWith('Tổ')) {
+                    btn.style.background = 'var(--primary)';
+                    btn.style.boxShadow = 'none';
+                }
+            });
+            
+            // Filter and show results
+            showFilteredResults();
+        }
+        
+        function showFilteredResults() {
+            const tbody = document.querySelector('#resultsTable tbody');
+            if (!tbody) {
+                console.log('[DEBUG] resultsTable not found, skipping render');
+                return;
+            }
+            
+            let filteredData = allResultsData;
+            
+            if (selectedGroup) {
+                filteredData = allResultsData.filter(r => r.to === selectedGroup);
+            }
+            
+            if (filteredData.length > 0) {
+                tbody.innerHTML = filteredData.map(r => `
+                    <tr>
+                        <td>${r.stt}</td>
+                        <td>${r.khuVuc}</td>
+                        <td>${r.tongCuTri}</td>
+                        <td>${r.ungCuVien1}</td>
+                        <td>${r.ungCuVien2}</td>
+                        <td>${r.ungCuVien3}</td>
+                        <td>${r.ungCuVien4}</td>
+                        <td>${r.ungCuVien5}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999;">Chưa có dữ liệu</td></tr>';
+            }
+        }
+
+        async function uploadFile(fileNum) {
+            // include current level when uploading
+            console.log('Uploading files at level', selectedLevel);
+            const files = selectedFiles[fileNum];
+            if (!files || files.length === 0) {
+                alert('Vui lòng chọn file!');
+                return;
+            }
+
+            const endpoint = fileNum === 1 ? 'import-progress' : 'import-results';
+            const resultDiv = document.getElementById(`result${fileNum}`);
+            const totalFiles = files.length;
+            let successCount = 0;
+            let totalRows = 0;
+            let totalValidRows = 0;
+            const allErrors = [];
+
+            resultDiv.innerHTML = `<div class="alert alert-info"><span class="spinner"></span> Đang xử lý ${totalFiles} file...</div>`;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    formData.append('level', selectedLevel);
+                    const response = await fetch(`${API_BASE}/${endpoint}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        successCount++;
+                        totalRows += data.totalRows || 0;
+                        totalValidRows += data.validRows || 0;
+                    } else {
+                        allErrors.push(`${file.name}: ${data.message}`);
+                        if (data.errors) allErrors.push(...data.errors);
+                    }
+                } catch (error) {
+                    allErrors.push(`${file.name}: ${error.message}`);
+                }
+            }
+
+            if (successCount > 0) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        ✅ <strong>Nhập ${successCount}/${totalFiles} file thành công!</strong><br>
+                        Tổng dòng: ${totalRows}<br>
+                        Thành công: ${totalValidRows}<br>
+                        Lỗi: ${allErrors.length}
+                        ${allErrors.length > 0 ? `<br><strong>Chi tiết lỗi:</strong><br>${allErrors.slice(0, 5).map(e => '• ' + e).join('<br>')}${allErrors.length > 5 ? '<br>... và ' + (allErrors.length - 5) + ' lỗi khác' : ''}` : ''}
+                    </div>
+                `;
+                // Clear file list sau import thành công
+                setTimeout(() => {
+                    clearFileList(fileNum);
+                    loadDashboard();
+                    if (fileNum === 1) loadProgress();  // Reload progress table if importing progress data
+                    if (fileNum === 2) loadResults();
+                }, 500);
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        ❌ <strong>Lỗi:</strong> Không thể nhập bất kỳ file nào!<br>
+                        ${allErrors.map(e => `• ${e}`).join('<br>')}
+                    </div>
+                `;
+            }
+        }
+
+        // Load Dashboard
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard?level=${encodeURIComponent(selectedLevel)}`);
+                const data = await response.json();
+
+                document.getElementById('totalDistricts').textContent = data.totalDistricts || 0;
+                document.getElementById('totalVoters').textContent = (data.totalVoters || 0).toLocaleString('vi-VN');
+                document.getElementById('votedCount').textContent = (data.votedCount || 0).toLocaleString('vi-VN');
+                document.getElementById('turnoutPercentage').textContent = (data.turnoutPercentage || 0).toFixed(1) + '%';
+
+                // Candidate Results
+                const candidateDiv = document.getElementById('candidateResults');
+                if (data.candidateResults && data.candidateResults.length > 0) {
+                    candidateDiv.innerHTML = data.candidateResults.map(c => `
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <strong>${c.candidateName || 'Ứng cử viên'}</strong>
+                                <span>${c.votes} phiếu (${c.percentage.toFixed(1)}%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${c.percentage}%">
+                                    ${c.percentage > 10 ? c.percentage.toFixed(1) + '%' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    candidateDiv.innerHTML = '<p style="text-align: center; color: #999;">Chưa có dữ liệu</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Load Results
+        async function loadResults() {
+            try {
+                const url = `${API_BASE}/results?level=${encodeURIComponent(selectedLevel)}`;
+                console.log('[DEBUG] Loading results from:', url);
+                const response = await fetch(url);
+                allResultsData = await response.json();
+                console.log('[DEBUG] Results received:', allResultsData);
+                console.log('[DEBUG] Total records:', allResultsData.length);
+                if (allResultsData.length > 0) {
+                    console.log('[DEBUG] First record level:', allResultsData[0].level);
+                }
+                
+                selectedGroup = null;
+                const groupNameEl = document.getElementById('selectedGroupName');
+                if (groupNameEl) {
+                    groupNameEl.textContent = 'Chưa chọn';
+                }
+                
+                // Only call showFilteredResults if we're on the results tab (element exists)
+                const resultsTable = document.querySelector('#resultsTable tbody');
+                if (resultsTable) {
+                    showFilteredResults();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Load Progress
+        async function loadProgress() {
+            try {
+                const response = await fetch(`${API_BASE}/progress?level=${encodeURIComponent(selectedLevel)}`);
+                const data = await response.json();
+                
+                const tbody = document.querySelector('#progressTable tbody');
+                if (data && data.length > 0) {
+                    tbody.innerHTML = data.map((p, idx) => `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td>${p.tenKhuVuc || ''}</td>
+                            <td>${p.donVi || '-'}</td>
+                            <td>${p.tongCuTri || 0}</td>
+                            <td>${p.tongCuTriDiBau || 0}</td>
+                            <td style="color: red;">${(p.tiLe || 0).toFixed(1)}%</td>
+                            <td>${p.gio8 || 0}</td>
+                            <td>${p.gio10 || 0}</td>
+                            <td>${p.gio12 || 0}</td>
+                            <td>${p.gio14 || 0}</td>
+                            <td>${p.gio16 || 0}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #999;">Chưa có dữ liệu</td></tr>';
+                }
+
+                // Calculate and update summary table for 10 groups
+                updateProgressSummary(data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Update Progress Summary Table
+        function updateProgressSummary(data) {
+            const summaryTbody = document.querySelector('#progressSummaryTable tbody');
+            
+            if (!data || data.length === 0) {
+                summaryTbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #999;">Chưa có dữ liệu</td></tr>';
+                return;
+            }
+
+            // Group data by "Tổ X"
+            const groupedData = {};
+            for (let i = 1; i <= 10; i++) {
+                groupedData[i] = {
+                    tongCuTri: 0,
+                    tongCuTriDiBau: 0,
+                    gio8: 0,
+                    gio10: 0,
+                    gio12: 0,
+                    gio14: 0,
+                    gio16: 0,
+                    count: 0
+                };
+            }
+
+            data.forEach(p => {
+                // Extract group number from donVi only
+                // "Đơn vị 1" -> 1, "Đơn vị 2" -> 2, etc.
+                let match = p.donVi?.match(/(\d+)/);
+                let toNum = match ? parseInt(match[1]) : null;
+                
+                if (toNum && toNum >= 1 && toNum <= 10) {
+                    groupedData[toNum].tongCuTri += p.tongCuTri || 0;
+                    groupedData[toNum].tongCuTriDiBau += p.tongCuTriDiBau || 0;
+                    groupedData[toNum].gio8 += p.gio8 || 0;
+                    groupedData[toNum].gio10 += p.gio10 || 0;
+                    groupedData[toNum].gio12 += p.gio12 || 0;
+                    groupedData[toNum].gio14 += p.gio14 || 0;
+                    groupedData[toNum].gio16 += p.gio16 || 0;
+                    groupedData[toNum].count++;
+                }
+            });
+
+            // Render summary table
+            let html = '';
+            for (let i = 1; i <= 10; i++) {
+                const g = groupedData[i];
+                const tiLe = g.tongCuTri > 0 ? ((g.tongCuTriDiBau / g.tongCuTri) * 100).toFixed(1) : 0;
+                html += `
+                    <tr>
+                        <td>${i}</td>
+                        <td>Tổ ${i}</td>
+                        <td>${g.tongCuTri}</td>
+                        <td>${g.tongCuTriDiBau}</td>
+                        <td style="color: red;">${tiLe}%</td>
+                        <td>${g.gio8}</td>
+                        <td>${g.gio10}</td>
+                        <td>${g.gio12}</td>
+                        <td>${g.gio14}</td>
+                        <td>${g.gio16}</td>
+                    </tr>
+                `;
+            }
+            summaryTbody.innerHTML = html;
+        }
+
+        // Verification Functions
+        let selectedToGroup = null;
+        let selectedVerifGroupNum = null;
+        let selectedVerifAreaNum = null;
+
+        function selectToGroup(group) {
+            selectedToGroup = group;
+            document.getElementById('selectedVerifTo').textContent = group;
+            // Highlight button
+            document.querySelectorAll('#verificationFormContainer button').forEach(btn => {
+                if (btn.textContent.trim() === group) {
+                    btn.style.backgroundColor = '#2B4F8C';
+                    btn.style.color = 'white';
+                } else if (btn.textContent.trim() !== '💾 Lưu Dữ Liệu' && btn.textContent.trim() !== '❌ Hủy') {
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                }
+            });
+        }
+
+        function selectVerifGroup(groupNum) {
+            selectedVerifGroupNum = groupNum;
+            selectedVerifAreaNum = null;
+            
+            // Update group display
+            document.getElementById('selectedVerifTo').textContent = `Tổ ${groupNum}`;
+            document.getElementById('selectedVerifArea').textContent = 'Chưa chọn';
+            
+            // Update button styles
+            const verifButtons = document.querySelectorAll('#verificationFormContainer .btn-primary');
+            verifButtons.forEach((btn, idx) => {
+                if (idx === groupNum - 1) {  // Group buttons start from index 0
+                    btn.style.background = '#10b981';
+                    btn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                } else if (idx < 10) {  // Only style the group buttons (first 10)
+                    btn.style.background = 'var(--primary)';
+                    btn.style.boxShadow = 'none';
+                }
+            });
+            
+            // Show and populate area buttons
+            displayVerifAreaButtons(groupNum);
+        }
+
+        function displayVerifAreaButtons(groupNum) {
+            const areas = groupAreaMapping[groupNum] || [];
+            const container = document.getElementById('verifAreaContainer');
+            const buttonsDiv = document.getElementById('verifAreaButtons');
+            
+            buttonsDiv.innerHTML = '';
+            areas.forEach(areaNum => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-primary';
+                btn.style.padding = '10px';
+                btn.style.fontSize = '12px';
+                btn.textContent = `Khu Vực ${areaNum}`;
+                btn.onclick = () => selectVerifArea(areaNum);
+                buttonsDiv.appendChild(btn);
+            });
+            
+            container.style.display = 'block';
+        }
+
+        function selectVerifArea(areaNum) {
+            selectedVerifAreaNum = areaNum;
+            document.getElementById('selectedVerifArea').textContent = `Khu Vực ${areaNum}`;
+            
+            // Update area button styles
+            document.querySelectorAll('#verifAreaButtons button').forEach(btn => {
+                const btnNum = parseInt(btn.textContent.replace('Khu Vực ', ''));
+                if (btnNum === areaNum) {
+                    btn.style.background = '#10b981';
+                    btn.style.color = 'white';
+                    btn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                } else {
+                    btn.style.background = 'var(--primary)';
+                    btn.style.color = 'white';
+                    btn.style.boxShadow = 'none';
+                }
+            });
+            
+            // Automatically show import form when area is selected
+            showBallotImportForm();
+        }
+
+        function showVerificationForm() {
+            document.getElementById('verificationFormContainer').style.display = 'block';
+            // Thêm event listener cho tính toán tự động
+            setTimeout(() => initVerificationFormListeners(), 100);
+        }
+
+        function initVerificationFormListeners() {
+            // Kiểm tra phiếu phát ra vs phiếu thu vào
+            ['verif_issued', 'verif_received'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', calculateVerificationTotals);
+                }
+            });
+            
+            // Tính tổng phiếu hợp lệ + không hợp lệ
+            ['verif_valid', 'verif_invalid'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', calculateVerificationTotals);
+                }
+            });
+            
+            // Tính tổng phiếu bầu
+            ['verif_bt1_count', 'verif_bt2_count', 'verif_bt3_count',
+             'verif_bt1_votes', 'verif_bt2_votes', 'verif_bt3_votes'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', calculateVerificationTotals);
+                }
+            });
+            
+            // Tính tổng kết quả kiểm phiếu
+            ['verif_cand1', 'verif_cand2', 'verif_cand3', 'verif_cand4', 'verif_cand5'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', calculateVerificationTotals);
+                }
+            });
+            
+            calculateVerificationTotals();
+        }
+
+        function calculateVerificationTotals() {
+            const issued = parseInt(document.getElementById('verif_issued').value) || 0;
+            const received = parseInt(document.getElementById('verif_received').value) || 0;
+            
+            // Tính tổng phiếu hợp lệ + phiếu không hợp lệ
+            const valid = parseInt(document.getElementById('verif_valid').value) || 0;
+            const invalid = parseInt(document.getElementById('verif_invalid').value) || 0;
+            const totalValidInvalid = valid + invalid;
+            document.getElementById('verif_total1').textContent = totalValidInvalid;
+            
+            // === KIỂM TRA 1: Phiếu phát ra >= phiếu thu vào ===
+            const checkIssuedEl = document.getElementById('check_issued');
+            if (issued > 0 && received > 0) {
+                if (issued >= received) {
+                    checkIssuedEl.textContent = 'Dữ liệu đã khớp';
+                    checkIssuedEl.style.color = 'green';
+                } else {
+                    checkIssuedEl.textContent = '⚠️ Lỗi';
+                    checkIssuedEl.style.color = 'red';
+                }
+            } else {
+                checkIssuedEl.textContent = '';
+            }
+            
+            // === KIỂM TRA 2: Tổng (phiếu hợp lệ + không hợp lệ) = phiếu thu vào ===
+            const checkValidEl = document.getElementById('check_valid');
+            if (received > 0) {
+                if (totalValidInvalid === received) {
+                    checkValidEl.textContent = 'Dữ liệu đã khớp';
+                    checkValidEl.style.color = 'green';
+                } else {
+                    checkValidEl.textContent = `⚠️ Lỗi (${totalValidInvalid} ≠ ${received})`;
+                    checkValidEl.style.color = 'red';
+                }
+            } else {
+                checkValidEl.textContent = '';
+            }
+            
+            // Tính tổng số lượng phiếu bầu
+            const bt1Count = parseInt(document.getElementById('verif_bt1_count').value) || 0;
+            const bt2Count = parseInt(document.getElementById('verif_bt2_count').value) || 0;
+            const bt3Count = parseInt(document.getElementById('verif_bt3_count').value) || 0;
+            
+            // Auto-calculate Tổng Bầu: bt1 × 1, bt2 × 2, bt3 × 3
+            const bt1Votes = bt1Count * 1;
+            const bt2Votes = bt2Count * 2;
+            const bt3Votes = bt3Count * 3;
+            
+            // Set calculated values
+            document.getElementById('verif_bt1_votes').value = bt1Votes;
+            document.getElementById('verif_bt2_votes').value = bt2Votes;
+            document.getElementById('verif_bt3_votes').value = bt3Votes;
+            
+            // Update display totals
+            document.getElementById('verif_ballot_total').textContent = bt1Count + bt2Count + bt3Count;
+            document.getElementById('verif_ballot_sum').textContent = bt1Votes + bt2Votes + bt3Votes;
+            
+            // Tính tổng kết quả kiểm phiếu các ngành
+            const cand1 = parseInt(document.getElementById('verif_cand1').value) || 0;
+            const cand2 = parseInt(document.getElementById('verif_cand2').value) || 0;
+            const cand3 = parseInt(document.getElementById('verif_cand3').value) || 0;
+            const cand4 = parseInt(document.getElementById('verif_cand4').value) || 0;
+            const cand5 = parseInt(document.getElementById('verif_cand5').value) || 0;
+            document.getElementById('verif_cand_total').textContent = cand1 + cand2 + cand3 + cand4 + cand5;
+        }
+
+        function hideVerificationForm() {
+            document.getElementById('verificationFormContainer').style.display = 'none';
+            clearVerificationForm();
+        }
+
+        function clearVerificationForm() {
+            selectedToGroup = null;
+            selectedVerifGroupNum = null;
+            selectedVerifAreaNum = null;
+            document.getElementById('selectedVerifTo').textContent = 'Chưa chọn';
+            document.getElementById('selectedVerifArea').textContent = 'Chưa chọn';
+            document.getElementById('verifAreaContainer').style.display = 'none';
+            document.getElementById('verif_issued').value = '';
+            document.getElementById('verif_received').value = '';
+            document.getElementById('verif_valid').value = '';
+            document.getElementById('verif_invalid').value = '';
+            document.getElementById('verif_bt1_count').value = '';
+            document.getElementById('verif_bt1_votes').value = '';
+            document.getElementById('verif_bt2_count').value = '';
+            document.getElementById('verif_bt2_votes').value = '';
+            document.getElementById('verif_bt3_count').value = '';
+            document.getElementById('verif_bt3_votes').value = '';
+            // Clear candidate votes
+            document.getElementById('verif_cand1').value = '';
+            document.getElementById('verif_cand2').value = '';
+            document.getElementById('verif_cand3').value = '';
+            document.getElementById('verif_cand4').value = '';
+            document.getElementById('verif_cand5').value = '';
+            document.getElementById('verif_cand_name1').value = '';
+            document.getElementById('verif_cand_name2').value = '';
+            document.getElementById('verif_cand_name3').value = '';
+            document.getElementById('verif_cand_name4').value = '';
+            document.getElementById('verif_cand_name5').value = '';
+            // Reset button styles
+            document.querySelectorAll('#verificationFormContainer button').forEach(btn => {
+                if (btn.textContent.trim() !== '💾 Lưu Dữ Liệu' && btn.textContent.trim() !== '❌ Hủy') {
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                }
+            });
+        }
+
+        async function saveVerificationData() {
+            if (!selectedVerifGroupNum || !selectedVerifAreaNum) {
+                alert('Vui lòng chọn tổ và khu vực trước khi lưu dữ liệu!');
+                return;
+            }
+
+            const data = {
+                districtName: `Tổ ${selectedVerifGroupNum} - Khu Vực ${selectedVerifAreaNum}`,
+                issuedBallots: parseInt(document.getElementById('verif_issued').value) || 0,
+                receivedBallots: parseInt(document.getElementById('verif_received').value) || 0,
+                validBallots: parseInt(document.getElementById('verif_valid').value) || 0,
+                invalidBallots: parseInt(document.getElementById('verif_invalid').value) || 0,
+                ballotType1Count: parseInt(document.getElementById('verif_bt1_count').value) || 0,
+                ballotType1Votes: parseInt(document.getElementById('verif_bt1_votes').value) || 0,
+                ballotType2Count: parseInt(document.getElementById('verif_bt2_count').value) || 0,
+                ballotType2Votes: parseInt(document.getElementById('verif_bt2_votes').value) || 0,
+                ballotType3Count: parseInt(document.getElementById('verif_bt3_count').value) || 0,
+                ballotType3Votes: parseInt(document.getElementById('verif_bt3_votes').value) || 0,
+                candidate1Votes: parseInt(document.getElementById('verif_cand1').value) || 0,
+                candidate2Votes: parseInt(document.getElementById('verif_cand2').value) || 0,
+                candidate3Votes: parseInt(document.getElementById('verif_cand3').value) || 0,
+                candidate4Votes: parseInt(document.getElementById('verif_cand4').value) || 0,
+                candidate5Votes: parseInt(document.getElementById('verif_cand5').value) || 0,
+                candidate1Name: document.getElementById('verif_cand_name1').value || '',
+                candidate2Name: document.getElementById('verif_cand_name2').value || '',
+                candidate3Name: document.getElementById('verif_cand_name3').value || '',
+                candidate4Name: document.getElementById('verif_cand_name4').value || '',
+                candidate5Name: document.getElementById('verif_cand_name5').value || ''
+            };
+
+            try {
+                // Kiểm tra xem dữ liệu của tổ này đã tồn tại chưa
+                const allDataResponse = await fetch(`http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`);
+                const allData = await allDataResponse.json();
+                
+                const existingRecord = allData.find(r => r.districtName === selectedToGroup);
+                
+                let url = `http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`;
+                let method = 'POST';
+                
+                if (existingRecord) {
+                    // Nếu tồn tại thì update
+                    url = `http://localhost:5000/api/ballotverification/${existingRecord.id}`;
+                    method = 'PUT';
+                    data.id = existingRecord.id;
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Lưu dữ liệu thành công!');
+                    hideVerificationForm();
+                    loadVerificationData();
+                } else {
+                    alert('Lỗi khi lưu dữ liệu!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+
+        async function loadVerificationData() {
+            try {
+                const response = await fetch(`http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`);
+                const data = await response.json();
+
+                const tbody = document.querySelector('#verificationTable tbody');
+                if (data && data.length > 0) {
+                    tbody.innerHTML = data.map((row, idx) => `
+                        <tr>
+                            <td>${row.districtName}</td>
+                            <td>${row.issuedBallots}</td>
+                            <td>${row.receivedBallots}</td>
+                            <td>${row.validBallots}</td>
+                            <td>${row.invalidBallots}</td>
+                            <td>${row.candidate1Votes}</td>
+                            <td>${row.candidate2Votes}</td>
+                            <td>${row.candidate3Votes}</td>
+                            <td>${row.candidate4Votes}</td>
+                            <td>${row.candidate5Votes}</td>
+                            <td style="display: flex; gap: 4px;">
+                                <button class="btn btn-primary" style="padding: 4px 8px; font-size: 12px;" onclick="editVerificationData(${row.id})">✏️ Sửa</button>
+                                <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteVerificationData(${row.id})">🗑️ Xóa</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #999;">Chưa có dữ liệu</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function editVerificationData(id) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/ballotverification/${id}`);
+                const record = await response.json();
+
+                if (response.ok && record) {
+                    // Hiển thị form và load dữ liệu vào
+                    showVerificationForm();
+                    
+                    // Chọn tổ
+                    selectToGroup(record.districtName);
+                    
+                    // Load dữ liệu vào form
+                    document.getElementById('verif_issued').value = record.issuedBallots || '';
+                    document.getElementById('verif_received').value = record.receivedBallots || '';
+                    document.getElementById('verif_valid').value = record.validBallots || '';
+                    document.getElementById('verif_invalid').value = record.invalidBallots || '';
+                    document.getElementById('verif_bt1_count').value = record.ballotType1Count || '';
+                    document.getElementById('verif_bt1_votes').value = record.ballotType1Votes || '';
+                    document.getElementById('verif_bt2_count').value = record.ballotType2Count || '';
+                    document.getElementById('verif_bt2_votes').value = record.ballotType2Votes || '';
+                    document.getElementById('verif_bt3_count').value = record.ballotType3Count || '';
+                    document.getElementById('verif_bt3_votes').value = record.ballotType3Votes || '';
+                    document.getElementById('verif_cand1').value = record.candidate1Votes || '';
+                    document.getElementById('verif_cand2').value = record.candidate2Votes || '';
+                    document.getElementById('verif_cand3').value = record.candidate3Votes || '';
+                    document.getElementById('verif_cand4').value = record.candidate4Votes || '';
+                    document.getElementById('verif_cand5').value = record.candidate5Votes || '';
+                    document.getElementById('verif_cand_name1').value = record.candidate1Name || '';
+                    document.getElementById('verif_cand_name2').value = record.candidate2Name || '';
+                    document.getElementById('verif_cand_name3').value = record.candidate3Name || '';
+                    document.getElementById('verif_cand_name4').value = record.candidate4Name || '';
+                    document.getElementById('verif_cand_name5').value = record.candidate5Name || '';
+                    
+                    // Recalculate verification totals
+                    calculateVerificationTotals();
+                    
+                    // Scroll to form
+                    document.getElementById('verificationFormContainer').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Không thể tải dữ liệu!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+
+        async function deleteVerificationData(id) {
+            if (!confirm('Bạn chắc chắn muốn xóa dữ liệu này?')) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/ballotverification/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadVerificationData();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function clearVerificationData() {
+            if (!confirm('Bạn chắc chắn muốn xóa tất cả dữ liệu kiểm tra phiếu bầu?')) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/ballotverification/clear-all?level=${encodeURIComponent(selectedLevel)}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadVerificationData();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Ballot Import Functions
+        let selectedBallotFile = null;
+
+        function showBallotImportForm() {
+            document.getElementById('ballotImportFormContainer').style.display = 'block';
+        }
+
+        function hideBallotImportForm() {
+            document.getElementById('ballotImportFormContainer').style.display = 'none';
+            selectedBallotFile = null;
+            document.getElementById('ballotFileList').innerHTML = '';
+        }
+
+        function handleBallotFileDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ballotUploadArea').classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                selectedBallotFile = files[0];
+                updateBallotFileList();
+            }
+        }
+
+        function handleBallotFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                selectedBallotFile = files[0];
+                updateBallotFileList();
+            }
+        }
+
+        function updateBallotFileList() {
+            const fileListDiv = document.getElementById('ballotFileList');
+            if (selectedBallotFile) {
+                fileListDiv.innerHTML = `
+                    <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>📄 ${selectedBallotFile.name} (${(selectedBallotFile.size / 1024).toFixed(2)} KB)</span>
+                        <button class="btn btn-sm btn-danger" style="padding: 4px 8px;" onclick="removeBallotFile()">✕</button>
+                    </div>
+                `;
+            } else {
+                fileListDiv.innerHTML = '';
+            }
+        }
+
+        function removeBallotFile() {
+            selectedBallotFile = null;
+            document.getElementById('ballotFileInput').value = '';
+            document.getElementById('ballotFileList').innerHTML = '';
+        }
+
+        async function importBallotFile() {
+            if (!selectedBallotFile) {
+                alert('Vui lòng chọn file Excel!');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', selectedBallotFile);
+
+            try {
+                const response = await fetch('http://localhost:5000/api/ballotverification/import-ballot', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert('Lỗi: ' + result.message + '\n' + (result.errorDetails || ''));
+                    return;
+                }
+
+                // Hiển thị kết quả
+                const data = result.data;
+                console.log('Import response data:', data);
+                console.log('Candidate names from API:', {
+                    candidate1Name: data.candidate1Name,
+                    candidate2Name: data.candidate2Name,
+                    candidate3Name: data.candidate3Name,
+                    candidate4Name: data.candidate4Name,
+                    candidate5Name: data.candidate5Name
+                });
+                alert(`✅ Import thành công!\n\nTổng phiếu: ${data.totalBallots}\nPhiếu hợp lệ: ${data.validBallots}\nPhiếu không hợp lệ: ${data.invalidBallots}`);
+
+                // Auto-fill form với dữ liệu vừa import
+                showVerificationForm();
+                selectToGroup('Tổ 1'); // Default chọn Tổ 1
+                
+                document.getElementById('verif_issued').value = data.issuedBallots;
+                document.getElementById('verif_received').value = data.receivedBallots;
+                document.getElementById('verif_valid').value = data.validBallots;
+                document.getElementById('verif_invalid').value = data.invalidBallots;
+                document.getElementById('verif_bt1_count').value = data.ballotType1Count;
+                document.getElementById('verif_bt1_votes').value = data.ballotType1Votes;
+                document.getElementById('verif_bt2_count').value = data.ballotType2Count;
+                document.getElementById('verif_bt2_votes').value = data.ballotType2Votes;
+                document.getElementById('verif_bt3_count').value = data.ballotType3Count;
+                document.getElementById('verif_bt3_votes').value = data.ballotType3Votes;
+                document.getElementById('verif_cand1').value = data.candidate1Votes;
+                document.getElementById('verif_cand2').value = data.candidate2Votes;
+                document.getElementById('verif_cand3').value = data.candidate3Votes;
+                document.getElementById('verif_cand4').value = data.candidate4Votes;
+                document.getElementById('verif_cand5').value = data.candidate5Votes;
+                document.getElementById('verif_cand_name1').value = data.candidate1Name || '';
+                document.getElementById('verif_cand_name2').value = data.candidate2Name || '';
+                document.getElementById('verif_cand_name3').value = data.candidate3Name || '';
+                document.getElementById('verif_cand_name4').value = data.candidate4Name || '';
+                document.getElementById('verif_cand_name5').value = data.candidate5Name || '';
+                
+                // Tính toán tổng
+                calculateVerificationTotals();
+
+                // Clear import form
+                setTimeout(() => hideBallotImportForm(), 500);
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+
+        // Load Logs
+        async function loadLogs() {
+            try {
+                const response = await fetch(`${API_BASE}/import-logs?level=${encodeURIComponent(selectedLevel)}`);
+                const data = await response.json();
+                
+                const tbody = document.querySelector('#logsTable tbody');
+                if (data && data.length > 0) {
+                    tbody.innerHTML = data.map(log => `
+                        <tr>
+                            <td>${new Date(log.createdAt).toLocaleString('vi-VN')}</td>
+                            <td>${log.fileName}</td>
+                            <td>${log.importType}</td>
+                            <td>${log.totalRows}</td>
+                            <td style="color: green;">${log.successRows}</td>
+                            <td style="color: red;">${log.errorRows}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">Chưa có lịch sử</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Clear Results Data
+        async function clearResultsData() {
+            if (!confirm('⚠️ Bạn chắc chắn muốn xóa TẤT CẢ dữ liệu kết quả bầu cử? Hành động này không thể hoàn tác!')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/results/clear-all?level=${encodeURIComponent(selectedLevel)}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                alert(data.message);
+                loadResults();
+                loadDashboard();
+            } catch (error) {
+                alert('❌ Lỗi: ' + error.message);
+            }
+        }
+
+        // Export Area Details to Excel
+        function exportAreaDetailsToExcel() {
+            try {
+                const table = document.getElementById('progressTable');
+                const rows = table.querySelectorAll('tr');
+                
+                if (rows.length <= 1) {
+                    alert('⚠️ Không có dữ liệu để xuất!');
+                    return;
+                }
+
+                // Prepare CSV data
+                let csv = [];
+                
+                // Add headers
+                const headerRow = [];
+                const headers = table.querySelectorAll('thead th');
+                headers.forEach(th => {
+                    headerRow.push('"' + th.textContent.trim().replace(/"/g, '""') + '"');
+                });
+                csv.push(headerRow.join(','));
+                
+                // Add data rows
+                const bodyRows = table.querySelectorAll('tbody tr');
+                bodyRows.forEach(tr => {
+                    if (tr.querySelector('td[colspan]')) {
+                        return; // Skip empty rows
+                    }
+                    
+                    const row = [];
+                    const cells = tr.querySelectorAll('td');
+                    cells.forEach(td => {
+                        row.push('"' + td.textContent.trim().replace(/"/g, '""') + '"');
+                    });
+                    csv.push(row.join(','));
+                });
+                
+                // Create blob and trigger download
+                const csvContent = csv.join('\n');
+                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                const now = new Date();
+                const filename = `ChiTietKhuVuc_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}.csv`;
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log('✅ Xuất dữ liệu chi tiết khu vực thành công!');
+            } catch (error) {
+                alert('❌ Lỗi khi xuất file: ' + error.message);
+                console.error('Export error:', error);
+            }
+        }
+
+        // Export helpers including selected level
+        function exportResultsWithLevel() {
+            window.location.href = `${API_BASE}/export-results?level=${encodeURIComponent(selectedLevel)}`;
+        }
+
+        function exportProgressWithLevel() {
+            window.location.href = `${API_BASE}/export-progress?level=${encodeURIComponent(selectedLevel)}`;
+        }
+
+        function exportSummaryWithLevel() {
+            window.location.href = `${API_BASE}/export-progress?level=${encodeURIComponent(selectedLevel)}`; // summary same endpoint
+        }
+
+        // Clear Progress Data
+        async function clearProgressData() {
+            if (!confirm('⚠️ Bạn chắc chắn muốn xóa TẤT CẢ dữ liệu tiến độ bầu cử? Hành động này không thể hoàn tác!')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/progress/clear-all?level=${encodeURIComponent(selectedLevel)}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                alert(data.message);
+                loadProgress();
+            } catch (error) {
+                alert('❌ Lỗi: ' + error.message);
+            }
+        }
+
+        // Clear Logs Data
+        async function clearLogsData() {
+            if (!confirm('⚠️ Bạn chắc chắn muốn xóa TẤT CẢ lịch sử nhập dữ liệu? Hành động này không thể hoàn tác!')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/logs/clear-all?level=${encodeURIComponent(selectedLevel)}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                alert(data.message);
+                loadLogs();
+            } catch (error) {
+                alert('❌ Lỗi: ' + error.message);
+            }
+        }
+
+        // ===== GROUP AND AREA MANAGEMENT =====
+        
+        const groupAreaMapping = {
+            1: [1, 2],
+            2: [3, 4],
+            3: [5, 6],
+            4: [7, 8],
+            5: [9, 10, 11],
+            6: [12, 13, 14],
+            7: [15, 16],
+            8: [17, 18],
+            9: [19, 20],
+            10: [21, 22]
+        };
+
+        let currentSelectedGroup = null;
+        let currentSelectedArea = null;
+
+        function selectGroup(groupNum) {
+            currentSelectedGroup = groupNum;
+            currentSelectedArea = null;
+            
+            // Update group name display
+            document.getElementById('selectedGroupName').textContent = `Tổ ${groupNum}`;
+            
+            // Update group button styles
+            document.querySelectorAll('#groups .nav button').forEach(btn => {
+                const btnText = btn.textContent.trim();
+                if (btnText === `Tổ ${groupNum}`) {
+                    btn.style.background = '#10b981';
+                    btn.style.color = 'white';
+                    btn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                } else if (btnText.startsWith('Tổ')) {
+                    btn.style.background = 'white';
+                    btn.style.color = 'var(--dark)';
+                    btn.style.boxShadow = 'none';
+                }
+            });
+            
+            // Show area buttons
+            displayAreaButtons(groupNum);
+            
+            // Display group summary
+            loadGroupSummary(groupNum);
+        }
+
+        function displayAreaButtons(groupNum) {
+            const areas = groupAreaMapping[groupNum] || [];
+            const container = document.getElementById('areaButtonsContainer');
+            const buttonsDiv = document.getElementById('areaButtons');
+            
+            buttonsDiv.innerHTML = '';
+            areas.forEach(areaNum => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-primary';
+                btn.textContent = `Khu Vực ${areaNum}`;
+                btn.onclick = () => selectArea(groupNum, areaNum);
+                btn.style.padding = '12px';
+                btn.style.fontSize = '13px';
+                buttonsDiv.appendChild(btn);
+            });
+            
+            container.style.display = 'block';
+            document.getElementById('selectedAreaName').textContent = 'Chưa chọn';
+        }
+
+        function selectArea(groupNum, areaNum) {
+            currentSelectedArea = areaNum;
+            
+            // Update area name display
+            document.getElementById('selectedAreaName').textContent = `Khu Vực ${areaNum}`;
+            
+            // Update area button styles
+            document.querySelectorAll('#areaButtons button').forEach(btn => {
+                const btnNum = parseInt(btn.textContent.replace('Khu Vực ', ''));
+                if (btnNum === areaNum) {
+                    btn.style.background = '#10b981';
+                    btn.style.color = 'white';
+                    btn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                } else {
+                    btn.style.background = 'var(--primary)';
+                    btn.style.color = 'white';
+                    btn.style.boxShadow = 'none';
+                }
+            });
+            
+            // Load and display area data
+            loadAreaData(groupNum, areaNum);
+        }
+
+        function loadAreaData(groupNum, areaNum) {
+            const areaDataTable = document.getElementById('areaDataTable');
+            const candidatesTable = document.getElementById('candidatesTable');
+            const districtName = `Tổ ${groupNum} - Khu Vực ${areaNum}`;
+            
+            // Fetch real data from API
+            fetch('http://localhost:5000/api/ballotverification')
+                .then(response => response.json())
+                .then(data => {
+                    // Find the record matching this group and area
+                    const record = data.find(r => r.districtName === districtName);
+                    
+                    if (record) {
+                        const areaData = [
+                            { stt: 1, content: 'Số phiếu phát ra', votes: record.issuedBallots || 0, note: 'Cấp phát' },
+                            { stt: 2, content: 'Số phiếu thu vào', votes: record.receivedBallots || 0, note: 'Thu thập' },
+                            { stt: 3, content: 'Phiếu hợp lệ', votes: record.validBallots || 0, note: 'Hợp lệ' },
+                            { stt: 4, content: 'Phiếu không hợp lệ', votes: record.invalidBallots || 0, note: 'Không hợp lệ' },
+                            { stt: 5, content: 'Tổng', votes: (record.validBallots || 0) + (record.invalidBallots || 0), note: 'Tính tự động' }
+                        ];
+                        
+                        areaDataTable.innerHTML = `<thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Nội Dung</th>
+                                <th>Số Phiếu</th>
+                                <th>Ghi Chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${areaData.map(item => `
+                                <tr style="${item.stt === 5 ? 'background-color: #D3D3D3; font-weight: bold;' : ''}">
+                                    <td>${item.stt}</td>
+                                    <td>${item.content}</td>
+                                    <td style="text-align: center; font-weight: bold;">${item.votes}</td>
+                                    <td>${item.note}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>`;
+                        
+                        // Build candidates data
+                        const candidatesData = [
+                            { stt: 1, name: record.candidate1Name || 'Ứng cử viên số 1', votes: record.candidate1Votes || 0 },
+                            { stt: 2, name: record.candidate2Name || 'Ứng cử viên số 2', votes: record.candidate2Votes || 0 },
+                            { stt: 3, name: record.candidate3Name || 'Ứng cử viên số 3', votes: record.candidate3Votes || 0 },
+                            { stt: 4, name: record.candidate4Name || 'Ứng cử viên số 4', votes: record.candidate4Votes || 0 },
+                            { stt: 5, name: record.candidate5Name || 'Ứng cử viên số 5', votes: record.candidate5Votes || 0 }
+                        ];
+                        
+                        candidatesTable.innerHTML = `<thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên Ứng Cử Viên</th>
+                                <th>Số Phiếu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${candidatesData.map(item => `
+                                <tr>
+                                    <td style="text-align: center; font-weight: bold;">${item.stt}</td>
+                                    <td>${item.name}</td>
+                                    <td style="text-align: center; font-weight: bold;">${item.votes}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>`;
+                        
+                    } else {
+                        areaDataTable.innerHTML = `
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Nội Dung</th>
+                                    <th>Số Phiếu</th>
+                                    <th>Ghi Chú</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4" style="text-align: center; color: #999;">Chưa có dữ liệu cho khu vực này</td></tr>
+                            </tbody>
+                        `;
+                        
+                        candidatesTable.innerHTML = `
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên Ứng Cử Viên</th>
+                                    <th>Số Phiếu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="3" style="text-align: center; color: #999;">Chưa có dữ liệu cho khu vực này</td></tr>
+                            </tbody>
+                        `;
+                    }
+                    
+                    document.getElementById('areaDataTableContainer').style.display = 'block';
+                    document.getElementById('candidatesTableContainer').style.display = 'block';
+                    document.getElementById('areaDataTitle').textContent = `Tổ ${groupNum} - Khu Vực ${areaNum}`;
+                    document.getElementById('candidatesDataTitle').textContent = `Tổ ${groupNum} - Khu Vực ${areaNum}`;
+                })
+                .catch(error => {
+                    console.error('Error loading area data:', error);
+                    areaDataTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Nội Dung</th>
+                                <th>Số Phiếu</th>
+                                <th>Ghi Chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="4" style="text-align: center; color: red;">Lỗi tải dữ liệu</td></tr>
+                        </tbody>
+                    `;
+                    
+                    candidatesTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên Ứng Cử Viên</th>
+                                <th>Số Phiếu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="3" style="text-align: center; color: red;">Lỗi tải dữ liệu</td></tr>
+                        </tbody>
+                    `;
+                });
+        }
+
+        function loadGroupSummary(groupNum) {
+            const areas = groupAreaMapping[groupNum] || [];
+            const summaryTable = document.getElementById('groupSummaryTable');
+            const candidatesSummaryTable = document.getElementById('candidatesSummaryTable');
+            
+            // Fetch real data from API with level filter
+            fetch(`http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Filter records for this group
+                    const groupRecords = data.filter(r => r.districtName && r.districtName.includes(`Tổ ${groupNum}`));
+                    
+                    console.log(`[DEBUG] Tổ ${groupNum} - Found ${groupRecords.length} records (level=${selectedLevel}):`, groupRecords);
+                    groupRecords.forEach((rec, idx) => {
+                        console.log(`  Record ${idx}: ${rec.districtName} - C1=${rec.candidate1Votes}, C2=${rec.candidate2Votes}, C3=${rec.candidate3Votes}, C4=${rec.candidate4Votes}, C5=${rec.candidate5Votes}`);
+                    });
+                    
+                    // Build summary rows for each area in this group
+                    const summaryRows = areas.map(areaNum => {
+                        const areaRecord = groupRecords.find(r => r.districtName === `Tổ ${groupNum} - Khu Vực ${areaNum}`);
+                        
+                        if (areaRecord) {
+                            const totalVotes = (areaRecord.validBallots || 0) + (areaRecord.invalidBallots || 0);
+                            const validVotes = areaRecord.validBallots || 0;
+                            const invalidVotes = areaRecord.invalidBallots || 0;
+                            const percentage = totalVotes > 0 ? ((validVotes / totalVotes) * 100).toFixed(1) : 0;
+                            
+                            return {
+                                area: areaNum,
+                                total: totalVotes,
+                                valid: validVotes,
+                                invalid: invalidVotes,
+                                percentage: percentage
+                            };
+                        } else {
+                            return {
+                                area: areaNum,
+                                total: 0,
+                                valid: 0,
+                                invalid: 0,
+                                percentage: 0
+                            };
+                        }
+                    });
+                    
+                    // Aggregate candidate votes across all areas
+                    const candidatesData = [
+                        { stt: 1, votes: 0, name: '' },
+                        { stt: 2, votes: 0, name: '' },
+                        { stt: 3, votes: 0, name: '' },
+                        { stt: 4, votes: 0, name: '' },
+                        { stt: 5, votes: 0, name: '' }
+                    ];
+                    
+                    // Sum candidate votes from all areas
+                    groupRecords.forEach(record => {
+                        candidatesData[0].votes += record.candidate1Votes || 0;
+                        candidatesData[1].votes += record.candidate2Votes || 0;
+                        candidatesData[2].votes += record.candidate3Votes || 0;
+                        candidatesData[3].votes += record.candidate4Votes || 0;
+                        candidatesData[4].votes += record.candidate5Votes || 0;
+                        
+                        // Get candidate names from first record that has them
+                        if (!candidatesData[0].name && record.candidate1Name) {
+                            candidatesData[0].name = record.candidate1Name;
+                        }
+                        if (!candidatesData[1].name && record.candidate2Name) {
+                            candidatesData[1].name = record.candidate2Name;
+                        }
+                        if (!candidatesData[2].name && record.candidate3Name) {
+                            candidatesData[2].name = record.candidate3Name;
+                        }
+                        if (!candidatesData[3].name && record.candidate4Name) {
+                            candidatesData[3].name = record.candidate4Name;
+                        }
+                        if (!candidatesData[4].name && record.candidate5Name) {
+                            candidatesData[4].name = record.candidate5Name;
+                        }
+                    });
+                    
+                    // Set default names if not found
+                    candidatesData.forEach((candidate, idx) => {
+                        if (!candidate.name) {
+                            candidate.name = `Người ${idx + 1}`;
+                        }
+                    });
+                    
+                    // Sort candidates by votes (descending) to determine ranking
+                    const sortedCandidates = [...candidatesData].sort((a, b) => b.votes - a.votes);
+                    
+                    // Add result status based on ranking
+                    const candidatesWithResult = sortedCandidates.map((candidate, idx) => {
+                        return {
+                            ...candidate,
+                            rank: idx + 1,
+                            result: idx < 3 ? '✓ Trúng cử' : '✗ Không trúng cử'
+                        };
+                    });
+                    
+                    summaryTable.innerHTML = `<thead>
+                        <tr>
+                            <th>Khu Vực</th>
+                            <th>Tổng Phiếu</th>
+                            <th>Tổng Hợp Lệ</th>
+                            <th>Tổng Không Hợp Lệ</th>
+                            <th>Tỷ Lệ (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${summaryRows.map(row => `
+                            <tr>
+                                <td style="text-align: center; font-weight: bold;">Khu ${row.area}</td>
+                                <td style="text-align: center;">${row.total}</td>
+                                <td style="text-align: center; color: green;">✓ ${row.valid}</td>
+                                <td style="text-align: center; color: red;">✗ ${row.invalid}</td>
+                                <td style="text-align: center;">${row.percentage}%</td>
+                            </tr>
+                        `).join('')}
+                        <tr style="background-color: #D3D3D3; font-weight: bold;">
+                            <td style="text-align: center;">Cộng</td>
+                            <td style="text-align: center;">${summaryRows.reduce((s, r) => s + r.total, 0)}</td>
+                            <td style="text-align: center;">${summaryRows.reduce((s, r) => s + r.valid, 0)}</td>
+                            <td style="text-align: center;">${summaryRows.reduce((s, r) => s + r.invalid, 0)}</td>
+                            <td style="text-align: center;">${summaryRows.length > 0 ? (summaryRows.reduce((s, r) => s + parseFloat(r.percentage), 0) / summaryRows.length).toFixed(1) : 0}%</td>
+                        </tr>
+                    </tbody>`;
+                    
+                    // Display candidates summary with results
+                    candidatesSummaryTable.innerHTML = `<thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên Ứng Cử Viên</th>
+                            <th>Tổng Số Phiếu</th>
+                            <th>Kết Quả</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${candidatesWithResult.map(candidate => `
+                            <tr style="${candidate.rank <= 3 ? 'background-color: #E8F5E9;' : 'background-color: #FFEBEE;'}">
+                                <td style="text-align: center; font-weight: bold;">${candidate.stt}</td>
+                                <td>${candidate.name}</td>
+                                <td style="text-align: center; font-weight: bold;">${candidate.votes}</td>
+                                <td style="text-align: center; font-weight: bold; ${candidate.rank <= 3 ? 'color: green;' : 'color: red;'}">${candidate.result}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>`;
+                    
+                    document.getElementById('groupSummaryContainer').style.display = 'block';
+                    document.getElementById('candidatesSummaryContainer').style.display = 'block';
+                    document.getElementById('groupSummaryTitle').textContent = `Tổ ${groupNum}`;
+                    document.getElementById('candidatesSummaryTitle').textContent = `Tổ ${groupNum}`;
+                })
+                .catch(error => {
+                    console.error('Error loading group summary:', error);
+                    summaryTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Khu Vực</th>
+                                <th>Tổng Phiếu</th>
+                                <th>Tổng Hợp Lệ</th>
+                                <th>Tổng Không Hợp Lệ</th>
+                                <th>Tỷ Lệ (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="5" style="text-align: center; color: red;">Lỗi tải dữ liệu</td></tr>
+                        </tbody>
+                    `;
+                    
+                    candidatesSummaryTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên Ứng Cử Viên</th>
+                                <th>Tổng Số Phiếu</th>
+                                <th>Kết Quả</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="4" style="text-align: center; color: red;">Lỗi tải dữ liệu</td></tr>
+                        </tbody>
+                    `;
+                });
+        }
+
+        // Initial Load
+        loadDashboard();
+    </script>
+</body>
+</html>
