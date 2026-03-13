@@ -1199,9 +1199,6 @@ namespace ElectionManagement.Services
                 row++;
 
                 // === DATA ROWS ===
-                ws.Cells[row, 1].Value = 1;
-                ws.Cells[row, 2].Value = 1;
-                ws.Cells[row, 3].Value = "Khu vực 1";
                 
                 // UCV votes - all levels show UCV 1-7
                 int ucvCol = uvcStartCol;
@@ -1268,40 +1265,31 @@ namespace ElectionManagement.Services
                 calcRow++;
 
                 ws.Cells[calcRow, 8].Value = "Số phiếu bầu 04 đại biểu:";
-                ws.Cells[calcRow, 9].Value = 200;
                 ws.Cells[calcRow, 10].Value = "x";
                 ws.Cells[calcRow, 11].Value = 4;
                 ws.Cells[calcRow, 12].Value = "=";
-                ws.Cells[calcRow, 13].Value = 800;
                 calcRow++;
 
                 ws.Cells[calcRow, 8].Value = "Số phiếu bầu 03 đại biểu:";
-                ws.Cells[calcRow, 9].Value = 150;
                 ws.Cells[calcRow, 10].Value = "x";
                 ws.Cells[calcRow, 11].Value = 3;
                 ws.Cells[calcRow, 12].Value = "=";
-                ws.Cells[calcRow, 13].Value = 450;
                 calcRow++;
 
                 ws.Cells[calcRow, 8].Value = "Số phiếu bầu 02 đại biểu:";
-                ws.Cells[calcRow, 9].Value = 100;
                 ws.Cells[calcRow, 10].Value = "x";
                 ws.Cells[calcRow, 11].Value = 2;
                 ws.Cells[calcRow, 12].Value = "=";
-                ws.Cells[calcRow, 13].Value = 200;
                 calcRow++;
 
                 ws.Cells[calcRow, 8].Value = "Số phiếu bầu 01 đại biểu:";
-                ws.Cells[calcRow, 9].Value = 50;
                 ws.Cells[calcRow, 10].Value = "x";
                 ws.Cells[calcRow, 11].Value = 1;
                 ws.Cells[calcRow, 12].Value = "=";
-                ws.Cells[calcRow, 13].Value = 50;
                 calcRow++;
 
                 ws.Cells[calcRow, 11].Value = "Cộng:";
                 ws.Cells[calcRow, 11].Style.Font.Bold = true;
-                ws.Cells[calcRow, 13].Value = 3500;
                 ws.Cells[calcRow, 13].Style.Font.Bold = true;
                 calcRow += 2;
 
