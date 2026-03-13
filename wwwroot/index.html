@@ -3082,8 +3082,14 @@
             document.getElementById('officialUnitNum').textContent = unitNum;
             document.getElementById('officialUnitCode').textContent = unitNum;
 
+            // Determine number of candidates based on current level
+            let candidateCount = 5;
+            if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
+                candidateCount = 7;
+            }
+
             let totalVoters = 0, totalIssued = 0, totalReceived = 0, totalValid = 0, totalInvalid = 0;
-            const candTotals = [0, 0, 0, 0, 0];
+            const candTotals = Array(candidateCount).fill(0);
             let rowNum = 1;
 
             // Get area records
@@ -3108,9 +3114,9 @@
                 const invalidRate = received > 0 ? ((invalid / received) * 100).toFixed(1) : '0.0';
                 const validRate = received > 0 ? ((valid / received) * 100).toFixed(1) : '0.0';
 
-                // Get candidate votes (up to 5 candidates only)
+                // Get candidate votes (dynamic: 5 or 7 depending on level)
                 const candVotes = [];
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 1; i <= candidateCount; i++) {
                     const votes = record[`candidate${i}Votes`] || 0;
                     candVotes.push(votes);
                     candTotals[i-1] += votes;
@@ -3135,26 +3141,25 @@
                     invalidRate + '%',               // Tỷ % KHL
                     valid,                           // HL
                     validRate + '%',                 // Tỷ % HL
-                    candVotes[0],                    // ỨC1
-                    candVotes[1],                    // ỨC2
-                    candVotes[2],                    // ỨC3
-                    candVotes[3],                    // ỨC4
-                    candVotes[4],                    // ỨC5
+                    ...candVotes,                    // Candidate votes (5 or 7)
                     totalCandVotes                   // Tổng
                 ];
 
-                // Build HTML cells
+                // Build HTML cells with dynamic background colors
                 let cellHTML = '';
-                const bgColors = [
+                const baseBgColors = [
                     '#e0e0e0', '#e0e0e0', '#e0e0e0', '#e0e0e0',  // Stt, Xã, Tổ, KV
                     '#c6efce', '#c6efce',                          // Cử tri + Tỷ %
                     '#ffff99', '#ffff99', '#ffff99',               // Phát, Thu, Tỷ %
                     '#ffff99', '#ffff99',                          // KHL, Tỷ % KHL
-                    '#ffff99', '#ffff99',                          // HL, Tỷ % HL
-                    '#ffe5e5', '#ffe5e5', '#ffe5e5', '#ffe5e5',   // ỨC1-4
-                    '#ffe5e5',                                     // ỨC5
-                    '#e0e0e0'                                      // Tổng
+                    '#ffff99', '#ffff99'                           // HL, Tỷ % HL
                 ];
+                
+                // Build candidate background colors (red for all candidates)
+                const candBgColors = Array(candidateCount).fill('#ffe5e5');
+                
+                // Combine colors
+                const bgColors = [...baseBgColors, ...candBgColors, '#e0e0e0'];  // Last is Total
 
                 cells.forEach((cell, idx) => {
                     const textAlign = (idx === 0 || idx === 1 || idx === 2 || idx === 3) ? 'left' : 'center';
@@ -3183,8 +3188,11 @@
             document.getElementById('totalInvalid').textContent = totalInvalid;
             document.getElementById('totalInvalidRate').textContent = totalInvalidRate + '%';
 
-            for (let i = 0; i < 5; i++) {
-                document.getElementById(`totalCand${i+1}`).textContent = candTotals[i];
+            for (let i = 0; i < candidateCount; i++) {
+                const totalCandEl = document.getElementById(`totalCand${i+1}`);
+                if (totalCandEl) {
+                    totalCandEl.textContent = candTotals[i];
+                }
             }
 
             const totalSum = candTotals.reduce((a, b) => a + b, 0);
@@ -3197,6 +3205,10 @@
                 alert('Vui lòng chọn đơn vị bầu cử trước!');
                 return;
             }
+            
+            console.log('=== exportGroupDataToExcel ===');
+            console.log('selectedLevel:', selectedLevel);
+            console.log('currentUnitAggregatedData:', window.currentUnitAggregatedData);
             
             const data = window.currentUnitAggregatedData;
             let htmlContent = `
