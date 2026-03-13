@@ -3236,6 +3236,22 @@
             
             // Also hide header columns for extra candidates
             updateOfficialTableHeaderVisibility(candidateCount);
+            
+            // DEBUG: Show visible indicator
+            setTimeout(() => {
+                const hiddenCells = document.querySelectorAll('table td[style*="display: none"], table th[style*="display: none"]');
+                console.log(`[DEBUG] After updateOfficialTableHeaderVisibility: ${hiddenCells.length} cells have display:none`);
+                
+                // Check UCV 6 and UCV 7 cells specifically
+                const allCells = document.querySelectorAll('table th, table td');
+                let ucv6Hidden = false, ucv7Hidden = false;
+                allCells.forEach(cell => {
+                    const text = cell.textContent.trim();
+                    if (text === 'UCV 6' && cell.style.display === 'none') ucv6Hidden = true;
+                    if (text === 'UCV 7' && cell.style.display === 'none') ucv7Hidden = true;
+                });
+                console.log(`[DEBUG] UCV 6 hidden: ${ucv6Hidden}, UCV 7 hidden: ${ucv7Hidden}, candidateCount: ${candidateCount}`);
+            }, 100);
 
             const totalSum = candTotals.reduce((a, b) => a + b, 0);
             document.getElementById('totalSum').textContent = totalSum;
