@@ -1371,14 +1371,19 @@ namespace ElectionManagement.Services
                     ws.Cells["W11"].Value = null;
                     ws.Cells["W12"].Value = null;
                 }
-                // TINH (provincial) level - giữ nguyên tất cả, không xóa
+                // TINH (provincial) level - thêm dữ liệu
                 else if (levelLower.Contains("tinh"))
                 {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: TỈNH (PROVINCIAL) LEVEL - NOT CLEARING =====");
+                    Console.WriteLine("[DEBUG] ===== MATCHED: TỈNH (PROVINCIAL) LEVEL - ADDING DATA =====");
+                    // Add specific data for TỈNH (provincial) level
+                    ws.Cells["M8"].Value = "Bầu 04 đại biểu";
+                    ws.Cells["V8"].Value = "UCV 6";
+                    ws.Cells["W8"].Value = "UCV 7";
+                    Console.WriteLine("[DEBUG] Added: M8='Bầu 04 đại biểu', V8='UCV 6', W8='UCV 7'");
                 }
                 else
                 {
-                    Console.WriteLine("[DEBUG] ===== UNKNOWN LEVEL - NOT CLEARING =====");
+                    Console.WriteLine("[DEBUG] ===== UNKNOWN LEVEL - NOT CHANGING =====");
                 }
 
                 return package.GetAsByteArray();
