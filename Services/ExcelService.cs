@@ -950,19 +950,15 @@ namespace ElectionManagement.Services
                 ws.View.ZoomScale = 60;
 
                 // Determine column structure based on level
-                // xã (district/commune) and other lower levels: 5 UCVs
-                // tỉnh (province): 7 UCVs
+                // All levels now display: UCV 1, 2, 3, 4, 5, 6, 7 (7 candidates)
                 Console.WriteLine($"[DEBUG] ExportOfficialBallotVerificationForm - Received level: '{level}'");
                 Console.WriteLine($"[DEBUG] level.ToLower(): '{level.ToLower()}'");
-                Console.WriteLine($"[DEBUG] level.ToLower() == \"tinh\": {level.ToLower() == "tinh"}");
                 
-                int ucvCount = level.ToLower() == "tinh" ? 7 : 5;
+                int ucvCount = 7;  // All levels: 7 UCVs
                 Console.WriteLine($"[DEBUG] Calculated ucvCount: {ucvCount}");
                 
-                int uvcStartCol = 17; // Column Q (moved left by 1 due to removed "Bầu 05 đại biểu")
-                int totalCol = level.ToLower() == "tinh" 
-                    ? uvcStartCol + 6  // For tỉnh: 6 UCV columns (1,2,3,4,6,7), then total = column 23
-                    : uvcStartCol + ucvCount; // For others: 5 UCV columns, then total = column 22
+                int uvcStartCol = 17; // Column Q
+                int totalCol = uvcStartCol + ucvCount;  // Column 24 (17 + 7)
                 int maxCol = totalCol;
                 
                 Console.WriteLine($"[DEBUG] totalCol: {totalCol}, maxCol: {maxCol}");
@@ -1159,30 +1155,13 @@ namespace ElectionManagement.Services
                 ws.Cells[level2Row, 15].Value = "Bầu 02 đại biểu";
                 ws.Cells[level2Row, 16].Value = "Bầu 01 đại biểu";
                 
-                // UCV columns - dynamic based on level
-                // For provincial level (tỉnh): skip UCV 5, display UCV 1,2,3,4,6,7
-                // For other levels: display UCV 1,2,3,4,5
+                // UCV columns - all levels show UCV 1-7
                 Console.WriteLine($"[DEBUG] Level 2 UCV Headers - Setting {ucvCount} UCV columns starting at column {uvcStartCol}");
-                int colOffset = 0;
-                for (int i = 1; i <= 7; i++)
+                for (int i = 1; i <= ucvCount; i++)
                 {
-                    // Skip UCV 5 for provincial level (tỉnh)
-                    if (level.ToLower() == "tinh" && i == 5)
-                    {
-                        Console.WriteLine($"[DEBUG] Skipping UCV {i} for provincial level");
-                        continue;
-                    }
-                    
-                    // Stop if we've reached the limit for non-provincial levels
-                    if (level.ToLower() != "tinh" && i > ucvCount)
-                    {
-                        break;
-                    }
-                    
-                    int colNum = uvcStartCol + colOffset;
+                    int colNum = uvcStartCol + i - 1;
                     ws.Cells[level2Row, colNum].Value = $"UCV {i}";
                     Console.WriteLine($"[DEBUG] Set UCV {i} at column {colNum} ({GetColumnLetter(colNum)})");
-                    colOffset++;
                 }
 
                 // Total column header - no text in level2Row since it's merged with level1Row
@@ -1237,32 +1216,16 @@ namespace ElectionManagement.Services
                 ws.Cells[row, 15].Value = 100;  // B\u1ea7u 02 \u0111\u1ea1i bi\u1ec3u
                 ws.Cells[row, 16].Value = 50;   // B\u1ea7u 01 \u0111\u1ea1i bi\u1ec3u
                 
-                // UCV votes - dynamic based on level
-                // For provincial level: use columns 17-22 for UCV 1,2,3,4,6,7; column 23 for total
-                // For other levels: use columns 17-21 for UCV 1,2,3,4,5; column 22 for total
+                // UCV votes - all levels show UCV 1-7
                 int ucvCol = uvcStartCol;
-                if (ucvCount == 5)
-                {
-                    // Standard 5 UCVs
-                    ws.Cells[row, ucvCol].Value = 400;
-                    ws.Cells[row, ucvCol + 1].Value = 200;
-                    ws.Cells[row, ucvCol + 2].Value = 150;
-                    ws.Cells[row, ucvCol + 3].Value = 100;
-                    ws.Cells[row, ucvCol + 4].Value = 50;
-                    ws.Cells[row, ucvCol + 5].Value = 900;  // Total
-                }
-                else if (level.ToLower() == "tinh")
-                {
-                    // Provincial level: 7 UCVs with UCV 5 skipped
-                    // UCV 1, 2, 3, 4, 6, 7 (skip 5)
-                    ws.Cells[row, ucvCol].Value = 400;      // UCV 1
-                    ws.Cells[row, ucvCol + 1].Value = 200;  // UCV 2
-                    ws.Cells[row, ucvCol + 2].Value = 150;  // UCV 3
-                    ws.Cells[row, ucvCol + 3].Value = 100;  // UCV 4
-                    ws.Cells[row, ucvCol + 4].Value = 75;   // UCV 6 (not 5)
-                    ws.Cells[row, ucvCol + 5].Value = 60;   // UCV 7
-                    ws.Cells[row, ucvCol + 6].Value = 1185; // Total
-                }
+                ws.Cells[row, ucvCol].Value = 400;      // UCV 1
+                ws.Cells[row, ucvCol + 1].Value = 200;  // UCV 2
+                ws.Cells[row, ucvCol + 2].Value = 150;  // UCV 3
+                ws.Cells[row, ucvCol + 3].Value = 100;  // UCV 4
+                ws.Cells[row, ucvCol + 4].Value = 75;   // UCV 5
+                ws.Cells[row, ucvCol + 5].Value = 60;   // UCV 6
+                ws.Cells[row, ucvCol + 6].Value = 50;   // UCV 7
+                ws.Cells[row, ucvCol + 7].Value = 1035; // Total
 
                 for (int col = 1; col <= maxCol; col++)
                 {
