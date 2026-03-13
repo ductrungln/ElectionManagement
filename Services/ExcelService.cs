@@ -1316,13 +1316,6 @@ namespace ElectionManagement.Services
 
                 // === CALCULATION SECTION ===
                 int calcRow = row;
-                
-                ws.Cells[calcRow, 8].Value = "Số phiếu bầu 05 đại biểu:";
-                ws.Cells[calcRow, 9].Value = 400;
-                ws.Cells[calcRow, 10].Value = "x";
-                ws.Cells[calcRow, 11].Value = 5;
-                ws.Cells[calcRow, 12].Value = "=";
-                ws.Cells[calcRow, 13].Value = 2000;
                 calcRow++;
 
                 ws.Cells[calcRow, 8].Value = "Số phiếu bầu 04 đại biểu:";
