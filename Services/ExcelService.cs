@@ -1325,6 +1325,19 @@ namespace ElectionManagement.Services
                     ws.Column(i).Width = 13;
                 }
 
+                // For commune (xã) and national (quốc hội) levels, clear specific cells
+                if (!string.IsNullOrEmpty(level) && !level.ToLower().Contains("tinh"))
+                {
+                    // Clear cells for commune and national levels
+                    ws.Cells["M9"].Value = null;  // Column M, Row 9
+                    ws.Cells["V8"].Value = null;  // Column V, Row 8
+                    ws.Cells["W9"].Value = null;  // Column W, Row 9
+                    ws.Cells["H19"].Value = null; // Column H, Row 19
+                    ws.Cells["J19"].Value = null; // Column J, Row 19
+                    ws.Cells["K19"].Value = null; // Column K, Row 19
+                    ws.Cells["L19"].Value = null; // Column L, Row 19
+                }
+
                 return package.GetAsByteArray();
             }
         }
