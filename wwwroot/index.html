@@ -3096,6 +3096,7 @@
             document.getElementById('officialUnitCode').textContent = unitNum;
 
             // Determine number of candidates based on current level
+            // Tier province (TINH): 7 candidates, Commune (XÃ) and National (QUỐC HỘI): 5 candidates
             let candidateCount = 5;
             if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
                 candidateCount = 7;
@@ -3127,7 +3128,7 @@
                 const invalidRate = received > 0 ? ((invalid / received) * 100).toFixed(1) : '0.0';
                 const validRate = received > 0 ? ((valid / received) * 100).toFixed(1) : '0.0';
 
-                // Get candidate votes (all 7 candidates)
+                // Get candidate votes (dynamic: 5 or 7 depending on level)
                 const candVotes = [];
                 for (let i = 1; i <= 7; i++) {
                     const votes = record[`candidate${i}Votes`] || 0;
@@ -3141,7 +3142,9 @@
                 const ballotType3 = record.ballotType3Count || 0;
                 const ballotType4 = record.ballotType4Count || 0;
 
-                const totalCandVotes = candVotes.reduce((a, b) => a + b, 0);
+                // Only use candidateCount votes (5 for commune/national, 7 for province)
+                const displayCandVotes = candVotes.slice(0, candidateCount);
+                const totalCandVotes = displayCandVotes.reduce((a, b) => a + b, 0);
 
                 // Create row
                 const row = document.createElement('tr');
@@ -3163,7 +3166,7 @@
                     ballotType2,                     // Bầu 03
                     ballotType3,                     // Bầu 02
                     ballotType4,                     // Bầu 01
-                    ...candVotes,                    // All UCV votes (1-7)
+                    ...displayCandVotes,             // Display candidates (5 or 7)
                     totalCandVotes                   // Tổng
                 ];
 
@@ -3178,8 +3181,8 @@
                     '#fff0f0', '#fff0f0', '#fff0f0', '#fff0f0'  // Bầu 04, 03, 02, 01
                 ];
                 
-                // Build candidate background colors (red for all 7)
-                const candBgColors = Array(7).fill('#ffe5e5');
+                // Build candidate background colors (dynamic: 5 or 7)
+                const candBgColors = Array(candidateCount).fill('#ffe5e5');
                 
                 // Add total column color
                 const allBgColors = [...bgColors, ...candBgColors, '#ffff99'];
@@ -3212,15 +3215,58 @@
             document.getElementById('totalInvalid').textContent = totalInvalid;
             document.getElementById('totalInvalidRate').textContent = totalInvalidRate + '%';
 
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < candidateCount; i++) {
                 const totalCandEl = document.getElementById(`totalCand${i+1}`);
                 if (totalCandEl) {
                     totalCandEl.textContent = candTotals[i];
+                    // Restore visibility in case switching from 5 to 7 candidates
+                    totalCandEl.parentElement.style.display = '';
                 }
             }
+            
+            // Hide remaining candidate columns for commune level (show only 5)
+            for (let i = candidateCount; i < 7; i++) {
+                const totalCandEl = document.getElementById(`totalCand${i+1}`);
+                if (totalCandEl) {
+                    totalCandEl.parentElement.style.display = 'none';
+                }
+            }
+            
+            // Also hide header columns for extra candidates
+            updateOfficialTableHeaderVisibility(candidateCount);
 
             const totalSum = candTotals.reduce((a, b) => a + b, 0);
             document.getElementById('totalSum').textContent = totalSum;
+        }
+        
+        // Update header visibility for official ballot table based on candidate count
+        function updateOfficialTableHeaderVisibility(candidateCount) {
+            const headerCells = document.querySelectorAll('thead th');
+            
+            // First, restore all UCV columns to visible (in case switching from 5 to 7)
+            for (let i = 1; i <= 7; i++) {
+                headerCells.forEach(cell => {
+                    if (cell.textContent.trim() === `UCV ${i}`) {
+                        cell.style.display = '';  // Reset to default display
+                    }
+                });
+            }
+            
+            // Hide UCV header columns beyond candidateCount (5 or 7)
+            for (let i = candidateCount + 1; i <= 7; i++) {
+                headerCells.forEach(cell => {
+                    if (cell.textContent.trim() === `UCV ${i}`) {
+                        cell.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Also adjust the colspan of the UCV parent header to match actual candidate count
+            headerCells.forEach(cell => {
+                if (cell.textContent.includes('Số phiếu bầu cho mỗi người ứng cử viên')) {
+                    cell.setAttribute('colspan', candidateCount.toString());
+                }
+            });
         }
         
         // Export group data to Excel
