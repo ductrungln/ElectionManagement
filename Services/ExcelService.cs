@@ -1214,8 +1214,6 @@ namespace ElectionManagement.Services
                 row++;
 
                 // Row 2 (template)
-                ws.Cells[row, 1].Value = 2;
-                ws.Cells[row, 2].Value = 2;
                 for (int col = 1; col <= maxCol; col++)
                 {
                     ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
@@ -1233,41 +1231,13 @@ namespace ElectionManagement.Services
 
                 // TOTAL ROW
                 ws.Cells[row, 1].Value = "Tổng";
-                ws.Cells[row, 4].Value = 1000;
-                ws.Cells[row, 5].Value = 950;
-                ws.Cells[row, 6].Value = 95.00M;
-                ws.Cells[row, 7].Value = 950;
-                ws.Cells[row, 8].Value = 900;
-                ws.Cells[row, 9].Value = 50;
-                ws.Cells[row, 10].Value = 5.56M;
-                ws.Cells[row, 11].Value = 850;
-                ws.Cells[row, 12].Value = 94.44M;
-                ws.Cells[row, 13].Value = 400;
-                ws.Cells[row, 14].Value = 200;
-                ws.Cells[row, 15].Value = 150;
-                ws.Cells[row, 16].Value = 100;
-                ws.Cells[row, 17].Value = 50;
                 
                 // Totals for UCV columns
                 if (ucvCount == 5)
                 {
-                    ws.Cells[row, 18].Value = 400;
-                    ws.Cells[row, 19].Value = 200;
-                    ws.Cells[row, 20].Value = 150;
-                    ws.Cells[row, 21].Value = 100;
-                    ws.Cells[row, 22].Value = 50;
-                    ws.Cells[row, 23].Value = 2000;
                 }
                 else if (ucvCount == 7)
                 {
-                    ws.Cells[row, 18].Value = 400;
-                    ws.Cells[row, 19].Value = 200;
-                    ws.Cells[row, 20].Value = 150;
-                    ws.Cells[row, 21].Value = 100;
-                    ws.Cells[row, 22].Value = 75;
-                    ws.Cells[row, 23].Value = 60;
-                    ws.Cells[row, 24].Value = 15;
-                    ws.Cells[row, 25].Value = 3000;
                 }
 
                 ws.Cells[row, 1].Style.Font.Bold = true;
