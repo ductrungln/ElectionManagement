@@ -1,25 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Dev\\ElectionManagement-main\\ElectionManagement.csproj": {}
+    "E:\\Test\\ElectionManagement\\ElectionManagement.csproj": {}
   },
   "projects": {
-    "D:\\Dev\\ElectionManagement-main\\ElectionManagement.csproj": {
+    "E:\\Test\\ElectionManagement\\ElectionManagement.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dev\\ElectionManagement-main\\ElectionManagement.csproj",
+        "projectUniqueName": "E:\\Test\\ElectionManagement\\ElectionManagement.csproj",
         "projectName": "ElectionManagement",
-        "projectPath": "D:\\Dev\\ElectionManagement-main\\ElectionManagement.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "D:\\Dev\\ElectionManagement-main\\obj\\",
+        "projectPath": "E:\\Test\\ElectionManagement\\ElectionManagement.csproj",
+        "packagesPath": "C:\\Users\\trung le\\.nuget\\packages\\",
+        "outputPath": "E:\\Test\\ElectionManagement\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\trung le\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -85,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.408\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }
