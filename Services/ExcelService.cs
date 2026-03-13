@@ -1333,15 +1333,15 @@ namespace ElectionManagement.Services
 
                 if (levelLower.Contains("xa"))
                 {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - DELETING CELLS =====");
-                    // Delete specific cells for XÃ (commune) level
-                    ws.Cells["M8:M12"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["V8:V12"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["W8:W12"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["H19"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["J19"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["K19"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["L19"].Delete(eShiftTypeDelete.Left);
+                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - CLEARING CELLS =====");
+                    // Clear specific cells for XÃ (commune) level
+                    ws.Cells["M8:M12"].Clear();
+                    ws.Cells["V8:V12"].Clear();
+                    ws.Cells["W8:W12"].Clear();
+                    ws.Cells["H19"].Clear();
+                    ws.Cells["J19"].Clear();
+                    ws.Cells["K19"].Clear();
+                    ws.Cells["L19"].Clear();
                 }
                 else if (levelLower.Contains("quochoi"))
                 {
