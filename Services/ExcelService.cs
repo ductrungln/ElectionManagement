@@ -1325,18 +1325,48 @@ namespace ElectionManagement.Services
                     ws.Column(i).Width = 13;
                 }
 
-                // For commune (xã) and national (quốc hội) levels, clear specific cells
-                if (!string.IsNullOrEmpty(level) && !level.ToLower().Contains("tinh"))
+                // Clear specific cells based on election level
+                string levelLower = level?.ToLower() ?? "";
+
+                if (levelLower.Contains("xa"))
                 {
-                    // Clear cells for commune and national levels
-                    ws.Cells["M9"].Value = null;  // Column M, Row 9
-                    ws.Cells["V8"].Value = null;  // Column V, Row 8
-                    ws.Cells["W9"].Value = null;  // Column W, Row 9
-                    ws.Cells["H19"].Value = null; // Column H, Row 19
-                    ws.Cells["J19"].Value = null; // Column J, Row 19
-                    ws.Cells["K19"].Value = null; // Column K, Row 19
-                    ws.Cells["L19"].Value = null; // Column L, Row 19
+                    // Clear specific cells for XÃ (commune) level
+                    ws.Cells["M8"].Value = null;
+                    ws.Cells["M9"].Value = null;
+                    ws.Cells["M10"].Value = null;
+                    ws.Cells["M11"].Value = null;
+                    ws.Cells["M12"].Value = null;
+                    ws.Cells["V8"].Value = null;
+                    ws.Cells["V9"].Value = null;
+                    ws.Cells["V10"].Value = null;
+                    ws.Cells["V11"].Value = null;
+                    ws.Cells["V12"].Value = null;
+                    ws.Cells["W8"].Value = null;
+                    ws.Cells["W9"].Value = null;
+                    ws.Cells["W10"].Value = null;
+                    ws.Cells["W11"].Value = null;
+                    ws.Cells["W12"].Value = null;
                 }
+                else if (levelLower.Contains("quochoi"))
+                {
+                    // Clear specific cells for QUỐC HỘI (national) level
+                    ws.Cells["M8"].Value = null;
+                    ws.Cells["M9"].Value = null;
+                    ws.Cells["M10"].Value = null;
+                    ws.Cells["M11"].Value = null;
+                    ws.Cells["M12"].Value = null;
+                    ws.Cells["V8"].Value = null;
+                    ws.Cells["V9"].Value = null;
+                    ws.Cells["V10"].Value = null;
+                    ws.Cells["V11"].Value = null;
+                    ws.Cells["V12"].Value = null;
+                    ws.Cells["W8"].Value = null;
+                    ws.Cells["W9"].Value = null;
+                    ws.Cells["W10"].Value = null;
+                    ws.Cells["W11"].Value = null;
+                    ws.Cells["W12"].Value = null;
+                }
+                // TINH (provincial) level - giữ nguyên tất cả, không xóa
 
                 return package.GetAsByteArray();
             }
