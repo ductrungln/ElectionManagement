@@ -1359,9 +1359,15 @@ namespace ElectionManagement.Services
                     ws.Cells[level2Row, 13].Value = "Bầu 03 đại biểu"; // Column M
                     ws.Cells[level2Row, 14].Value = "Bầu 02 đại biểu"; // Column N
                     ws.Cells[level2Row, 15].Value = "Bầu 01 đại biểu"; // Column O
-                    ws.Cells[level2Row, 16].Clear(); // Column P
                     
-                    // Shift UCV columns left (Q→P, R→Q, S→R, T→S) for data rows starting after headers
+                    // Shift header row (row 8) columns left (Q→P, R→Q, S→R, T→S)
+                    ws.Cells[level2Row, 16].Value = ws.Cells[level2Row, 17].Value; // P = Q
+                    ws.Cells[level2Row, 17].Value = ws.Cells[level2Row, 18].Value; // Q = R
+                    ws.Cells[level2Row, 18].Value = ws.Cells[level2Row, 19].Value; // R = S
+                    ws.Cells[level2Row, 19].Value = ws.Cells[level2Row, 20].Value; // S = T
+                    ws.Cells[level2Row, 20].Clear(); // T cleared
+                    
+                    // Shift UCV columns left (Q→P, R→Q, S→R, T→S) for data rows
                     int dataStartRow = level2Row + 1;
                     for (int r = dataStartRow; r < level2Row + 5; r++)
                     {
@@ -1369,6 +1375,7 @@ namespace ElectionManagement.Services
                         ws.Cells[r, 17].Value = ws.Cells[r, 18].Value; // Q = R
                         ws.Cells[r, 18].Value = ws.Cells[r, 19].Value; // R = S
                         ws.Cells[r, 19].Value = ws.Cells[r, 20].Value; // S = T
+                        ws.Cells[r, 20].Clear(); // T cleared
                     }
                     // Shift data from column X to column U for data rows
                     for (int r = dataStartRow; r < level2Row + 5; r++)
