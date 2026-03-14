@@ -1333,6 +1333,8 @@ namespace ElectionManagement.Services
                 
                 foreach (var result in results.OrderBy(r => r.Stt).Take(4))  // Max 4 data rows (rows 9-12)
                 {
+                    Console.WriteLine($"[DEBUG] Processing result - Row={row}, Stt={result.Stt}");
+                    
                     ws.Cells[row, 1].Value = result.Level ?? "";  // Xã/Phường
                     ws.Cells[row, 2].Value = result.To ?? "";  // Tổ (group)
                     ws.Cells[row, 3].Value = result.KhuVuc ?? "";
@@ -1390,6 +1392,9 @@ namespace ElectionManagement.Services
                     
                     // UCV vote counts (columns Q (17) onwards for TINH, columns P (16) onwards for XA/QUOCHOI)
                     int ucvStartCol_Data = levelLower.Contains("tinh") ? 17 : 16;  // Q (17) for TINH, P (16) for XA/QUOCHOI
+                    
+                    Console.WriteLine($"[DEBUG] Row {row}: UCV data - Level={levelLower}, ucvStartCol_Data={ucvStartCol_Data}");
+                    Console.WriteLine($"[DEBUG] UngCuVien1={result.UngCuVien1}, UngCuVien2={result.UngCuVien2}, UngCuVien3={result.UngCuVien3}, UngCuVien4={result.UngCuVien4}, UngCuVien5={result.UngCuVien5}");
                     
                     ws.Cells[row, ucvStartCol_Data].Value = result.UngCuVien1 > 0 ? result.UngCuVien1 : "";
                     ws.Cells[row, ucvStartCol_Data + 1].Value = result.UngCuVien2 > 0 ? result.UngCuVien2 : "";
@@ -1606,60 +1611,26 @@ namespace ElectionManagement.Services
                     ws.Cells[level2Row, 14].Value = "Bầu 02 đại biểu"; // Column N
                     ws.Cells[level2Row, 15].Value = "Bầu 01 đại biểu"; // Column O
                     
-                    // Shift header row (row 8) columns left (Q→P, R→Q, S→R, T→S) for XA/QUOCHOI
-                    ws.Cells[level2Row, 16].Value = ws.Cells[level2Row, 17].Value; // P = Q
-                    ws.Cells[level2Row, 17].Value = ws.Cells[level2Row, 18].Value; // Q = R
-                    ws.Cells[level2Row, 18].Value = ws.Cells[level2Row, 19].Value; // R = S
-                    ws.Cells[level2Row, 19].Value = ws.Cells[level2Row, 20].Value; // S = T
-                    ws.Cells[level2Row, 20].Clear(); // T cleared
+                    // DO NOT shift header row - UCV columns (P-T) will have "UCV 1-5" headers
+                    // DO NOT shift data rows - UCV data already correctly placed in P-T columns
                     
-                    // Shift UCV columns left (Q→P, R→Q, S→R, T→S) for data rows
-                    int dataStartRow = level2Row + 1;
-                    for (int r = dataStartRow; r < level2Row + 5; r++)
-                    {
-                        ws.Cells[r, 16].Value = ws.Cells[r, 17].Value; // P = Q
-                        ws.Cells[r, 17].Value = ws.Cells[r, 18].Value; // Q = R
-                        ws.Cells[r, 18].Value = ws.Cells[r, 19].Value; // R = S
-                        ws.Cells[r, 19].Value = ws.Cells[r, 20].Value; // S = T
-                        ws.Cells[r, 20].Clear(); // T cleared
-                    }
-                    // Shift data from column X to column U for data rows
-                    for (int r = dataStartRow; r < level2Row + 5; r++)
-                    {
-                        ws.Cells[r, 21].Value = ws.Cells[r, 24].Value; // U = X
-                        ws.Cells[r, 24].Clear(); // X cleared
-                    }
+                    // REMOVED: Code that was shifting P←Q, Q←R, etc. which overwrote UCV data
+                    // REMOVED: Code that was shifting X→U→T columns
                     
-                    // Shift data from column U to column T for rows 8-12 (header + data rows)
-                    // IMPORTANT: Unmerge U7:U8 first before shifting, since .Clear() on U8 conflicts with merged range
-                    ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = false;
-                    Console.WriteLine("[DEBUG] Unmerged U7:U8 before shifting U column");
-                    
-                    for (int r = level2Row; r <= level2Row + 4; r++)
-                    {
-                        ws.Cells[r, 20].Value = ws.Cells[r, 21].Value; // T = U
-                        ws.Cells[r, 21].Clear(); // U cleared
-                    }
-                    Console.WriteLine("[DEBUG] Shifted U column to T column for rows 8-12");
-                    
-                    // Re-merge U7:U8 after shifting
-                    ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = true;
-                    Console.WriteLine("[DEBUG] Re-merged U7:U8 after column shift");
-                    
-                    // NOTE: U7 value is already preserved from line 1244 (copy from X7)
-                    
+                    // Do NOT unmerge or shift U7:U8 - it's already correctly set
+                    // U7 contains "Tổng số phiếu bầu của các ứng cử viên" (set at line 1256)
                     
                     // Clear V8:V12 and W8:W12 for XA/QUOCHOI level
                     ws.Cells[$"V{level2Row}:W{level2Row + 4}"].Clear();
                     Console.WriteLine($"[DEBUG] Cleared cells V{level2Row}:W{level2Row + 4} for XA/QUOCHOI level");
                     
-                    // Add UCV headers AFTER shift to ensure correct positioning
+                    // Add UCV headers to P8-T8 for XA/QUOCHOI level
                     ws.Cells[level2Row, 16].Value = "UCV 1";  // P8
                     ws.Cells[level2Row, 17].Value = "UCV 2";  // Q8
                     ws.Cells[level2Row, 18].Value = "UCV 3";  // R8
                     ws.Cells[level2Row, 19].Value = "UCV 4";  // S8
                     ws.Cells[level2Row, 20].Value = "UCV 5";  // T8
-                    Console.WriteLine("[DEBUG] Added UCV1-5 headers to P8-T8 for XA/QUOCHOI level after shift");
+                    Console.WriteLine("[DEBUG] Added UCV1-5 headers to P8-T8 for XA/QUOCHOI level");
                     
                     // Add borders to UCV cells (P8:T12) at XA/QUOCHOI level
                     var ucvRange = ws.Cells[level2Row, 16, level2Row + 4, 20]; // P8:T12
@@ -1668,7 +1639,7 @@ namespace ElectionManagement.Services
                     ucvRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                     ucvRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                     ucvRange.Style.Border.DiagonalDown = false;
-                    Console.WriteLine("[DEBUG] Shifted UCV columns for XÃ/QUỐC HỘI level");
+                    Console.WriteLine("[DEBUG] Fixed UCV columns for XÃ/QUỐC HỘI level - DATA NOT SHIFTED");
                 }
                 else if (levelLower.Contains("tinh"))
                 {
