@@ -1361,7 +1361,7 @@ namespace ElectionManagement.Services
                     ws.Cells[level2Row, 15].Value = "Bầu 01 đại biểu"; // Column O
                     ws.Cells[level2Row, 16].Clear(); // Column P
                     
-                    // Shift UCV columns left (Q→P, R→Q, S→R, T→S, U→T) for data rows starting after headers
+                    // Shift UCV columns left (Q→P, R→Q, S→R, T→S) for data rows starting after headers
                     int dataStartRow = level2Row + 1;
                     for (int r = dataStartRow; r < level2Row + 5; r++)
                     {
@@ -1369,8 +1369,6 @@ namespace ElectionManagement.Services
                         ws.Cells[r, 17].Value = ws.Cells[r, 18].Value; // Q = R
                         ws.Cells[r, 18].Value = ws.Cells[r, 19].Value; // R = S
                         ws.Cells[r, 19].Value = ws.Cells[r, 20].Value; // S = T
-                        ws.Cells[r, 20].Value = ws.Cells[r, 21].Value; // T = U
-                        ws.Cells[r, 21].Clear(); // U cleared
                     }
                     // Shift data from column X to column U for data rows
                     for (int r = dataStartRow; r < level2Row + 5; r++)
