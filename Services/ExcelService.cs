@@ -1355,13 +1355,11 @@ namespace ElectionManagement.Services
                         ws.Cells[row, 12].Value = validPercentage > 0 ? Math.Round(validPercentage, 1) : "";
                     }
                     
-                    // Ballot classification (columns 13-16) - Fields not in model, leaving empty for now
-                    // These would need to be added to ElectionResult model:
-                    // PhieuBau04, PhieuBau03, PhieuBau02, PhieuBau01
-                    // ws.Cells[row, 13].Value = "";
-                    // ws.Cells[row, 14].Value = "";
-                    // ws.Cells[row, 15].Value = "";
-                    // ws.Cells[row, 16].Value = "";
+                    // Ballot classification (columns 13-16)
+                    ws.Cells[row, 13].Value = result.PhieuBau04 > 0 ? result.PhieuBau04 : "";
+                    ws.Cells[row, 14].Value = result.PhieuBau03 > 0 ? result.PhieuBau03 : "";
+                    ws.Cells[row, 15].Value = result.PhieuBau02 > 0 ? result.PhieuBau02 : "";
+                    ws.Cells[row, 16].Value = result.PhieuBau01 > 0 ? result.PhieuBau01 : "";
                     
                     // UCV vote counts (columns Q onwards for default, P onwards for XA level)
                     int ucvStartCol_Data = levelLower.Contains("xa") ? 16 : uvcStartCol;  // P (16) for XA, Q (17) for others

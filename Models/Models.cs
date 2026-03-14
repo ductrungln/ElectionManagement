@@ -16,6 +16,12 @@ namespace ElectionManagement.Models
         public int PhieuHopLe { get; set; }
         public int PhieuKhongHopLe { get; set; }
 
+        // Ballot classification fields
+        public int PhieuBau04 { get; set; }
+        public int PhieuBau03 { get; set; }
+        public int PhieuBau02 { get; set; }
+        public int PhieuBau01 { get; set; }
+
         public int UngCuVien1 { get; set; }
         public int UngCuVien2 { get; set; }
         public int UngCuVien3 { get; set; }
