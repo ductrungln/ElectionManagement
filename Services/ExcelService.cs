@@ -1346,7 +1346,7 @@ namespace ElectionManagement.Services
                 {
                     Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - CLEARING CELLS =====");
                     // Clear specific cells for XÃ (commune) level
-                    ws.Cells["M8:M12"].Clear();
+                    ws.Cells["N8:N12"].Clear();
                     ws.Cells["V8:V12"].Clear();
                     ws.Cells["W8:W12"].Clear();
                     ws.Cells["H19"].Clear();
