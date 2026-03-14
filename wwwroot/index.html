@@ -700,8 +700,8 @@
                                         <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phiếu</th>
                                         <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu không hợp lệ</th>
                                         <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu hợp lệ</th>
-                                        <th colspan="4" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Phân loại phiếu</th>
-                                        <th colspan="7" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">Số phiếu bầu cho mỗi người ứng cử viên</th>
+                                        <th id="ballotClassHeaderGroup" colspan="4" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Phân loại phiếu</th>
+                                        <th id="candidateVoteHeaderGroup" colspan="7" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">Số phiếu bầu cho mỗi người ứng cử viên</th>
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tổng</th>
                                     </tr>
                                     <tr style="border: 1px solid #333;">
@@ -1172,6 +1172,21 @@
                     console.log(`Candidate results table ${selectedLevel === 'xa' ? 'hidden' : 'shown'} for level: ${selectedLevel}`);
                 }
                 
+                // Dynamically adjust header colspans based on level
+                // For XA: 3 ballot types (Bầu 03, 02, 01), 5 candidates
+                // For TINH/QUOCHOI: 4 ballot types (Bầu 04, 03, 02, 01), 7 candidates (TINH) or 5 (QUOCHOI)
+                const ballotClassHeader = document.getElementById('ballotClassHeaderGroup');
+                const candidateVoteHeader = document.getElementById('candidateVoteHeaderGroup');
+                const isTinh = selectedLevel === 'tinh';
+                const isXa = selectedLevel === 'xa';
+                
+                if (ballotClassHeader) {
+                    ballotClassHeader.colSpan = isXa ? 3 : 4;  // 3 for XA, 4 for TINH/QUOCHOI
+                }
+                if (candidateVoteHeader) {
+                    candidateVoteHeader.colSpan = isTinh ? 7 : 5;  // 7 for TINH, 5 for XA/QUOCHOI
+                }
+                
                 // Toggle Bầu 04 column visibility - hide for XA level
                 const ballotType04Header = document.querySelector('.ballot-type-04-header');
                 const ballotType04FooterCell = document.querySelector('.ballot-type-04-footer');
@@ -1182,6 +1197,7 @@
                     ballotType04FooterCell.style.display = selectedLevel === 'xa' ? 'none' : 'table-cell';
                 }
                 console.log(`Bầu 04 column ${selectedLevel === 'xa' ? 'hidden' : 'shown'} for level: ${selectedLevel}`);
+
                 
                 // Reload data for current active tab without page reload
                 setTimeout(() => {
@@ -3400,6 +3416,20 @@
         // Initialize when page load completes
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
+                // Initialize header colspans based on default level
+                const ballotClassHeader = document.getElementById('ballotClassHeaderGroup');
+                const candidateVoteHeader = document.getElementById('candidateVoteHeaderGroup');
+                const isTinh = selectedLevel === 'tinh';
+                const isXa = selectedLevel === 'xa';
+                
+                if (ballotClassHeader) {
+                    ballotClassHeader.colSpan = isXa ? 3 : 4;  // 3 for XA, 4 for TINH/QUOCHOI
+                }
+                if (candidateVoteHeader) {
+                    candidateVoteHeader.colSpan = isTinh ? 7 : 5;  // 7 for TINH, 5 for XA/QUOCHOI
+                }
+                console.log(`Header colspans initialized: ballot=${ballotClassHeader?.colSpan}, candidate=${candidateVoteHeader?.colSpan} for level: ${selectedLevel}`);
+                
                 // Initialize candidate results table visibility (hide for default 'xa' level)
                 const candidateResultsSection = document.getElementById('candidateResultsSection');
                 if (candidateResultsSection && selectedLevel === 'xa') {
