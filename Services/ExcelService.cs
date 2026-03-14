@@ -1072,8 +1072,8 @@ namespace ElectionManagement.Services
                 ws.Cells[level1Row, 8].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
                 ws.Cells[level1Row, 8].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
-                // Cols 9-10: MERGED only for XA (commune) level - "Số phiếu không hợp lệ"
-                if (levelLower.Contains("xa"))
+                // Cols 9-10: MERGED only for XA/QUOCHOI (commune and national) levels - "Số phiếu không hợp lệ"
+                if (!levelLower.Contains("tinh"))
                 {
                     ws.Cells[$"I{level1Row}:J{level1Row}"].Merge = true;
                 }
@@ -1098,13 +1098,13 @@ namespace ElectionManagement.Services
                 ws.Cells[level1Row, 11].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
                 // Cols 13-16: MERGED - "Phân loại phiếu"
-                if (levelLower.Contains("xa"))
+                if (levelLower.Contains("tinh"))
                 {
-                    ws.Cells[$"M{level1Row}:O{level1Row}"].Merge = true;
+                    ws.Cells[$"M{level1Row}:P{level1Row}"].Merge = true;  // TINH: 4 columns (M-P)
                 }
-                else if (levelLower.Contains("tinh"))
+                else
                 {
-                    ws.Cells[$"M{level1Row}:P{level1Row}"].Merge = true;
+                    ws.Cells[$"M{level1Row}:O{level1Row}"].Merge = true;  // XA and QUOCHOI: 3 columns (M-O)
                 }
                 ws.Cells[level1Row, 13].Value = "Phân loại phiếu";
                 ws.Cells[level1Row, 13].Style.Font.Bold = true;
@@ -1119,14 +1119,14 @@ namespace ElectionManagement.Services
                 string uvcEndCol = GetColumnLetter(totalCol - 1);
                 Console.WriteLine($"[DEBUG] UCV Headers - uvcStartCol: {uvcStartCol}, Total UCV columns: {ucvCount}, uvcEndCol: {uvcEndCol}, Merge range: Q{level1Row}:{uvcEndCol}{level1Row}");
                 int headerCol = uvcStartCol; // Default to Q (17)
-                if (levelLower.Contains("xa"))
+                if (levelLower.Contains("tinh"))
                 {
-                    ws.Cells[$"P{level1Row}:T{level1Row}"].Merge = true;
-                    headerCol = 16; // P for XA level merged cell
+                    ws.Cells[$"Q{level1Row}:{uvcEndCol}{level1Row}"].Merge = true;  // TINH: merge Q onwards
                 }
-                else if (levelLower.Contains("tinh"))
+                else
                 {
-                    ws.Cells[$"Q{level1Row}:{uvcEndCol}{level1Row}"].Merge = true;
+                    ws.Cells[$"P{level1Row}:T{level1Row}"].Merge = true;  // XA and QUOCHOI: P-T
+                    headerCol = 16; // P for XA/QUOCHOI level merged cell
                 }
                 ws.Cells[level1Row, headerCol].Value = "Số phiếu bầu cho mỗi người ứng cử viên";
                 ws.Cells[level1Row, headerCol].Style.Font.Bold = true;
@@ -1174,8 +1174,8 @@ namespace ElectionManagement.Services
                 ws.Cells[level2Row, 11].Value = "Số phiếu";
                 ws.Cells[level2Row, 12].Value = "Tỉ lệ so với số phiếu thu vào (%)";
                 
-                // Ballot classification headers - PhieuBau04 (column 13) only for TINH and QUOCHOI
-                if (!levelLower.Contains("xa"))
+                // Ballot classification headers - PhieuBau04 (column 13) only for TINH
+                if (levelLower.Contains("tinh"))
                 {
                     ws.Cells[level2Row, 13].Value = "Bầu 04 đại biểu";
                 }
@@ -1225,17 +1225,17 @@ namespace ElectionManagement.Services
                 ws.Cells[$"{totalColLetter}{level1Row}:{totalColLetter}{level2Row}"].Merge = true;
                 
                 // === ADD BORDER FOR HEADERS (XA LEVEL ONLY) ===
-                object u7Value = null; // Will store U7 value from X7 move (for XA level only)
+                object u7Value = null; // Will store U7 value from X7 move (for XA/QUOCHOI levels only)
                 
                 try
                 {
-                    if (levelLower.Contains("xa"))
+                    if (!levelLower.Contains("tinh"))
                     {
-                        // Unmerge X7:X8 for XA level
+                        // Unmerge X7:X8 for XA/QUOCHOI levels
                         ws.Cells[$"{totalColLetter}{level1Row}:{totalColLetter}{level2Row}"].Merge = false;
-                        Console.WriteLine("[DEBUG] Unmerged X7:X8 for XA level");
+                        Console.WriteLine("[DEBUG] Unmerged X7:X8 for XA/QUOCHOI levels");
                         
-                        // Move X7 content to U7 and clear X8 for XA level
+                        // Move X7 content to U7 and clear X8 for XA/QUOCHOI levels
                         var x7Cell = ws.Cells[level1Row, totalCol];
                         var u7Cell = ws.Cells[level1Row, 21];
                         var u8Cell = ws.Cells[level2Row, 21];
@@ -1292,14 +1292,14 @@ namespace ElectionManagement.Services
                         try
                         {
                             ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = true;
-                            Console.WriteLine("[DEBUG] Successfully merged U7:U8 for XA level");
+                            Console.WriteLine("[DEBUG] Successfully merged U7:U8 for XA/QUOCHOI levels");
                         }
                         catch (Exception mergeEx)
                         {
                             Console.WriteLine($"[DEBUG] Merge U7:U8 error: {mergeEx.Message}");
                         }
                         
-                        // Add border to header range for XA level
+                        // Add border to header range for XA/QUOCHOI levels
                         var headerRange = ws.Cells[$"A{level1Row}:T{level2Row}"];
                         headerRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                         headerRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -1307,9 +1307,9 @@ namespace ElectionManagement.Services
                         headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                     }
                 }
-                catch (Exception xaEx)
+                catch (Exception nonTinhEx)
                 {
-                    Console.WriteLine($"[ERROR] XA level processing failed: {xaEx.GetBaseException().Message}");
+                    Console.WriteLine($"[ERROR] XA/QUOCHOI level processing failed: {nonTinhEx.GetBaseException().Message}");
                     throw;
                 }
                 
@@ -1360,8 +1360,8 @@ namespace ElectionManagement.Services
                     }
                     
                     // Ballot classification (columns 13-16)
-                    // PhieuBau04 only for TINH and QUOCHOI levels (not for XA level)
-                    if (!levelLower.Contains("xa"))
+                    // PhieuBau04 only for TINH level
+                    if (levelLower.Contains("tinh"))
                     {
                         ws.Cells[row, 13].Value = result.PhieuBau04 > 0 ? result.PhieuBau04 : "";
                     }
@@ -1369,8 +1369,8 @@ namespace ElectionManagement.Services
                     ws.Cells[row, 15].Value = result.PhieuBau02 > 0 ? result.PhieuBau02 : "";
                     ws.Cells[row, 16].Value = result.PhieuBau01 > 0 ? result.PhieuBau01 : "";
                     
-                    // UCV vote counts (columns Q onwards for default, P onwards for XA level)
-                    int ucvStartCol_Data = levelLower.Contains("xa") ? 16 : uvcStartCol;  // P (16) for XA, Q (17) for others
+                    // UCV vote counts (columns Q onwards for TINH, P onwards for XA/QUOCHOI)
+                    int ucvStartCol_Data = levelLower.Contains("tinh") ? uvcStartCol : 16;  // Q (17) for TINH, P (16) for XA/QUOCHOI
                     
                     ws.Cells[row, ucvStartCol_Data].Value = result.UngCuVien1 > 0 ? result.UngCuVien1 : "";
                     ws.Cells[row, ucvStartCol_Data + 1].Value = result.UngCuVien2 > 0 ? result.UngCuVien2 : "";
@@ -1472,24 +1472,24 @@ namespace ElectionManagement.Services
                 
                 int dataEndRow = row; // Save the end row of data table
                 
-                // === ADD BORDER FOR DATA ROWS (XA LEVEL ONLY) ===
-                if (levelLower.Contains("xa"))
+                // === ADD BORDER FOR DATA ROWS (XA/QUOCHOI LEVELS ONLY) ===
+                if (!levelLower.Contains("tinh"))
                 {
-                    // Add border to entire data table range for XA level
+                    // Add border to entire data table range for XA/QUOCHOI levels
                     var dataTableRange = ws.Cells[$"A{level2Row + 1}:T{dataEndRow}"];
                     dataTableRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                     dataTableRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                     dataTableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                     dataTableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                     dataTableRange.Style.Border.DiagonalDown = false;
-                    Console.WriteLine($"[DEBUG] Added borders to data table: A{level2Row + 1}:T{dataEndRow} for XA level");
+                    Console.WriteLine($"[DEBUG] Added borders to data table: A{level2Row + 1}:T{dataEndRow} for XA/QUOCHOI levels");
                     
                     // Add borders to U column data rows (U9, U10, U11, U12)
                     ws.Cells[9, 21].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);  // U9
                     ws.Cells[10, 21].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin); // U10
                     ws.Cells[11, 21].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin); // U11
                     ws.Cells[12, 21].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin); // U12
-                    Console.WriteLine($"[DEBUG] Added borders to U9:U12 using BorderAround for XA level");
+                    Console.WriteLine($"[DEBUG] Added borders to U9:U12 using BorderAround for XA/QUOCHOI levels");
                 }
                 
                 row += 2;
@@ -1577,15 +1577,15 @@ namespace ElectionManagement.Services
                 Console.WriteLine($"[DEBUG] Before clearing - Original level: '{level}'");
                 Console.WriteLine($"[DEBUG] Before clearing - levelLower: '{levelLower}'");
 
-                if (levelLower.Contains("xa"))
+                if (!levelLower.Contains("tinh"))
                 {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - SHIFTING COLUMNS =====");
-                    // Set level2Row headers for XÃ level (row 8)
+                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ/QUỐC HỘI LEVEL - SHIFTING COLUMNS =====");
+                    // Set level2Row headers for XÃ/QUỐC HỘI level (row 8)
                     ws.Cells[level2Row, 13].Value = "Bầu 03 đại biểu"; // Column M
                     ws.Cells[level2Row, 14].Value = "Bầu 02 đại biểu"; // Column N
                     ws.Cells[level2Row, 15].Value = "Bầu 01 đại biểu"; // Column O
                     
-                    // Shift header row (row 8) columns left (Q→P, R→Q, S→R, T→S)
+                    // Shift header row (row 8) columns left (Q→P, R→Q, S→R, T→S) for XA/QUOCHOI
                     ws.Cells[level2Row, 16].Value = ws.Cells[level2Row, 17].Value; // P = Q
                     ws.Cells[level2Row, 17].Value = ws.Cells[level2Row, 18].Value; // Q = R
                     ws.Cells[level2Row, 18].Value = ws.Cells[level2Row, 19].Value; // R = S
@@ -1628,9 +1628,9 @@ namespace ElectionManagement.Services
                     // NOTE: U7 value is already preserved from line 1244 (copy from X7)
                     
                     
-                    // Clear V8:V12 and W8:W12 for XA level
+                    // Clear V8:V12 and W8:W12 for XA/QUOCHOI level
                     ws.Cells[$"V{level2Row}:W{level2Row + 4}"].Clear();
-                    Console.WriteLine($"[DEBUG] Cleared cells V{level2Row}:W{level2Row + 4} for XA level");
+                    Console.WriteLine($"[DEBUG] Cleared cells V{level2Row}:W{level2Row + 4} for XA/QUOCHOI level");
                     
                     // Add UCV headers AFTER shift to ensure correct positioning
                     ws.Cells[level2Row, 16].Value = "UCV 1";  // P8
@@ -1638,31 +1638,17 @@ namespace ElectionManagement.Services
                     ws.Cells[level2Row, 18].Value = "UCV 3";  // R8
                     ws.Cells[level2Row, 19].Value = "UCV 4";  // S8
                     ws.Cells[level2Row, 20].Value = "UCV 5";  // T8
-                    Console.WriteLine("[DEBUG] Added UCV1-5 headers to P8-T8 for XA level after shift");
+                    Console.WriteLine("[DEBUG] Added UCV1-5 headers to P8-T8 for XA/QUOCHOI level after shift");
                     
-                    // Add borders to UCV cells (P8:T12) at XA level
+                    // Add borders to UCV cells (P8:T12) at XA/QUOCHOI level
                     var ucvRange = ws.Cells[level2Row, 16, level2Row + 4, 20]; // P8:T12
                     ucvRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                     ucvRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                     ucvRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                     ucvRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                     ucvRange.Style.Border.DiagonalDown = false;
-                    Console.WriteLine("[DEBUG] Shifted UCV columns for XÃ level");
+                    Console.WriteLine("[DEBUG] Shifted UCV columns for XÃ/QUỐC HỘI level");
                 }
-                else if (levelLower.Contains("quochoi"))
-                {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: QUỐC HỘI LEVEL - CLEARING CELLS =====");
-                    // Clear specific cells for QUỐC HỘI (national) level
-                    ws.Cells["M8:M12"].Clear();
-                    ws.Cells["V8:V12"].Clear();
-                    ws.Cells["W8:W12"].Clear();
-                    ws.Cells["H19"].Clear();
-                    ws.Cells["J19"].Clear();
-                    ws.Cells["K19"].Clear();
-                    ws.Cells["L19"].Clear();
-                    Console.WriteLine("[DEBUG] Cleared cells for QUỐC HỘI level");
-                }
-                // TINH (provincial) level - thêm dữ liệu
                 else if (levelLower.Contains("tinh"))
                 {
                     Console.WriteLine("[DEBUG] ===== MATCHED: TỈNH (PROVINCIAL) LEVEL - ADDING DATA =====");
@@ -1671,10 +1657,6 @@ namespace ElectionManagement.Services
                     ws.Cells["V8"].Value = "UCV 6";
                     ws.Cells["W8"].Value = "UCV 7";
                     Console.WriteLine("[DEBUG] Added: M8='Bầu 04 đại biểu', V8='UCV 6', W8='UCV 7'");
-                }
-                else
-                {
-                    Console.WriteLine("[DEBUG] ===== UNKNOWN LEVEL - NOT CHANGING =====");
                 }
 
                 return package.GetAsByteArray();
