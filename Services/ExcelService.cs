@@ -1371,6 +1371,17 @@ namespace ElectionManagement.Services
                     dataTableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                     dataTableRange.Style.Border.DiagonalDown = false;
                     Console.WriteLine($"[DEBUG] Added borders to data table: A{level2Row + 1}:T{dataEndRow} for XA level");
+                    
+                    // Add borders to U9:U12 (data rows in U column)
+                    for (int r = level2Row + 1; r <= dataEndRow; r++)
+                    {
+                        var uCell = ws.Cells[r, 21]; // Column U = 21
+                        uCell.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                        uCell.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                        uCell.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                        uCell.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    }
+                    Console.WriteLine($"[DEBUG] Added borders to U column data rows: U{level2Row + 1}:U{dataEndRow} for XA level");
                 }
                 
                 row += 2;
