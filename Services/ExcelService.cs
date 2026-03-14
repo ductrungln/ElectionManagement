@@ -1232,6 +1232,7 @@ namespace ElectionManagement.Services
                     // Move X7 content to U7 and clear X8 for XA level
                     var x7Cell = ws.Cells[level1Row, totalCol];
                     var u7Cell = ws.Cells[level1Row, 21];
+                    var u8Cell = ws.Cells[level2Row, 21];
                     
                     // Copy X7 value to U7
                     u7Cell.Value = x7Cell.Value;
@@ -1250,21 +1251,41 @@ namespace ElectionManagement.Services
                     u7Value = u7Cell.Value;
                     Console.WriteLine($"[DEBUG] Saved U7 value: {u7Value}");
                     
-                    // Clear X7 cell completely
+                    // Clear X7 cell and remove borders
                     x7Cell.Value = null;
                     x7Cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
+                    x7Cell.Style.Border.Left.Style = ExcelBorderStyle.None;
+                    x7Cell.Style.Border.Right.Style = ExcelBorderStyle.None;
+                    x7Cell.Style.Border.Top.Style = ExcelBorderStyle.None;
+                    x7Cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
                     Console.WriteLine("[DEBUG] Moved X7 to U7 for XA level");
                     
-                    // Clear X8 cell completely
-                    ws.Cells[level2Row, totalCol].Value = null;
-                    ws.Cells[level2Row, totalCol].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
-                    Console.WriteLine("[DEBUG] Cleared X8 for XA level");
+                    // Clear X8 cell and remove borders
+                    var x8Cell = ws.Cells[level2Row, totalCol];
+                    x8Cell.Value = null;
+                    x8Cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
+                    x8Cell.Style.Border.Left.Style = ExcelBorderStyle.None;
+                    x8Cell.Style.Border.Right.Style = ExcelBorderStyle.None;
+                    x8Cell.Style.Border.Top.Style = ExcelBorderStyle.None;
+                    x8Cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
+                    Console.WriteLine("[DEBUG] Cleared X8 and removed borders for XA level");
                     
-                    // Clear U8 (remove UCV 6 header) to keep U7 clean for XA level
-                    var u8Cell = ws.Cells[level2Row, 21];
+                    // Clear U8 completely first (must be empty for merge to work)
                     u8Cell.Value = null;
                     u8Cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
-                    Console.WriteLine("[DEBUG] Cleared U8 (UCV 6 header) for XA level");
+                    u8Cell.Style.Border.Left.Style = ExcelBorderStyle.None;
+                    u8Cell.Style.Border.Right.Style = ExcelBorderStyle.None;
+                    u8Cell.Style.Border.Top.Style = ExcelBorderStyle.None;
+                    u8Cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
+                    Console.WriteLine("[DEBUG] Cleared U8 for merge");
+                    
+                    // Merge U7:U8 cells
+                    ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = true;
+                    Console.WriteLine("[DEBUG] Merged U7:U8 for XA level");
+                    
+                    // Add UCV5 to T8
+                    ws.Cells[level2Row, 20].Value = "UCV 5";
+                    Console.WriteLine("[DEBUG] Added UCV5 to T8 for XA level");
                     
                     // Add border to header range for XA level
                     var headerRange = ws.Cells[$"A{level1Row}:T{level2Row}"];
