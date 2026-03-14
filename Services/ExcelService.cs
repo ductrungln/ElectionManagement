@@ -1250,13 +1250,19 @@ namespace ElectionManagement.Services
                     u7Value = u7Cell.Value;
                     Console.WriteLine($"[DEBUG] Saved U7 value: {u7Value}");
                     
-                    // Clear X7 cell
+                    // Clear X7 cell completely
                     x7Cell.Value = null;
+                    x7Cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
                     Console.WriteLine("[DEBUG] Moved X7 to U7 for XA level");
                     
-                    // Clear X8 cell
+                    // Clear X8 cell completely
                     ws.Cells[level2Row, totalCol].Value = null;
+                    ws.Cells[level2Row, totalCol].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
                     Console.WriteLine("[DEBUG] Cleared X8 for XA level");
+                    
+                    // Merge U7:U8
+                    ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = true;
+                    Console.WriteLine("[DEBUG] Merged U7:U8 for XA level");
                     
                     // Add border to header range for XA level
                     var headerRange = ws.Cells[$"A{level1Row}:T{level2Row}"];
