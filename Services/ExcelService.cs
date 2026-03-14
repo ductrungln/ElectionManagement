@@ -1354,13 +1354,23 @@ namespace ElectionManagement.Services
                     ws.Cells["N8"].Value = "Bầu 02 đại biểu";
                     ws.Cells["O8"].Value = "Bầu 01 đại biểu";
                     ws.Cells["P8"].Clear();
+                    // Shift Q8:U8 to P8:T8
+                    for (int r = 8; r <= 12; r++)
+                    {
+                        ws.Cells[r, 16].Value = ws.Cells[r, 17].Value; // P = Q
+                        ws.Cells[r, 17].Value = ws.Cells[r, 18].Value; // Q = R
+                        ws.Cells[r, 18].Value = ws.Cells[r, 19].Value; // R = S
+                        ws.Cells[r, 19].Value = ws.Cells[r, 20].Value; // S = T
+                        ws.Cells[r, 20].Value = ws.Cells[r, 21].Value; // T = U
+                        ws.Cells[r, 21].Clear(); // U cleared
+                    }
                     ws.Cells["V8:V12"].Clear();
                     ws.Cells["W8:W12"].Clear();
                     ws.Cells["H19"].Clear();
                     ws.Cells["J19"].Clear();
                     ws.Cells["K19"].Clear();
                     ws.Cells["L19"].Clear();
-                    Console.WriteLine("[DEBUG] Shifted columns for XÃ level: M8='Bầu 03 đại biểu', N8='Bầu 02 đại biểu', O8='Bầu 01 đại biểu', P8 cleared");
+                    Console.WriteLine("[DEBUG] Shifted Q8:U8 to P8:T8 for XÃ level");
                 }
                 else if (levelLower.Contains("quochoi"))
                 {
