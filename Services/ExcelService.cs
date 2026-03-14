@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Microsoft.EntityFrameworkCore;
 using ElectionManagement.Models;
 using ElectionManagement.Data;
@@ -1219,6 +1220,17 @@ namespace ElectionManagement.Services
                 string totalColLetter = GetColumnLetter(totalCol);
                 ws.Cells[$"{totalColLetter}{level1Row}:{totalColLetter}{level2Row}"].Merge = true;
                 
+                // === ADD BORDER FOR HEADERS (XA LEVEL ONLY) ===
+                if (levelLower.Contains("xa"))
+                {
+                    // Add border to header range for XA level
+                    var headerRange = ws.Cells[$"A{level1Row}:T{level2Row}"];
+                    headerRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    headerRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    headerRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                }
+                
                 row++;
 
                 // === DATA ROWS ===
@@ -1267,6 +1279,22 @@ namespace ElectionManagement.Services
                     ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
                     ws.Cells[row, col].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                 }
+                
+                int dataEndRow = row; // Save the end row of data table
+                
+                // === ADD BORDER FOR DATA ROWS (XA LEVEL ONLY) ===
+                if (levelLower.Contains("xa"))
+                {
+                    // Add border to entire data table range for XA level
+                    var dataTableRange = ws.Cells[$"A{level2Row + 1}:T{dataEndRow}"];
+                    dataTableRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    dataTableRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    dataTableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    dataTableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    dataTableRange.Style.Border.DiagonalDown = false;
+                    Console.WriteLine($"[DEBUG] Added borders to data table: A{level2Row + 1}:T{dataEndRow} for XA level");
+                }
+                
                 row += 2;
 
                 // === VERIFICATION SECTION ===
@@ -1390,6 +1418,14 @@ namespace ElectionManagement.Services
                         ws.Cells[r, 20].Value = ws.Cells[r, 21].Value; // T = U
                         ws.Cells[r, 21].Clear(); // U cleared
                     }
+                    
+                    // Add borders to UCV cells (P8:T12) at XA level
+                    var ucvRange = ws.Cells[level2Row, 16, level2Row + 4, 20]; // P8:T12
+                    ucvRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    ucvRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    ucvRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    ucvRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    ucvRange.Style.Border.DiagonalDown = false;
                     Console.WriteLine("[DEBUG] Shifted UCV columns for XÃ level");
                 }
                 else if (levelLower.Contains("quochoi"))
