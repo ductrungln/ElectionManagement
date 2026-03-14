@@ -1071,8 +1071,8 @@ namespace ElectionManagement.Services
                 ws.Cells[level1Row, 8].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
                 ws.Cells[level1Row, 8].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
-                // Cols 9-10: MERGED (except for XÃ level) - "Số phiếu không hợp lệ"
-                if (!levelLower.Contains("xa"))
+                // Cols 9-10: MERGED only for TINH (provincial) level - "Số phiếu không hợp lệ"
+                if (levelLower.Contains("tinh"))
                 {
                     ws.Cells[$"I{level1Row}:J{level1Row}"].Merge = true;
                 }
@@ -1096,8 +1096,8 @@ namespace ElectionManagement.Services
                 ws.Cells[level1Row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
                 ws.Cells[level1Row, 11].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
-                // Cols 13-16: MERGED (except for XÃ level) - "Phân loại phiếu" (removed Bầu 05 đại biểu)
-                if (!levelLower.Contains("xa"))
+                // Cols 13-16: MERGED only for TINH (provincial) level - "Phân loại phiếu" (removed Bầu 05 đại biểu)
+                if (levelLower.Contains("tinh"))
                 {
                     ws.Cells[$"M{level1Row}:P{level1Row}"].Merge = true;
                 }
