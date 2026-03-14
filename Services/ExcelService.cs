@@ -1223,6 +1223,10 @@ namespace ElectionManagement.Services
                 // === ADD BORDER FOR HEADERS (XA LEVEL ONLY) ===
                 if (levelLower.Contains("xa"))
                 {
+                    // Unmerge X7:X8 for XA level
+                    ws.Cells[$"{totalColLetter}{level1Row}:{totalColLetter}{level2Row}"].Merge = false;
+                    Console.WriteLine("[DEBUG] Unmerged X7:X8 for XA level");
+                    
                     // Clear U7 value for XA level
                     ws.Cells[level1Row, 21].Value = null;
                     Console.WriteLine("[DEBUG] Cleared U7 for XA level");
