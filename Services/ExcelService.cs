@@ -1174,7 +1174,11 @@ namespace ElectionManagement.Services
                 ws.Cells[level2Row, 11].Value = "Số phiếu";
                 ws.Cells[level2Row, 12].Value = "Tỉ lệ so với số phiếu thu vào (%)";
                 
-                ws.Cells[level2Row, 13].Value = "Bầu 04 đại biểu";
+                // Ballot classification headers - PhieuBau04 (column 13) only for TINH and QUOCHOI
+                if (!levelLower.Contains("xa"))
+                {
+                    ws.Cells[level2Row, 13].Value = "Bầu 04 đại biểu";
+                }
                 ws.Cells[level2Row, 14].Value = "Bầu 03 đại biểu";
                 ws.Cells[level2Row, 15].Value = "Bầu 02 đại biểu";
                 ws.Cells[level2Row, 16].Value = "Bầu 01 đại biểu";
