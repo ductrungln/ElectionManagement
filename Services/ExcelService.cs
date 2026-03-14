@@ -1383,6 +1383,13 @@ namespace ElectionManagement.Services
                         ws.Cells[r, 21].Value = ws.Cells[r, 24].Value; // U = X
                         ws.Cells[r, 24].Clear(); // X cleared
                     }
+                    
+                    // Shift data from column U to column T for rows 8-12 (header + data rows)
+                    for (int r = level2Row; r <= level2Row + 4; r++)
+                    {
+                        ws.Cells[r, 20].Value = ws.Cells[r, 21].Value; // T = U
+                        ws.Cells[r, 21].Clear(); // U cleared
+                    }
                     Console.WriteLine("[DEBUG] Shifted UCV columns for XÃ level");
                 }
                 else if (levelLower.Contains("quochoi"))
