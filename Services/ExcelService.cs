@@ -959,11 +959,15 @@ namespace ElectionManagement.Services
                 // All levels now display: UCV 1, 2, 3, 4, 5, 6, 7 (7 candidates)
                 Console.WriteLine($"[DEBUG] level.ToLower(): '{level.ToLower()}'");
                 
-                int ucvCount = 7;  // All levels: 7 UCVs
-                Console.WriteLine($"[DEBUG] Calculated ucvCount: {ucvCount}");
+                // Calculate UCV layout based on level
+                // TINH: 7 candidates (UCV 1-7), XA/QUOCHOI: 5 candidates (UCV 1-5)
+                int candidateCount = levelLower.Contains("tinh") ? 7 : 5;
+                int ucvStartCol_Layout = levelLower.Contains("tinh") ? 17 : 16;  // Q (17) for TINH, P (16) for XA/QUOCHOI
+                int ucvCount = 7;  // All levels show UCV header 1-7 in layout
+                Console.WriteLine($"[DEBUG] Calculated candidateCount: {candidateCount}, ucvStartCol_Layout: {ucvStartCol_Layout}");
                 
-                int uvcStartCol = 17; // Column Q
-                int totalCol = uvcStartCol + ucvCount;  // Column 24 (17 + 7)
+                int uvcStartCol = 17; // Column Q (keep for compatibility)
+                int totalCol = ucvStartCol_Layout + candidateCount;  // Column 24 (17+7) for TINH, Column 21 (16+5) for XA/QUOCHOI
                 int maxCol = totalCol;
                 
                 Console.WriteLine($"[DEBUG] totalCol: {totalCol}, maxCol: {maxCol}");
@@ -1174,20 +1178,28 @@ namespace ElectionManagement.Services
                 ws.Cells[level2Row, 11].Value = "Số phiếu";
                 ws.Cells[level2Row, 12].Value = "Tỉ lệ so với số phiếu thu vào (%)";
                 
-                // Ballot classification headers - PhieuBau04 (column 13) only for TINH
+                // Ballot classification headers (columns 13-16 for TINH, 13-15 for XA/QUOCHOI)
                 if (levelLower.Contains("tinh"))
                 {
                     ws.Cells[level2Row, 13].Value = "Bầu 04 đại biểu";
+                    ws.Cells[level2Row, 14].Value = "Bầu 03 đại biểu";
+                    ws.Cells[level2Row, 15].Value = "Bầu 02 đại biểu";
+                    ws.Cells[level2Row, 16].Value = "Bầu 01 đại biểu";
                 }
-                ws.Cells[level2Row, 14].Value = "Bầu 03 đại biểu";
-                ws.Cells[level2Row, 15].Value = "Bầu 02 đại biểu";
-                ws.Cells[level2Row, 16].Value = "Bầu 01 đại biểu";
-                
-                // UCV columns - all levels show UCV 1-7
-                Console.WriteLine($"[DEBUG] Level 2 UCV Headers - Setting {ucvCount} UCV columns starting at column {uvcStartCol}");
-                for (int i = 1; i <= ucvCount; i++)
+                else
                 {
-                    int colNum = uvcStartCol + i - 1;
+                    // XA/QUOCHOI: Bầu 03, 02, 01 at columns 13, 14, 15 (no Bầu 04)
+                    ws.Cells[level2Row, 13].Value = "Bầu 03 đại biểu";
+                    ws.Cells[level2Row, 14].Value = "Bầu 02 đại biểu";
+                    ws.Cells[level2Row, 15].Value = "Bầu 01 đại biểu";
+                }
+                
+                // UCV columns - columns Q (17) onwards for TINH, columns P (16) onwards for XA/QUOCHOI
+                int ucvStartCol_Header = levelLower.Contains("tinh") ? 17 : 16;
+                int ucvCount_Header = levelLower.Contains("tinh") ? 7 : 5;  // Only display headers for actual candidates
+                for (int i = 1; i <= ucvCount_Header; i++)
+                {
+                    int colNum = ucvStartCol_Header + i - 1;
                     ws.Cells[level2Row, colNum].Value = $"UCV {i}";
                     Console.WriteLine($"[DEBUG] Set UCV {i} at column {colNum} ({GetColumnLetter(colNum)})");
                 }
@@ -1359,18 +1371,25 @@ namespace ElectionManagement.Services
                         ws.Cells[row, 12].Value = validPercentage > 0 ? Math.Round(validPercentage, 1) : "";
                     }
                     
-                    // Ballot classification (columns 13-16)
-                    // PhieuBau04 only for TINH level
+                    // Ballot classification (columns 13-16 for TINH, 13-15 for XA/QUOCHOI)
+                    // PhieuBau04 only for TINH level (column 13)
                     if (levelLower.Contains("tinh"))
                     {
                         ws.Cells[row, 13].Value = result.PhieuBau04 > 0 ? result.PhieuBau04 : "";
+                        ws.Cells[row, 14].Value = result.PhieuBau03 > 0 ? result.PhieuBau03 : "";
+                        ws.Cells[row, 15].Value = result.PhieuBau02 > 0 ? result.PhieuBau02 : "";
+                        ws.Cells[row, 16].Value = result.PhieuBau01 > 0 ? result.PhieuBau01 : "";
                     }
-                    ws.Cells[row, 14].Value = result.PhieuBau03 > 0 ? result.PhieuBau03 : "";
-                    ws.Cells[row, 15].Value = result.PhieuBau02 > 0 ? result.PhieuBau02 : "";
-                    ws.Cells[row, 16].Value = result.PhieuBau01 > 0 ? result.PhieuBau01 : "";
+                    else
+                    {
+                        // XA/QUOCHOI: Bầu 03, 02, 01 at columns 13, 14, 15 (no Bầu 04)
+                        ws.Cells[row, 13].Value = result.PhieuBau03 > 0 ? result.PhieuBau03 : "";
+                        ws.Cells[row, 14].Value = result.PhieuBau02 > 0 ? result.PhieuBau02 : "";
+                        ws.Cells[row, 15].Value = result.PhieuBau01 > 0 ? result.PhieuBau01 : "";
+                    }
                     
-                    // UCV vote counts (columns Q onwards for TINH, P onwards for XA/QUOCHOI)
-                    int ucvStartCol_Data = levelLower.Contains("tinh") ? uvcStartCol : 16;  // Q (17) for TINH, P (16) for XA/QUOCHOI
+                    // UCV vote counts (columns Q (17) onwards for TINH, columns P (16) onwards for XA/QUOCHOI)
+                    int ucvStartCol_Data = levelLower.Contains("tinh") ? 17 : 16;  // Q (17) for TINH, P (16) for XA/QUOCHOI
                     
                     ws.Cells[row, ucvStartCol_Data].Value = result.UngCuVien1 > 0 ? result.UngCuVien1 : "";
                     ws.Cells[row, ucvStartCol_Data + 1].Value = result.UngCuVien2 > 0 ? result.UngCuVien2 : "";
@@ -1385,7 +1404,9 @@ namespace ElectionManagement.Services
                         ws.Cells[row, ucvStartCol_Data + 6].Value = result.UngCuVien7 > 0 ? result.UngCuVien7 : "";
                     }
                     
-                    // Total column (Cộng) = sum of all UCV votes
+                    // Total column (Cộng) = direct sum of UCV votes without any transformation
+                    // For XA/QUOCHOI: sum UCV 1-5 (5 candidates)
+                    // For TINH: sum UCV 1-7 (7 candidates)
                     int totalVotes = result.UngCuVien1 + result.UngCuVien2 + result.UngCuVien3 + 
                                     result.UngCuVien4 + result.UngCuVien5;
                     if (levelLower.Contains("tinh"))
