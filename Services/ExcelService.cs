@@ -1260,9 +1260,11 @@ namespace ElectionManagement.Services
                     ws.Cells[level2Row, totalCol].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
                     Console.WriteLine("[DEBUG] Cleared X8 for XA level");
                     
-                    // Merge U7:U8
-                    ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = true;
-                    Console.WriteLine("[DEBUG] Merged U7:U8 for XA level");
+                    // Clear U8 (remove UCV 6 header) to keep U7 clean for XA level
+                    var u8Cell = ws.Cells[level2Row, 21];
+                    u8Cell.Value = null;
+                    u8Cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
+                    Console.WriteLine("[DEBUG] Cleared U8 (UCV 6 header) for XA level");
                     
                     // Add border to header range for XA level
                     var headerRange = ws.Cells[$"A{level1Row}:T{level2Row}"];
