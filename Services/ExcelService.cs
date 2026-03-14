@@ -1356,7 +1356,11 @@ namespace ElectionManagement.Services
                     }
                     
                     // Ballot classification (columns 13-16)
-                    ws.Cells[row, 13].Value = result.PhieuBau04 > 0 ? result.PhieuBau04 : "";
+                    // PhieuBau04 only for TINH and QUOCHOI levels (not for XA level)
+                    if (!levelLower.Contains("xa"))
+                    {
+                        ws.Cells[row, 13].Value = result.PhieuBau04 > 0 ? result.PhieuBau04 : "";
+                    }
                     ws.Cells[row, 14].Value = result.PhieuBau03 > 0 ? result.PhieuBau03 : "";
                     ws.Cells[row, 15].Value = result.PhieuBau02 > 0 ? result.PhieuBau02 : "";
                     ws.Cells[row, 16].Value = result.PhieuBau01 > 0 ? result.PhieuBau01 : "";
