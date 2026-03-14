@@ -1286,22 +1286,6 @@ namespace ElectionManagement.Services
                     u8Cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
                     Console.WriteLine("[DEBUG] Cleared U8 completely (no merge to avoid errors)");
                     
-                    // Add UCV1 to UCV5 to P8, Q8, R8, S8, T8
-                    ws.Cells[level2Row, 16].Value = "UCV 1";
-                    Console.WriteLine("[DEBUG] Added UCV1 to P8 for XA level");
-                    
-                    ws.Cells[level2Row, 17].Value = "UCV 2";
-                    Console.WriteLine("[DEBUG] Added UCV2 to Q8 for XA level");
-                    
-                    ws.Cells[level2Row, 18].Value = "UCV 3";
-                    Console.WriteLine("[DEBUG] Added UCV3 to R8 for XA level");
-                    
-                    ws.Cells[level2Row, 19].Value = "UCV 4";
-                    Console.WriteLine("[DEBUG] Added UCV4 to S8 for XA level");
-                    
-                    ws.Cells[level2Row, 20].Value = "UCV 5";
-                    Console.WriteLine("[DEBUG] Added UCV5 to T8 for XA level");
-                    
                     // Add border to header range for XA level
                     var headerRange = ws.Cells[$"A{level1Row}:T{level2Row}"];
                     headerRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
@@ -1505,6 +1489,14 @@ namespace ElectionManagement.Services
                     // Clear V8:V12 and W8:W12 for XA level
                     ws.Cells[$"V{level2Row}:W{level2Row + 4}"].Clear();
                     Console.WriteLine($"[DEBUG] Cleared cells V{level2Row}:W{level2Row + 4} for XA level");
+                    
+                    // Add UCV headers AFTER shift to ensure correct positioning
+                    ws.Cells[level2Row, 16].Value = "UCV 1";  // P8
+                    ws.Cells[level2Row, 17].Value = "UCV 2";  // Q8
+                    ws.Cells[level2Row, 18].Value = "UCV 3";  // R8
+                    ws.Cells[level2Row, 19].Value = "UCV 4";  // S8
+                    ws.Cells[level2Row, 20].Value = "UCV 5";  // T8
+                    Console.WriteLine("[DEBUG] Added UCV1-5 headers to P8-T8 for XA level after shift");
                     
                     // Add borders to UCV cells (P8:T12) at XA level
                     var ucvRange = ws.Cells[level2Row, 16, level2Row + 4, 20]; // P8:T12
