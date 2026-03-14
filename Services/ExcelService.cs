@@ -1252,8 +1252,8 @@ namespace ElectionManagement.Services
                         var u7Cell = ws.Cells[level1Row, 21];
                         var u8Cell = ws.Cells[level2Row, 21];
                         
-                        // Copy X7 value to U7
-                        u7Cell.Value = x7Cell.Value;
+                        // Set U7 to the header text for XA/QUOCHOI levels
+                        u7Cell.Value = "Tổng số phiếu bầu của các ứng cử viên";
                         
                         // Copy X7 styling to U7
                         u7Cell.Style.Font.Bold = x7Cell.Style.Font.Bold;
