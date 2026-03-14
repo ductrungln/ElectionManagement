@@ -949,9 +949,13 @@ namespace ElectionManagement.Services
                 var ws = package.Workbook.Worksheets.Add("Biểu tổng hợp kiểm phiếu");
                 ws.View.ZoomScale = 60;
 
+                // Convert level to lowercase for comparison
+                string levelLower = level?.ToLower() ?? "";
+                Console.WriteLine($"[DEBUG] ExportOfficialBallotVerificationForm - Received level: '{level}'");
+                Console.WriteLine($"[DEBUG] levelLower: '{levelLower}'");
+
                 // Determine column structure based on level
                 // All levels now display: UCV 1, 2, 3, 4, 5, 6, 7 (7 candidates)
-                Console.WriteLine($"[DEBUG] ExportOfficialBallotVerificationForm - Received level: '{level}'");
                 Console.WriteLine($"[DEBUG] level.ToLower(): '{level.ToLower()}'");
                 
                 int ucvCount = 7;  // All levels: 7 UCVs
@@ -1067,8 +1071,11 @@ namespace ElectionManagement.Services
                 ws.Cells[level1Row, 8].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
                 ws.Cells[level1Row, 8].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
-                // Cols 9-10: MERGED - "Số phiếu không hợp lệ"
-                ws.Cells[$"I{level1Row}:J{level1Row}"].Merge = true;
+                // Cols 9-10: MERGED (except for XÃ level) - "Số phiếu không hợp lệ"
+                if (!levelLower.Contains("xa"))
+                {
+                    ws.Cells[$"I{level1Row}:J{level1Row}"].Merge = true;
+                }
                 ws.Cells[level1Row, 9].Value = "Số phiếu không hợp lệ";
                 ws.Cells[level1Row, 9].Style.Font.Bold = true;
                 ws.Cells[level1Row, 9].Style.Font.Size = 9;
@@ -1089,8 +1096,11 @@ namespace ElectionManagement.Services
                 ws.Cells[level1Row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
                 ws.Cells[level1Row, 11].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
-                // Cols 13-16: MERGED - "Phân loại phiếu" (removed Bầu 05 đại biểu)
-                ws.Cells[$"M{level1Row}:P{level1Row}"].Merge = true;
+                // Cols 13-16: MERGED (except for XÃ level) - "Phân loại phiếu" (removed Bầu 05 đại biểu)
+                if (!levelLower.Contains("xa"))
+                {
+                    ws.Cells[$"M{level1Row}:P{level1Row}"].Merge = true;
+                }
                 ws.Cells[level1Row, 13].Value = "Phân loại phiếu";
                 ws.Cells[level1Row, 13].Style.Font.Bold = true;
                 ws.Cells[level1Row, 13].Style.Font.Size = 9;
@@ -1326,8 +1336,6 @@ namespace ElectionManagement.Services
                 }
 
                 // Clear specific cells based on election level
-                string levelLower = level?.ToLower() ?? "";
-                
                 Console.WriteLine($"[DEBUG] Before clearing - Original level: '{level}'");
                 Console.WriteLine($"[DEBUG] Before clearing - levelLower: '{levelLower}'");
 
