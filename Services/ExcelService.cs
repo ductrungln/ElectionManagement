@@ -1221,15 +1221,42 @@ namespace ElectionManagement.Services
                 ws.Cells[$"{totalColLetter}{level1Row}:{totalColLetter}{level2Row}"].Merge = true;
                 
                 // === ADD BORDER FOR HEADERS (XA LEVEL ONLY) ===
+                object u7Value = null; // Will store U7 value from X7 move (for XA level only)
+                
                 if (levelLower.Contains("xa"))
                 {
                     // Unmerge X7:X8 for XA level
                     ws.Cells[$"{totalColLetter}{level1Row}:{totalColLetter}{level2Row}"].Merge = false;
                     Console.WriteLine("[DEBUG] Unmerged X7:X8 for XA level");
                     
-                    // Clear U7 value for XA level
-                    ws.Cells[level1Row, 21].Value = null;
-                    Console.WriteLine("[DEBUG] Cleared U7 for XA level");
+                    // Move X7 content to U7 and clear X8 for XA level
+                    var x7Cell = ws.Cells[level1Row, totalCol];
+                    var u7Cell = ws.Cells[level1Row, 21];
+                    
+                    // Copy X7 value to U7
+                    u7Cell.Value = x7Cell.Value;
+                    
+                    // Copy X7 styling to U7
+                    u7Cell.Style.Font.Bold = x7Cell.Style.Font.Bold;
+                    u7Cell.Style.Font.Size = x7Cell.Style.Font.Size;
+                    u7Cell.Style.HorizontalAlignment = x7Cell.Style.HorizontalAlignment;
+                    u7Cell.Style.VerticalAlignment = x7Cell.Style.VerticalAlignment;
+                    u7Cell.Style.Fill.PatternType = x7Cell.Style.Fill.PatternType;
+                    u7Cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Yellow);
+                    u7Cell.Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    u7Cell.Style.WrapText = x7Cell.Style.WrapText;
+                    
+                    // Save U7 value to restore later (to ensure it's preserved)
+                    u7Value = u7Cell.Value;
+                    Console.WriteLine($"[DEBUG] Saved U7 value: {u7Value}");
+                    
+                    // Clear X7 cell
+                    x7Cell.Value = null;
+                    Console.WriteLine("[DEBUG] Moved X7 to U7 for XA level");
+                    
+                    // Clear X8 cell
+                    ws.Cells[level2Row, totalCol].Value = null;
+                    Console.WriteLine("[DEBUG] Cleared X8 for XA level");
                     
                     // Add border to header range for XA level
                     var headerRange = ws.Cells[$"A{level1Row}:T{level2Row}"];
@@ -1426,6 +1453,10 @@ namespace ElectionManagement.Services
                         ws.Cells[r, 20].Value = ws.Cells[r, 21].Value; // T = U
                         ws.Cells[r, 21].Clear(); // U cleared
                     }
+                    
+                    // IMPORTANT: Restore U7 value to ensure the moved X7 content is preserved
+                    ws.Cells[level1Row, 21].Value = u7Value;
+                    Console.WriteLine($"[DEBUG] Restored U7 value after column shifts: {u7Value}");
                     
                     // Clear V8:V12 and W8:W12 for XA level
                     ws.Cells[$"V{level2Row}:W{level2Row + 4}"].Clear();
