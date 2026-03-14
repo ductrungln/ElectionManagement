@@ -1096,8 +1096,12 @@ namespace ElectionManagement.Services
                 ws.Cells[level1Row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
                 ws.Cells[level1Row, 11].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
-                // Cols 13-16: MERGED only for TINH (provincial) level - "Phân loại phiếu" (removed Bầu 05 đại biểu)
-                if (levelLower.Contains("tinh"))
+                // Cols 13-16: MERGED - "Phân loại phiếu"
+                if (levelLower.Contains("xa"))
+                {
+                    ws.Cells[$"M{level1Row}:O{level1Row}"].Merge = true;
+                }
+                else if (levelLower.Contains("tinh"))
                 {
                     ws.Cells[$"M{level1Row}:P{level1Row}"].Merge = true;
                 }
