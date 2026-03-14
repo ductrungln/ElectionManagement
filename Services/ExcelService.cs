@@ -1270,14 +1270,28 @@ namespace ElectionManagement.Services
                     x8Cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
                     Console.WriteLine("[DEBUG] Cleared X8 and removed borders for XA level");
                     
-                    // Clear U8 completely but don't merge - just make it look clean
+                    // Clear U8 completely before merging
                     u8Cell.Value = null;
                     u8Cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
+                    // Clear all borders from U8
                     u8Cell.Style.Border.Left.Style = ExcelBorderStyle.None;
                     u8Cell.Style.Border.Right.Style = ExcelBorderStyle.None;
                     u8Cell.Style.Border.Top.Style = ExcelBorderStyle.None;
                     u8Cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
-                    Console.WriteLine("[DEBUG] Cleared U8 for XA level (no merge to avoid errors)");
+                    u8Cell.Style.Border.DiagonalDown = false;
+                    u8Cell.Style.Border.DiagonalUp = false;
+                    Console.WriteLine("[DEBUG] Cleared U8 completely for XA level");
+                    
+                    // Now merge U7:U8 - should work since U8 is completely empty
+                    try
+                    {
+                        ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = true;
+                        Console.WriteLine("[DEBUG] Successfully merged U7:U8 for XA level");
+                    }
+                    catch (Exception mergeEx)
+                    {
+                        Console.WriteLine($"[DEBUG] Merge U7:U8 error: {mergeEx.Message}");
+                    }
                     
                     // Add border to header range for XA level
                     var headerRange = ws.Cells[$"A{level1Row}:T{level2Row}"];
