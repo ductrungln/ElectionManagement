@@ -1333,16 +1333,27 @@ namespace ElectionManagement.Services
 
                 if (levelLower.Contains("xa"))
                 {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - DELETING AND SHIFTING CELLS =====");
-                    // Delete specific cells and shift left for XÃ (commune) level
-                    // Delete from right to left to avoid index shifts
-                    ws.Cells["L19"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["K19"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["J19"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["H19"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["W8:W12"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["V8:V12"].Delete(eShiftTypeDelete.Left);
-                    ws.Cells["M8:M12"].Delete(eShiftTypeDelete.Left);
+                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - CLEARING CELLS =====");
+                    // Clear specific cells for XÃ (commune) level
+                    ws.Cells["M8"].Value = null;
+                    ws.Cells["M9"].Value = null;
+                    ws.Cells["M10"].Value = null;
+                    ws.Cells["M11"].Value = null;
+                    ws.Cells["M12"].Value = null;
+                    ws.Cells["V8"].Value = null;
+                    ws.Cells["V9"].Value = null;
+                    ws.Cells["V10"].Value = null;
+                    ws.Cells["V11"].Value = null;
+                    ws.Cells["V12"].Value = null;
+                    ws.Cells["W8"].Value = null;
+                    ws.Cells["W9"].Value = null;
+                    ws.Cells["W10"].Value = null;
+                    ws.Cells["W11"].Value = null;
+                    ws.Cells["W12"].Value = null;
+                    ws.Cells["H19"].Value = null;
+                    ws.Cells["J19"].Value = null;
+                    ws.Cells["K19"].Value = null;
+                    ws.Cells["L19"].Value = null;
                 }
                 else if (levelLower.Contains("quochoi"))
                 {
@@ -1363,6 +1374,10 @@ namespace ElectionManagement.Services
                     ws.Cells["W10"].Value = null;
                     ws.Cells["W11"].Value = null;
                     ws.Cells["W12"].Value = null;
+                    ws.Cells["H19"].Value = null;
+                    ws.Cells["J19"].Value = null;
+                    ws.Cells["K19"].Value = null;
+                    ws.Cells["L19"].Value = null;
                 }
                 // TINH (provincial) level - thêm dữ liệu
                 else if (levelLower.Contains("tinh"))
