@@ -746,7 +746,7 @@
                                         <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidRate">0%</td>
                                         <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValid">0</td>
                                         <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidRate">0%</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" class="ballot-type-04-cell">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" class="ballot-type-04-footer">0</td>
                                         <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;">0</td>
                                         <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;">0</td>
                                         <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;">0</td>
@@ -1174,13 +1174,13 @@
                 
                 // Toggle Bầu 04 column visibility - hide for XA level
                 const ballotType04Header = document.querySelector('.ballot-type-04-header');
-                const ballotType04Cells = document.querySelectorAll('.ballot-type-04-cell');
+                const ballotType04FooterCell = document.querySelector('.ballot-type-04-footer');
                 if (ballotType04Header) {
                     ballotType04Header.style.display = selectedLevel === 'xa' ? 'none' : 'table-cell';
                 }
-                ballotType04Cells.forEach(cell => {
-                    cell.style.display = selectedLevel === 'xa' ? 'none' : 'table-cell';
-                });
+                if (ballotType04FooterCell) {
+                    ballotType04FooterCell.style.display = selectedLevel === 'xa' ? 'none' : 'table-cell';
+                }
                 console.log(`Bầu 04 column ${selectedLevel === 'xa' ? 'hidden' : 'shown'} for level: ${selectedLevel}`);
                 
                 // Reload data for current active tab without page reload
@@ -3191,7 +3191,9 @@
                 // Create row
                 const row = document.createElement('tr');
                 row.style.border = '1px solid #333';
-                const cells = [
+                
+                // Build cells array - skip Bầu 04 (ballotType1) for XA level
+                let cells = [
                     'Xã Văn',                        // Xã/Phường
                     unitNum,                         // Tổ
                     areaNum,                         // Khu vực
@@ -3204,24 +3206,32 @@
                     invalidRate,                     // Tỉ lệ KHĐ (%)
                     valid,                           // Số phiếu HL
                     validRate,                       // Tỉ lệ HL (%)
-                    ballotType1,                     // Bầu 04
-                    ballotType2,                     // Bầu 03
-                    ballotType3,                     // Bầu 02
-                    ballotType4,                     // Bầu 01
-                    ...displayCandVotes,             // Display candidates (5 or 7)
-                    totalCandVotes                   // Tổng
                 ];
+                
+                // Add ballot types based on level (skip Bầu 04 for XA level)
+                if (selectedLevel !== 'xa') {
+                    cells.push(ballotType1);         // Bầu 04 - only for TINH and QUOCHOI
+                }
+                cells.push(ballotType2, ballotType3, ballotType4);  // Bầu 03, 02, 01
+                cells.push(...displayCandVotes, totalCandVotes);
 
                 // Build HTML cells with dynamic background colors
                 let cellHTML = '';
-                const bgColors = [
+                
+                // Build color array - skip Bầu 04 color for XA level
+                let bgColors = [
                     '#e0e0e0', '#e0e0e0', '#e0e0e0',  // Xã, Tổ, KV
                     '#c6efce', '#c6efce', '#c6efce',  // Cử tri (Tổng, Thực tế, %)
                     '#ffff99', '#ffff99',               // Phiếu (Phát, Thu)
                     '#ffff99', '#ffff99',               // KHĐ (Số, %)
                     '#ffff99', '#ffff99',               // HL (Số, %)
-                    '#fff0f0', '#fff0f0', '#fff0f0', '#fff0f0'  // Bầu 04, 03, 02, 01
                 ];
+                
+                // Add ballot type colors (skip Bầu 04 for XA)
+                if (selectedLevel !== 'xa') {
+                    bgColors.push('#fff0f0');        // Bầu 04 color
+                }
+                bgColors.push('#fff0f0', '#fff0f0', '#fff0f0');  // Bầu 03, 02, 01 colors
                 
                 // Build candidate background colors (dynamic: 5 or 7)
                 const candBgColors = Array(candidateCount).fill('#ffe5e5');
@@ -3232,10 +3242,7 @@
                 cells.forEach((cell, idx) => {
                     const textAlign = (idx === 0 || idx === 1 || idx === 2) ? 'left' : 'center';
                     const cellValue = typeof cell === 'number' && (idx >= 3) ? cell.toFixed(cell % 1 !== 0 ? 1 : 0) : cell;
-                    // Add class to Bầu 04 column (index 12)
-                    const cellClass = idx === 12 ? 'ballot-type-04-cell' : '';
-                    const classAttr = cellClass ? ` class="${cellClass}"` : '';
-                    cellHTML += `<td${classAttr} style="border: 1px solid #333; padding: 6px; text-align: ${textAlign}; background: ${allBgColors[idx]}; font-size: 11px;">${cellValue}</td>`;
+                    cellHTML += `<td style="border: 1px solid #333; padding: 6px; text-align: ${textAlign}; background: ${allBgColors[idx]}; font-size: 11px;">${cellValue}</td>`;
                 });
 
                 row.innerHTML = cellHTML;
@@ -3403,13 +3410,13 @@
                 // Initialize Bầu 04 column visibility (hide for default 'xa' level)
                 if (selectedLevel === 'xa') {
                     const ballotType04Header = document.querySelector('.ballot-type-04-header');
-                    const ballotType04Cells = document.querySelectorAll('.ballot-type-04-cell');
+                    const ballotType04FooterCell = document.querySelector('.ballot-type-04-footer');
                     if (ballotType04Header) {
                         ballotType04Header.style.display = 'none';
                     }
-                    ballotType04Cells.forEach(cell => {
-                        cell.style.display = 'none';
-                    });
+                    if (ballotType04FooterCell) {
+                        ballotType04FooterCell.style.display = 'none';
+                    }
                     console.log('Bầu 04 column hidden for initial xa level');
                 }
                 
