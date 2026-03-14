@@ -1277,25 +1277,14 @@ namespace ElectionManagement.Services
                         Console.WriteLine("[DEBUG] Unmerged U7:U8 if previously merged");
                     }
                     
-                    // Clear U8 completely
+                    // Clear U8 completely - do NOT merge since it causes errors
                     u8Cell.Value = null;
                     u8Cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.None;
                     u8Cell.Style.Border.Left.Style = ExcelBorderStyle.None;
                     u8Cell.Style.Border.Right.Style = ExcelBorderStyle.None;
                     u8Cell.Style.Border.Top.Style = ExcelBorderStyle.None;
                     u8Cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
-                    Console.WriteLine("[DEBUG] Cleared U8 completely");
-                    
-                    // Try to merge U7:U8 cells for XA level
-                    try
-                    {
-                        ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = true;
-                        Console.WriteLine("[DEBUG] Merged U7:U8 for XA level");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[DEBUG] Merge failed: {ex.Message}, keeping cells separate");
-                    }
+                    Console.WriteLine("[DEBUG] Cleared U8 completely (no merge to avoid errors)");
                     
                     // Add UCV5 to T8
                     ws.Cells[level2Row, 20].Value = "UCV 5";
