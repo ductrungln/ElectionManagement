@@ -1117,18 +1117,24 @@ namespace ElectionManagement.Services
                 // Cols 17-24: MERGED - "Số phiếu bầu cho mỗi người ứng cử viên"
                 string uvcEndCol = GetColumnLetter(totalCol - 1);
                 Console.WriteLine($"[DEBUG] UCV Headers - uvcStartCol: {uvcStartCol}, Total UCV columns: {ucvCount}, uvcEndCol: {uvcEndCol}, Merge range: Q{level1Row}:{uvcEndCol}{level1Row}");
-                if (levelLower.Contains("tinh"))
+                int headerCol = uvcStartCol; // Default to Q (17)
+                if (levelLower.Contains("xa"))
+                {
+                    ws.Cells[$"P{level1Row}:T{level1Row}"].Merge = true;
+                    headerCol = 16; // P for XA level merged cell
+                }
+                else if (levelLower.Contains("tinh"))
                 {
                     ws.Cells[$"Q{level1Row}:{uvcEndCol}{level1Row}"].Merge = true;
                 }
-                ws.Cells[level1Row, uvcStartCol].Value = "Số phiếu bầu cho mỗi người ứng cử viên";
-                ws.Cells[level1Row, uvcStartCol].Style.Font.Bold = true;
-                ws.Cells[level1Row, uvcStartCol].Style.Font.Size = 8;
-                ws.Cells[level1Row, uvcStartCol].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                ws.Cells[level1Row, uvcStartCol].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-                ws.Cells[level1Row, uvcStartCol].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                ws.Cells[level1Row, uvcStartCol].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
-                ws.Cells[level1Row, uvcStartCol].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                ws.Cells[level1Row, headerCol].Value = "Số phiếu bầu cho mỗi người ứng cử viên";
+                ws.Cells[level1Row, headerCol].Style.Font.Bold = true;
+                ws.Cells[level1Row, headerCol].Style.Font.Size = 8;
+                ws.Cells[level1Row, headerCol].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                ws.Cells[level1Row, headerCol].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                ws.Cells[level1Row, headerCol].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[level1Row, headerCol].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(192, 192, 192));
+                ws.Cells[level1Row, headerCol].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
 
                 // Total column header (W7 / Y7) - text at level 1
                 Console.WriteLine($"[DEBUG] Total column - Column {totalCol}, Letter: {GetColumnLetter(totalCol)}");
@@ -1349,13 +1355,15 @@ namespace ElectionManagement.Services
                 if (levelLower.Contains("xa"))
                 {
                     Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - SHIFTING COLUMNS =====");
-                    // Shift O8 to N8, P8 to O8, and set M8 for XÃ (commune) level
-                    ws.Cells["M8"].Value = "Bầu 03 đại biểu";
-                    ws.Cells["N8"].Value = "Bầu 02 đại biểu";
-                    ws.Cells["O8"].Value = "Bầu 01 đại biểu";
-                    ws.Cells["P8"].Clear();
-                    // Shift Q8:U8 to P8:T8
-                    for (int r = 8; r <= 12; r++)
+                    // Set level2Row headers for XÃ level (row 8)
+                    ws.Cells[level2Row, 13].Value = "Bầu 03 đại biểu"; // Column M
+                    ws.Cells[level2Row, 14].Value = "Bầu 02 đại biểu"; // Column N
+                    ws.Cells[level2Row, 15].Value = "Bầu 01 đại biểu"; // Column O
+                    ws.Cells[level2Row, 16].Clear(); // Column P
+                    
+                    // Shift UCV columns left (Q→P, R→Q, S→R, T→S, U→T) for data rows starting after headers
+                    int dataStartRow = level2Row + 1;
+                    for (int r = dataStartRow; r < level2Row + 5; r++)
                     {
                         ws.Cells[r, 16].Value = ws.Cells[r, 17].Value; // P = Q
                         ws.Cells[r, 17].Value = ws.Cells[r, 18].Value; // Q = R
@@ -1364,13 +1372,13 @@ namespace ElectionManagement.Services
                         ws.Cells[r, 20].Value = ws.Cells[r, 21].Value; // T = U
                         ws.Cells[r, 21].Clear(); // U cleared
                     }
-                    ws.Cells["V8:V12"].Clear();
-                    ws.Cells["W8:W12"].Clear();
-                    ws.Cells["H19"].Clear();
-                    ws.Cells["J19"].Clear();
-                    ws.Cells["K19"].Clear();
-                    ws.Cells["L19"].Clear();
-                    Console.WriteLine("[DEBUG] Shifted Q8:U8 to P8:T8 for XÃ level");
+                    // Shift data from column X to column U for data rows
+                    for (int r = dataStartRow; r < level2Row + 5; r++)
+                    {
+                        ws.Cells[r, 21].Value = ws.Cells[r, 24].Value; // U = X
+                        ws.Cells[r, 24].Clear(); // X cleared
+                    }
+                    Console.WriteLine("[DEBUG] Shifted UCV columns for XÃ level");
                 }
                 else if (levelLower.Contains("quochoi"))
                 {
