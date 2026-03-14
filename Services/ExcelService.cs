@@ -1419,6 +1419,10 @@ namespace ElectionManagement.Services
                         ws.Cells[r, 21].Clear(); // U cleared
                     }
                     
+                    // Clear V8:V12 and W8:W12 for XA level
+                    ws.Cells[$"V{level2Row}:W{level2Row + 4}"].Clear();
+                    Console.WriteLine($"[DEBUG] Cleared cells V{level2Row}:W{level2Row + 4} for XA level");
+                    
                     // Add borders to UCV cells (P8:T12) at XA level
                     var ucvRange = ws.Cells[level2Row, 16, level2Row + 4, 20]; // P8:T12
                     ucvRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
