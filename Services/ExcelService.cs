@@ -1344,16 +1344,19 @@ namespace ElectionManagement.Services
 
                 if (levelLower.Contains("xa"))
                 {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - CLEARING CELLS =====");
-                    // Clear specific cells for XÃ (commune) level
-                    ws.Cells["N8:N12"].Clear();
+                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - SHIFTING COLUMNS =====");
+                    // Shift O8 to N8, P8 to O8, and set M8 for XÃ (commune) level
+                    ws.Cells["M8"].Value = "Bầu 03 đại biểu";
+                    ws.Cells["N8"].Value = "Bầu 02 đại biểu";
+                    ws.Cells["O8"].Value = "Bầu 01 đại biểu";
+                    ws.Cells["P8"].Clear();
                     ws.Cells["V8:V12"].Clear();
                     ws.Cells["W8:W12"].Clear();
                     ws.Cells["H19"].Clear();
                     ws.Cells["J19"].Clear();
                     ws.Cells["K19"].Clear();
                     ws.Cells["L19"].Clear();
-                    Console.WriteLine("[DEBUG] Cleared cells for XÃ level");
+                    Console.WriteLine("[DEBUG] Shifted columns for XÃ level: M8='Bầu 03 đại biểu', N8='Bầu 02 đại biểu', O8='Bầu 01 đại biểu', P8 cleared");
                 }
                 else if (levelLower.Contains("quochoi"))
                 {
