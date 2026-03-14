@@ -1286,7 +1286,10 @@ namespace ElectionManagement.Services
                     u8Cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
                     Console.WriteLine("[DEBUG] Cleared U8 completely (no merge to avoid errors)");
                     
-                    // Add UCV4 to S8 and UCV5 to T8
+                    // Add UCV3, UCV4, UCV5 to R8, S8, T8
+                    ws.Cells[level2Row, 18].Value = "UCV 3";
+                    Console.WriteLine("[DEBUG] Added UCV3 to R8 for XA level");
+                    
                     ws.Cells[level2Row, 19].Value = "UCV 4";
                     Console.WriteLine("[DEBUG] Added UCV4 to S8 for XA level");
                     
