@@ -1113,7 +1113,10 @@ namespace ElectionManagement.Services
                 // Cols 17-24: MERGED - "Số phiếu bầu cho mỗi người ứng cử viên"
                 string uvcEndCol = GetColumnLetter(totalCol - 1);
                 Console.WriteLine($"[DEBUG] UCV Headers - uvcStartCol: {uvcStartCol}, Total UCV columns: {ucvCount}, uvcEndCol: {uvcEndCol}, Merge range: Q{level1Row}:{uvcEndCol}{level1Row}");
-                ws.Cells[$"Q{level1Row}:{uvcEndCol}{level1Row}"].Merge = true;
+                if (levelLower.Contains("tinh"))
+                {
+                    ws.Cells[$"Q{level1Row}:{uvcEndCol}{level1Row}"].Merge = true;
+                }
                 ws.Cells[level1Row, uvcStartCol].Value = "Số phiếu bầu cho mỗi người ứng cử viên";
                 ws.Cells[level1Row, uvcStartCol].Style.Font.Bold = true;
                 ws.Cells[level1Row, uvcStartCol].Style.Font.Size = 8;
