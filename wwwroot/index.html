@@ -2815,13 +2815,23 @@
         
         // Load aggregated data from all ballot verification records for a unit
         async function loadAggregatedUnitData(unitNum) {
+            console.log('[DEBUG] ========== loadAggregatedUnitData START ==========');
+            console.log('[DEBUG] Loading data for Unit:', unitNum);
+            console.log('[DEBUG] Selected Level:', selectedLevel);
+            
             try {
                 const response = await fetch(`http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`);
                 const ballotData = await response.json();
+                console.log('[DEBUG] API Response - ballot data count:', ballotData.length);
+                console.log('[DEBUG] All ballot data from API:', ballotData.map(r => ({
+                    districtName: r.districtName,
+                    issuedBallots: r.issuedBallots,
+                    candidate1Votes: r.candidate1Votes
+                })));
                 
                 // Get all areas for this unit
                 const areas = groupAreaMapping[unitNum] || [];
-                console.log(`Unit ${unitNum} has areas:`, areas);
+                console.log(`[DEBUG] Unit ${unitNum} mapped areas:`, areas);
                 
                 // Find records matching this unit and all its areas
                 const unitRecords = ballotData.filter(r => {
@@ -2922,7 +2932,9 @@
                     };
 
                     // Populate area details table
+                    console.log('[DEBUG] About to call populateAreaDetailsTable with:', { unitNum, areas, ballotDataLength: ballotData.length });
                     populateAreaDetailsTable(unitNum, areas, ballotData);
+                    console.log('[DEBUG] About to call populateOfficialBallotTable with:', { unitNum, areas, ballotDataLength: ballotData.length });
                     populateOfficialBallotTable(unitNum, areas, ballotData);
                 } else {
                     console.log('No records found for this unit');
@@ -3144,6 +3156,15 @@
 
         // Populate official ballot verification table
         function populateOfficialBallotTable(unitNum, areas, ballotData) {
+            console.log('[DEBUG] ========== populateOfficialBallotTable START ==========');
+            console.log('[DEBUG] selectedLevel:', selectedLevel);
+            console.log('[DEBUG] unitNum:', unitNum);
+            console.log('[DEBUG] areas:', areas);
+            console.log('[DEBUG] ballotData count:', ballotData ? ballotData.length : 'N/A');
+            if (ballotData && ballotData.length > 0) {
+                console.log('[DEBUG] First ballot data record:', ballotData[0]);
+            }
+
             const tbody = document.getElementById('officialTableBody');
             tbody.innerHTML = '';
 
@@ -3158,7 +3179,7 @@
             if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
                 candidateCount = 7;
             }
-
+            console.log('[DEBUG] candidateCount:', candidateCount);
 
             let totalVoters = 0, totalIssued = 0, totalReceived = 0, totalValid = 0, totalInvalid = 0;
             const candTotals = Array(7).fill(0);
@@ -3166,8 +3187,35 @@
 
             // Get area records
             areas.forEach((areaNum, idx) => {
-                const record = ballotData.find(r => r.districtName === `Tổ ${unitNum} - Khu Vực ${areaNum}`);
+                const searchKey = `Tổ ${unitNum} - Khu Vực ${areaNum}`;
+                console.log(`[DEBUG] Looking for area ${areaNum} with key: "${searchKey}"`);
+                const record = ballotData.find(r => r.districtName === searchKey);
+                if (record) {
+                    console.log(`[DEBUG] Found record for area ${areaNum}:`, record);
+                } else {
+                    console.log(`[DEBUG] NO RECORD FOUND for area ${areaNum}`);
+                }
                 if (!record) return;
+
+                console.log(`[DEBUG] Processing record for area ${areaNum}:`);
+                console.log('[DEBUG]   districtName:', record.districtName);
+                console.log('[DEBUG]   issuedBallots:', record.issuedBallots);
+                console.log('[DEBUG]   receivedBallots:', record.receivedBallots);
+                console.log('[DEBUG]   validBallots:', record.validBallots);
+                console.log('[DEBUG]   invalidBallots:', record.invalidBallots);
+                console.log('[DEBUG]   ballotType1Count:', record.ballotType1Count);
+                console.log('[DEBUG]   ballotType2Count:', record.ballotType2Count);
+                console.log('[DEBUG]   ballotType3Count:', record.ballotType3Count);
+                console.log('[DEBUG]   ballotType4Count:', record.ballotType4Count);
+                console.log('[DEBUG]   candidate1Votes:', record.candidate1Votes);
+                console.log('[DEBUG]   candidate2Votes:', record.candidate2Votes);
+                console.log('[DEBUG]   candidate3Votes:', record.candidate3Votes);
+                console.log('[DEBUG]   candidate4Votes:', record.candidate4Votes);
+                console.log('[DEBUG]   candidate5Votes:', record.candidate5Votes);
+                if (candidateCount > 5) {
+                    console.log('[DEBUG]   candidate6Votes:', record.candidate6Votes);
+                    console.log('[DEBUG]   candidate7Votes:', record.candidate7Votes);
+                }
 
                 const issued = record.issuedBallots || 0;
                 const received = record.receivedBallots || 0;
@@ -3211,7 +3259,7 @@
                 // Build cells array - skip Bầu 04 (ballotType1) for XA level
                 let cells = [
                     'Xã Văn',                        // Xã/Phường
-                    unitNum,                         // Tổ
+                    unitNum,                          // Tổ
                     areaNum,                         // Khu vực
                     issued,                          // Tổng cử tri
                     issued,                          // Cử tri thực tế
@@ -3225,11 +3273,21 @@
                 ];
                 
                 // Add ballot types based on level (skip Bầu 04 for XA level)
+                console.log('[DEBUG] Ballot type processing for level:', selectedLevel);
                 if (selectedLevel !== 'xa') {
+                    console.log('[DEBUG] Adding ballotType1 (Bầu 04):', ballotType1);
                     cells.push(ballotType1);         // Bầu 04 - only for TINH and QUOCHOI
+                } else {
+                    console.log('[DEBUG] SKIPPING ballotType1 (Bầu 04) for XA level');
                 }
-                cells.push(ballotType2, ballotType3, ballotType4);  // Bầu 03, 02, 01
+                console.log('[DEBUG] Adding ballotType3 (Bầu 03):', ballotType3);
+                console.log('[DEBUG] Adding ballotType2 (Bầu 02):', ballotType2);
+                console.log('[DEBUG] Adding ballotType1 (Bầu 01):', ballotType1);
+                cells.push(ballotType3, ballotType2, ballotType1);  // Bầu 03, 02, 01
+                
+                console.log('[DEBUG] Adding candidate votes. candidateCount:', candidateCount, 'displayCandVotes:', displayCandVotes);
                 cells.push(...displayCandVotes, totalCandVotes);
+                console.log('[DEBUG] Final cells array for row:', cells);
 
                 // Build HTML cells with dynamic background colors
                 let cellHTML = '';
@@ -3305,6 +3363,15 @@
 
             const totalSum = candTotals.reduce((a, b) => a + b, 0);
             document.getElementById('totalSum').textContent = totalSum;
+            
+            console.log('[DEBUG] ========== populateOfficialBallotTable END ==========');
+            console.log('[DEBUG] Total rows added:', tbody.rows.length);
+            console.log('[DEBUG] candTotals:', candTotals);
+            console.log('[DEBUG] totalSum:', totalSum);
+            console.log('[DEBUG] totalIssued:', totalIssued);
+            console.log('[DEBUG] totalReceived:', totalReceived);
+            console.log('[DEBUG] totalValid:', totalValid);
+            console.log('[DEBUG] totalInvalid:', totalInvalid);
         }
         
         // Update header visibility for official ballot table based on candidate count
