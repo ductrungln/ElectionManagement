@@ -603,19 +603,42 @@
                     <div style="margin-top: 40px;">
                         <h3 id="areaDetailsTitle" style="margin-bottom: 20px; color: #1f2937;">📊 Chi Tiết Theo Khu Vực</h3>
                         <div class="table-container" style="overflow-x: auto;">
-                            <table id="areaDetailsTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <table id="areaDetailsTable" style="width: 100%; border-collapse: collapse; font-size: 12px;">
                                 <thead>
-                                    <tr style="background-color: #f3f4f6; border-bottom: 2px solid #d1d5db;">
-                                        <th style="padding: 12px; text-align: left; border: 1px solid #d1d5db;">Tổ</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Phiếu Phát</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Phiếu Thu</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Phiếu HĐ</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Phiếu KHĐ</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS Được Bầu</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">TS KV Bỏ Phiếu</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Tỷ Lệ Thu %</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Tỷ Lệ KHĐ %</th>
-                                        <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Tỷ Lệ HĐ %</th>
+                                    <!-- Header Row 1: Main Categories -->
+                                    <tr style="background-color: #e5e7eb; border-bottom: 1px solid #9ca3af; height: 30px;">
+                                        <th colspan="3" style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-weight: 600;">Thông Tin Tổ - Khu Vực</th>
+                                        <th colspan="3" style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-weight: 600;">Cử Tri</th>
+                                        <th colspan="2" style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-weight: 600;">Tổng số phiếu trong danh sách tham gia bỏ phiếu</th>
+                                        <th colspan="2" style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-weight: 600;">Số phiếu hợp lệ</th>
+                                        <th colspan="2" style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-weight: 600;">Số phiếu không hợp lệ</th>
+                                        <th colspan="5" style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-weight: 600;">Phân loại phiếu</th>
+                                        <th colspan="5" style="padding: 8px; text-align: center; border: 1px solid #9ca3af; background-color: #fef08a; font-weight: 600;">Số phiếu bầu cho mỗi người ứng cử/ viên</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; background-color: #fef08a; font-weight: 600;">Tổng</th>
+                                    </tr>
+                                    <!-- Header Row 2: Subheaders -->
+                                    <tr style="background-color: #f3f4f6; border-bottom: 2px solid #d1d5db; height: 28px;">
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Xã/Phường</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Tổ bầu cử</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Khu vực bầu cử</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Tổng số cử tri</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Cử tri thực tế</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Tỉ lệ (%)</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Số phiếu</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Tỉ lệ (%)</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Số phiếu</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Tỉ lệ (%)</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Phát</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Thu</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Số phiếu</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Tỉ lệ (%)</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">Số phiếu (%)</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">UCV 1</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">UCV 2</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">UCV 3</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">UCV 4</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; font-size: 11px;">UCV 5</th>
+                                        <th style="padding: 8px; text-align: center; border: 1px solid #9ca3af; background-color: #fef08a; font-size: 11px;">Cộng</th>
                                     </tr>
                                 </thead>
                                 <tbody id="areaDetailsTableBody">
