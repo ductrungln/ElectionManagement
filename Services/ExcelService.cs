@@ -1491,15 +1491,23 @@ namespace ElectionManagement.Services
                     }
                     
                     // Shift data from column U to column T for rows 8-12 (header + data rows)
+                    // IMPORTANT: Unmerge U7:U8 first before shifting, since .Clear() on U8 conflicts with merged range
+                    ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = false;
+                    Console.WriteLine("[DEBUG] Unmerged U7:U8 before shifting U column");
+                    
                     for (int r = level2Row; r <= level2Row + 4; r++)
                     {
                         ws.Cells[r, 20].Value = ws.Cells[r, 21].Value; // T = U
                         ws.Cells[r, 21].Clear(); // U cleared
                     }
+                    Console.WriteLine("[DEBUG] Shifted U column to T column for rows 8-12");
                     
-                    // NOTE: U7 value is already preserved from line 1244 (copy from X7), 
-                    // and shift logic (Q→P, R→Q, S→R, T→S) doesn't touch U column,
-                    // so no need to restore it. Restoring after merge would cause EPPlus error.
+                    // Re-merge U7:U8 after shifting
+                    ws.Cells[$"U{level1Row}:U{level2Row}"].Merge = true;
+                    Console.WriteLine("[DEBUG] Re-merged U7:U8 after column shift");
+                    
+                    // NOTE: U7 value is already preserved from line 1244 (copy from X7)
+                    
                     
                     // Clear V8:V12 and W8:W12 for XA level
                     ws.Cells[$"V{level2Row}:W{level2Row + 4}"].Clear();
