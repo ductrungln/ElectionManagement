@@ -1223,8 +1223,8 @@ namespace ElectionManagement.Services
                 // === ADD BORDER FOR HEADERS (XA LEVEL ONLY) ===
                 if (levelLower.Contains("xa"))
                 {
-                    // Clear U7 (column 21) for XA level
-                    ws.Cells[level1Row, 21].Clear();
+                    // Clear U7 value for XA level
+                    ws.Cells[level1Row, 21].Value = null;
                     Console.WriteLine("[DEBUG] Cleared U7 for XA level");
                     
                     // Add border to header range for XA level
