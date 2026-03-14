@@ -649,7 +649,7 @@
                     </div>
 
                     <!-- Kết quả bầu cử theo ứng viên -->
-                    <div style="margin-top: 40px;">
+                    <div id="candidateResultsSection" style="margin-top: 40px;">
                         <h3 id="candidateResultsTitle" style="margin-bottom: 20px; color: #1f2937;">📋 Kết Quả Bầu Cử Theo Ứng Viên</h3>
                         <div class="table-container" style="overflow-x: auto;">
                             <table id="candidateResultsTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
@@ -1164,6 +1164,13 @@
                 
                 const label = { xa: 'Xã', tinh: 'Tỉnh', quochoi: 'Quốc hội' }[selectedLevel] || selectedLevel;
                 document.getElementById('currentLevel').textContent = 'Cấp: ' + label;
+                
+                // Toggle candidate results table visibility - hide for XA level
+                const candidateResultsSection = document.getElementById('candidateResultsSection');
+                if (candidateResultsSection) {
+                    candidateResultsSection.style.display = selectedLevel === 'xa' ? 'none' : 'block';
+                    console.log(`Candidate results table ${selectedLevel === 'xa' ? 'hidden' : 'shown'} for level: ${selectedLevel}`);
+                }
                 
                 // Reload data for current active tab without page reload
                 setTimeout(() => {
@@ -3372,6 +3379,13 @@
         // Initialize when page load completes
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
+                // Initialize candidate results table visibility (hide for default 'xa' level)
+                const candidateResultsSection = document.getElementById('candidateResultsSection');
+                if (candidateResultsSection && selectedLevel === 'xa') {
+                    candidateResultsSection.style.display = 'none';
+                    console.log('Candidate results table hidden for initial xa level');
+                }
+                
                 initializeUnitAreaDropdowns();
                 clearAreaDetailsTable();
             }, 500);
