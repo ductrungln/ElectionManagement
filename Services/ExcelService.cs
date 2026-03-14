@@ -1341,57 +1341,29 @@ namespace ElectionManagement.Services
 
                 if (levelLower.Contains("xa"))
                 {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - DELETING AND SHIFTING CELLS =====");
-                    try
-                    {
-                        // Delete specific cells and shift left for XÃ (commune) level
-                        // Delete from right to left to avoid index shift issues
-                        // Delete row 19 cells first (H19, J19, K19, L19)
-                        ws.Cells["L19"].Delete(eShiftTypeDelete.Left);
-                        ws.Cells["K19"].Delete(eShiftTypeDelete.Left);
-                        ws.Cells["J19"].Delete(eShiftTypeDelete.Left);
-                        ws.Cells["H19"].Delete(eShiftTypeDelete.Left);
-                        
-                        // Delete column W rows 8-12
-                        ws.Cells["W8:W12"].Delete(eShiftTypeDelete.Left);
-                        
-                        // Delete column V rows 8-12
-                        ws.Cells["V8:V12"].Delete(eShiftTypeDelete.Left);
-                        
-                        // Delete column M rows 8-12
-                        ws.Cells["M8:M12"].Delete(eShiftTypeDelete.Left);
-                        
-                        Console.WriteLine("[DEBUG] Successfully deleted and shifted cells for XÃ level");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[DEBUG] ERROR deleting cells for XÃ level: {ex.Message}");
-                        Console.WriteLine($"[DEBUG] Stack trace: {ex.StackTrace}");
-                    }
+                    Console.WriteLine("[DEBUG] ===== MATCHED: XÃ LEVEL - CLEARING CELLS =====");
+                    // Clear specific cells for XÃ (commune) level
+                    ws.Cells["M8:M12"].Clear();
+                    ws.Cells["V8:V12"].Clear();
+                    ws.Cells["W8:W12"].Clear();
+                    ws.Cells["H19"].Clear();
+                    ws.Cells["J19"].Clear();
+                    ws.Cells["K19"].Clear();
+                    ws.Cells["L19"].Clear();
+                    Console.WriteLine("[DEBUG] Cleared cells for XÃ level");
                 }
                 else if (levelLower.Contains("quochoi"))
                 {
-                    Console.WriteLine("[DEBUG] ===== MATCHED: QUỐC HỘI LEVEL - DELETING AND SHIFTING CELLS =====");
-                    try
-                    {
-                        // Delete specific cells and shift left for QUỐC HỘI (national) level
-                        // Same as XÃ level - delete from right to left
-                        ws.Cells["L19"].Delete(eShiftTypeDelete.Left);
-                        ws.Cells["K19"].Delete(eShiftTypeDelete.Left);
-                        ws.Cells["J19"].Delete(eShiftTypeDelete.Left);
-                        ws.Cells["H19"].Delete(eShiftTypeDelete.Left);
-                        
-                        ws.Cells["W8:W12"].Delete(eShiftTypeDelete.Left);
-                        ws.Cells["V8:V12"].Delete(eShiftTypeDelete.Left);
-                        ws.Cells["M8:M12"].Delete(eShiftTypeDelete.Left);
-                        
-                        Console.WriteLine("[DEBUG] Successfully deleted and shifted cells for QUỐC HỘI level");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[DEBUG] ERROR deleting cells for QUỐC HỘI level: {ex.Message}");
-                        Console.WriteLine($"[DEBUG] Stack trace: {ex.StackTrace}");
-                    }
+                    Console.WriteLine("[DEBUG] ===== MATCHED: QUỐC HỘI LEVEL - CLEARING CELLS =====");
+                    // Clear specific cells for QUỐC HỘI (national) level
+                    ws.Cells["M8:M12"].Clear();
+                    ws.Cells["V8:V12"].Clear();
+                    ws.Cells["W8:W12"].Clear();
+                    ws.Cells["H19"].Clear();
+                    ws.Cells["J19"].Clear();
+                    ws.Cells["K19"].Clear();
+                    ws.Cells["L19"].Clear();
+                    Console.WriteLine("[DEBUG] Cleared cells for QUỐC HỘI level");
                 }
                 // TINH (provincial) level - thêm dữ liệu
                 else if (levelLower.Contains("tinh"))
