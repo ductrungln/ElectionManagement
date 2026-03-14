@@ -1311,19 +1311,125 @@ namespace ElectionManagement.Services
                 
                 row++;
 
-                // === DATA ROWS ===
+                // === DATA ROWS - POPULATE FROM RESULTS ===
+                // Populate each result into the Excel table
+                Console.WriteLine($"[DEBUG] Starting data population - Total results: {results.Count}");
                 
-                // UCV votes - all levels show UCV 1-7
-                int ucvCol = uvcStartCol;
-
-                for (int col = 1; col <= maxCol; col++)
+                foreach (var result in results.OrderBy(r => r.Stt).Take(4))  // Max 4 data rows (rows 9-12)
                 {
-                    ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
-                    ws.Cells[row, col].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    ws.Cells[row, 1].Value = result.Level ?? "";  // Xã/Phường
+                    ws.Cells[row, 2].Value = result.To ?? "";  // Tổ (group)
+                    ws.Cells[row, 3].Value = result.KhuVuc ?? "";
+                    
+                    ws.Cells[row, 4].Value = result.TongCuTri > 0 ? result.TongCuTri : "";
+                    // Note: CuTriThucTe not available in model, using PhieuThuVe as proxy
+                    ws.Cells[row, 5].Value = result.PhieuThuVe > 0 ? result.PhieuThuVe : "";
+                    
+                    // Calculate percentage: (PhieuThuVe / TongCuTri) * 100
+                    if (result.TongCuTri > 0)
+                    {
+                        decimal percentageVoters = (result.PhieuThuVe / (decimal)result.TongCuTri) * 100;
+                        ws.Cells[row, 6].Value = percentageVoters > 0 ? Math.Round(percentageVoters, 1) : "";
+                    }
+                    
+                    ws.Cells[row, 7].Value = result.PhieuPhatRa > 0 ? result.PhieuPhatRa : "";
+                    ws.Cells[row, 8].Value = result.PhieuThuVe > 0 ? result.PhieuThuVe : "";
+                    
+                    // Invalid votes
+                    ws.Cells[row, 9].Value = result.PhieuKhongHopLe > 0 ? result.PhieuKhongHopLe : "";
+                    
+                    // Invalid percentage
+                    if (result.PhieuThuVe > 0)
+                    {
+                        decimal invalidPercentage = (result.PhieuKhongHopLe / (decimal)result.PhieuThuVe) * 100;
+                        ws.Cells[row, 10].Value = invalidPercentage > 0 ? Math.Round(invalidPercentage, 1) : "";
+                    }
+                    
+                    // Valid votes
+                    ws.Cells[row, 11].Value = result.PhieuHopLe > 0 ? result.PhieuHopLe : "";
+                    
+                    // Valid percentage
+                    if (result.PhieuThuVe > 0)
+                    {
+                        decimal validPercentage = (result.PhieuHopLe / (decimal)result.PhieuThuVe) * 100;
+                        ws.Cells[row, 12].Value = validPercentage > 0 ? Math.Round(validPercentage, 1) : "";
+                    }
+                    
+                    // Ballot classification (columns 13-16) - Fields not in model, leaving empty for now
+                    // These would need to be added to ElectionResult model:
+                    // PhieuBau04, PhieuBau03, PhieuBau02, PhieuBau01
+                    // ws.Cells[row, 13].Value = "";
+                    // ws.Cells[row, 14].Value = "";
+                    // ws.Cells[row, 15].Value = "";
+                    // ws.Cells[row, 16].Value = "";
+                    
+                    // UCV vote counts (columns Q onwards for default, P onwards for XA level)
+                    int ucvStartCol_Data = levelLower.Contains("xa") ? 16 : uvcStartCol;  // P (16) for XA, Q (17) for others
+                    
+                    ws.Cells[row, ucvStartCol_Data].Value = result.UngCuVien1 > 0 ? result.UngCuVien1 : "";
+                    ws.Cells[row, ucvStartCol_Data + 1].Value = result.UngCuVien2 > 0 ? result.UngCuVien2 : "";
+                    ws.Cells[row, ucvStartCol_Data + 2].Value = result.UngCuVien3 > 0 ? result.UngCuVien3 : "";
+                    ws.Cells[row, ucvStartCol_Data + 3].Value = result.UngCuVien4 > 0 ? result.UngCuVien4 : "";
+                    ws.Cells[row, ucvStartCol_Data + 4].Value = result.UngCuVien5 > 0 ? result.UngCuVien5 : "";
+                    
+                    // For TINH level, add UCV 6 and 7
+                    if (levelLower.Contains("tinh"))
+                    {
+                        ws.Cells[row, ucvStartCol_Data + 5].Value = result.UngCuVien6 > 0 ? result.UngCuVien6 : "";
+                        ws.Cells[row, ucvStartCol_Data + 6].Value = result.UngCuVien7 > 0 ? result.UngCuVien7 : "";
+                    }
+                    
+                    // Total column (Cộng) = sum of all UCV votes
+                    int totalVotes = result.UngCuVien1 + result.UngCuVien2 + result.UngCuVien3 + 
+                                    result.UngCuVien4 + result.UngCuVien5;
+                    if (levelLower.Contains("tinh"))
+                    {
+                        totalVotes += result.UngCuVien6 + result.UngCuVien7;
+                    }
+                    ws.Cells[row, totalCol].Value = totalVotes > 0 ? totalVotes : "";
+                    
+                    // Apply styling to data row
+                    for (int col = 1; col <= maxCol; col++)
+                    {
+                        ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                        ws.Cells[row, col].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                        
+                        // Yellow background for UCV columns
+                        if (col >= ucvStartCol_Data && col < totalCol)
+                        {
+                            ws.Cells[row, col].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                            ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(254, 240, 138)); // #fef08a
+                        }
+                        
+                        // Yellow for total column
+                        if (col == totalCol)
+                        {
+                            ws.Cells[row, col].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                            ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(254, 240, 138)); // #fef08a
+                        }
+                    }
+                    
+                    row++;
+                    Console.WriteLine($"[DEBUG] Populated row {row - 1} with data from result STT={result.Stt}");
                 }
-                row++;
-
-                // Row 2 (template)
+                
+                // If no results, create empty template rows
+                if (results.Count == 0)
+                {
+                    // Create 3 empty rows for manual entry
+                    for (int emptyRow = 0; emptyRow < 3; emptyRow++)
+                    {
+                        for (int col = 1; col <= maxCol; col++)
+                        {
+                            ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                        }
+                        row++;
+                    }
+                }
+                
+                // Dots row
+                ws.Cells[row, 1].Value = "...";
+                ws.Cells[row, 2].Value = "...";
                 for (int col = 1; col <= maxCol; col++)
                 {
                     ws.Cells[row, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
