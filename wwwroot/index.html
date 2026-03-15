@@ -511,6 +511,16 @@
                                 </div>
                             </div>
 
+                            <!-- Khu vực -->
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Khu vực</label>
+                                <div style="position: relative;">
+                                    <select id="areaSelect" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; opacity: 0.5;">
+                                        <option value="">-- Chọn khu vực --</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <!-- Lần bầu cử -->
                             <div style="margin-bottom: 20px;">
                                 <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Lần bầu cử</label>
@@ -690,8 +700,10 @@
                             </div>
                         </div>
 
-                        <!-- Main Table -->
-                        <div style="overflow-x: auto; margin-bottom: 30px; border: 1px solid #333;">
+                        <!-- Main Table - Separate tables for each level -->
+                        
+                        <!-- XÃ Level Table (5 candidates, no Bầu 04) -->
+                        <div id="officialTableContainerXa" style="overflow-x: auto; margin-bottom: 30px; border: 1px solid #333; display: none;">
                             <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                                 <thead>
                                     <tr style="border: 1px solid #333;">
@@ -700,8 +712,8 @@
                                         <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phiếu</th>
                                         <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu không hợp lệ</th>
                                         <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu hợp lệ</th>
-                                        <th id="ballotClassHeaderGroup" colspan="4" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Phân loại phiếu</th>
-                                        <th id="candidateVoteHeaderGroup" colspan="7" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">Số phiếu bầu cho mỗi người ứng cử viên</th>
+                                        <th colspan="3" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Phân loại phiếu</th>
+                                        <th colspan="5" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">Số phiếu bầu cho mỗi người ứng cử viên</th>
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tổng</th>
                                     </tr>
                                     <tr style="border: 1px solid #333;">
@@ -717,7 +729,74 @@
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỉ lệ (%)</th>
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu</th>
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỉ lệ (%)</th>
-                                        <th class="ballot-type-04-header" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 04</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 03</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 02</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 01</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 1</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 2</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 3</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 4</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 5</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Cộng</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="officialTableBodyXa">
+                                    <!-- Data rows will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                    <tr style="border: 1px solid #333; font-weight: 600; background: #f0f0f0;">
+                                        <td colspan="3" style="border: 1px solid #333; padding: 6px; text-align: right;">Tổng</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersXa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRateXa">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRate2Xa">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalIssuedXa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalReceivedXa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidXa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidRateXa">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidXa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidRateXa">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType3Xa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType2Xa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType1Xa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand1Xa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand2Xa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand3Xa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand4Xa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand5Xa">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalSumXa">0</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- TỈNH Level Table (7 candidates, with Bầu 04) -->
+                        <div id="officialTableContainerTinh" style="overflow-x: auto; margin-bottom: 30px; border: 1px solid #333; display: none;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                <thead>
+                                    <tr style="border: 1px solid #333;">
+                                        <th colspan="3" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Thông Tin Tổ - Khu Vực</th>
+                                        <th colspan="3" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Cử Tri</th>
+                                        <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phiếu</th>
+                                        <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu không hợp lệ</th>
+                                        <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu hợp lệ</th>
+                                        <th colspan="4" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Phân loại phiếu</th>
+                                        <th colspan="7" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">Số phiếu bầu cho mỗi người ứng cử viên</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tổng</th>
+                                    </tr>
+                                    <tr style="border: 1px solid #333;">
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Xã/Phường</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Tổ bầu cử</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Khu vực</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Tổng số cử tri</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Cử tri thực tế</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Tỉ lệ (%)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phát</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Thu</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỉ lệ (%)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỉ lệ (%)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 04</th>
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 03</th>
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 02</th>
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 01</th>
@@ -731,33 +810,102 @@
                                         <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Cộng</th>
                                     </tr>
                                 </thead>
-                                <tbody id="officialTableBody">
+                                <tbody id="officialTableBodyTinh">
                                     <!-- Data rows will be populated by JavaScript -->
                                 </tbody>
                                 <tfoot>
                                     <tr style="border: 1px solid #333; font-weight: 600; background: #f0f0f0;">
                                         <td colspan="3" style="border: 1px solid #333; padding: 6px; text-align: right;">Tổng</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVoters">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRate">0%</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRate2">0%</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalIssued">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalReceived">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalid">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidRate">0%</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValid">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidRate">0%</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" class="ballot-type-04-footer">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand1">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand2">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand3">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand4">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand5">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand6">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand7">0</td>
-                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalSum">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersTinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRateTinh">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRate2Tinh">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalIssuedTinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalReceivedTinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidTinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidRateTinh">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidTinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidRateTinh">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType4Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType3Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType2Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType1Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand1Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand2Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand3Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand4Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand5Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand6Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand7Tinh">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalSumTinh">0</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- QUỐC HỘI Level Table (5 candidates, with Bầu 04) -->
+                        <div id="officialTableContainerQuochoi" style="overflow-x: auto; margin-bottom: 30px; border: 1px solid #333; display: none;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                                <thead>
+                                    <tr style="border: 1px solid #333;">
+                                        <th colspan="3" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Thông Tin Tổ - Khu Vực</th>
+                                        <th colspan="3" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Cử Tri</th>
+                                        <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phiếu</th>
+                                        <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu không hợp lệ</th>
+                                        <th colspan="2" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu hợp lệ</th>
+                                        <th colspan="4" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Phân loại phiếu</th>
+                                        <th colspan="5" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">Số phiếu bầu cho mỗi người ứng cử viên</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tổng</th>
+                                    </tr>
+                                    <tr style="border: 1px solid #333;">
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Xã/Phường</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Tổ bầu cử</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #e0e0e0;">Khu vực</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Tổng số cử tri</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Cử tri thực tế</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #c6efce;">Tỉ lệ (%)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Phát</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Thu</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỉ lệ (%)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Số phiếu</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Tỉ lệ (%)</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 04</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 03</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 02</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #fff0f0;">Bầu 01</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 1</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 2</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 3</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 4</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffe5e5;">UCV 5</th>
+                                        <th style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: 600; background: #ffff99;">Cộng</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="officialTableBodyQuochoi">
+                                    <!-- Data rows will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                    <tr style="border: 1px solid #333; font-weight: 600; background: #f0f0f0;">
+                                        <td colspan="3" style="border: 1px solid #333; padding: 6px; text-align: right;">Tổng</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersQuochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRateQuochoi">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalVotersRate2Quochoi">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalIssuedQuochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalReceivedQuochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidQuochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalInvalidRateQuochoi">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidQuochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalValidRateQuochoi">0%</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType4Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType3Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType2Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #fff0f0;" id="totalBallotType1Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand1Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand2Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand3Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand4Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center; background: #ffe5e5;" id="totalCand5Quochoi">0</td>
+                                        <td style="border: 1px solid #333; padding: 6px; text-align: center;" id="totalSumQuochoi">0</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -1138,6 +1286,8 @@
                 selectedGroup = null;
                 currentSelectedGroup = null;
                 currentSelectedArea = null;
+                currentUnitAreas = [];  // Reset area dropdown data
+                currentUnitData = null;
                 
                 // RESET UI
                 // Reset dropdown "Đơn vị bầu cử" back to default
@@ -1146,6 +1296,27 @@
                     unitDropdown.value = '';
                     console.log('Reset unit dropdown to default');
                 }
+                
+                // Reset "Đơn vị" and "Khu vực" dropdowns in "Quản Lý Tổ" tab
+                const unitSelect = document.getElementById('unitSelect');
+                if (unitSelect) {
+                    unitSelect.value = '';
+                    console.log('Reset unitSelect to default');
+                }
+                const areaSelect = document.getElementById('areaSelect');
+                if (areaSelect) {
+                    areaSelect.innerHTML = '<option value="">-- Chọn khu vực --</option>';
+                    areaSelect.style.opacity = '0.5';
+                    console.log('Reset areaSelect and disabled');
+                }
+                
+                // Clear official ballot table
+                clearOfficialBallotTable();
+                console.log('Cleared official ballot table');
+                
+                // Clear area details table  
+                clearAreaDetailsTable();
+                console.log('Cleared area details table');
                 
                 const groupNameEl = document.getElementById('selectedGroupName');
                 if (groupNameEl) groupNameEl.textContent = 'Chưa chọn';
@@ -1832,6 +2003,7 @@
             tbody.innerHTML = '';
             
             for (let i = 1; i <= totalCandidates; i++) {
+                // Main candidate row
                 const row = document.createElement('tr');
                 row.style.backgroundColor = '#E8E8E8';
                 row.innerHTML = `
@@ -1840,6 +2012,18 @@
                     <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand${i}" placeholder="0" readonly style="width: 100%; border: none; background: transparent; padding: 4px;"></td>
                 `;
                 tbody.appendChild(row);
+                
+                // Add 2 additional rows for verification by multiple people (for both XÃ and TỈNH levels)
+                for (let j = 1; j <= 2; j++) {
+                    const additionalRow = document.createElement('tr');
+                    additionalRow.style.backgroundColor = '#F5F5F5';
+                    additionalRow.innerHTML = `
+                        <td style="border: 1px solid #333; padding: 12px; font-weight: 600; color: #666; font-size: 13px;">  Người kiểm ${j}</td>
+                        <td style="border: 1px solid #333; padding: 8px;"><input type="text" id="verif_cand_name${i}_p${j}" placeholder="Tên người kiểm" style="width: 100%; border: 1px solid #ddd; padding: 4px; background: white;"></td>
+                        <td style="border: 1px solid #333; padding: 8px; background-color: #FFE5E5;"><input type="number" id="verif_cand${i}_p${j}" placeholder="0" style="width: 100%; border: 1px solid #ddd; padding: 4px; background: white;"></td>
+                    `;
+                    tbody.appendChild(additionalRow);
+                }
             }
             
             // Store the current candidate count
@@ -2431,7 +2615,47 @@
 
                 // Hiển thị kết quả
                 const data = result.data;
-                console.log('Import response data:', data);
+                console.log('=== IMPORT RESPONSE DEBUG ===');
+                console.log('Full response:', result);
+                console.log('Data object:', data);
+                console.log('Data keys:', Object.keys(data));
+                console.log('totalCandidates:', data.totalCandidates);
+                
+                // Log TẤT CẢ properties trong data object
+                console.log('[DEBUG] === ALL DATA PROPERTIES ===');
+                for (const [key, value] of Object.entries(data)) {
+                    if (typeof value === 'string' || typeof value === 'number') {
+                        console.log(`${key}: ${value}`);
+                    }
+                }
+                
+                // Log each candidate name individually
+                console.log('[DEBUG] === CANDIDATE NAMES (1-7) ===');
+                for (let i = 1; i <= 7; i++) {
+                    const nameKey = `candidate${i}Name`;
+                    const votesKey = `candidate${i}Votes`;
+                    console.log(`${nameKey}: "${data[nameKey]}" | ${votesKey}: ${data[votesKey]}`);
+                }
+                
+                // Kiểm tra xem có những key nào liên quan đến "candidate" không
+                console.log('[DEBUG] === ALL KEYS CONTAINING "candidate" ===');
+                const candidateKeys = Object.keys(data).filter(k => k.toLowerCase().includes('candidate'));
+                console.log(candidateKeys);
+                candidateKeys.forEach(key => {
+                    console.log(`  ${key}: ${data[key]}`);
+                });
+                
+                // Store candidate names in window object for access from other pages
+                window.ballotCandidateNames = {};
+                const candidateCount = data.totalCandidates || 5;
+                for (let i = 1; i <= candidateCount; i++) {
+                    const nameKey = `candidate${i}Name`;
+                    const nameValue = data[nameKey] || `Ứng cử viên ${i}`;
+                    window.ballotCandidateNames[nameKey] = nameValue;
+                    console.log(`[DEBUG] Stored ${nameKey}: "${nameValue}"`);
+                }
+                
+                console.log('[DEBUG] ✅ All candidate names stored in window.ballotCandidateNames:', window.ballotCandidateNames);
                 console.log('Candidate names from API:', {
                     candidate1Name: data.candidate1Name,
                     candidate2Name: data.candidate2Name,
@@ -2651,9 +2875,135 @@
             const level = selectedLevel || 'xa';
             const fileName = `BangTongHopKiemPhieu_${new Date().toISOString().slice(0,10)}.xlsx`;
             
-            fetch(`${API_BASE}/export-official-form?level=${encodeURIComponent(level)}`)
+            // Log array mapping to Excel columns for Cấp Xã
+            if (level === 'xa') {
+                console.log('[EXCEL_MAP_XA] ===== MAPPING ARRAY INDICES TO EXCEL ROW 13 COLUMNS =====');
+                console.log('[EXCEL_MAP_XA] Mapping for Cấp Xã (XA):');
+                
+                const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'];
+                const footerArray = window.lastFooterArrayXa || [];
+                
+                footerArray.forEach((value, idx) => {
+                    const colLetter = columns[idx] || '?';
+                    const excelCell = `${colLetter}13`;
+                    console.log(`[EXCEL_MAP_XA] [${String(idx).padStart(2, '0')}] = ${excelCell} : ${value}`);
+                });
+                
+                console.log('[EXCEL_MAP_XA] Complete array as JSON:');
+                console.log('[EXCEL_MAP_XA] Array data:', footerArray);
+                console.log('[EXCEL_MAP_XA] ===== END MAPPING =====');
+            } else if (level === 'tinh') {
+                console.log('[EXCEL_MAP_TINH] ===== MAPPING ARRAY INDICES TO EXCEL ROW 13 COLUMNS (TINH) =====');
+                const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W'];
+                const footerArray = window.lastFooterArrayTinh || [];
+                
+                footerArray.forEach((value, idx) => {
+                    const colLetter = columns[idx] || '?';
+                    const excelCell = `${colLetter}13`;
+                    console.log(`[EXCEL_MAP_TINH] [${String(idx).padStart(2, '0')}] = ${excelCell} : ${value}`);
+                });
+                console.log('[EXCEL_MAP_TINH] ===== END MAPPING =====');
+            } else if (level === 'quochoi') {
+                console.log('[EXCEL_MAP_QH] ===== MAPPING ARRAY INDICES TO EXCEL ROW 13 COLUMNS (QUOC HOI) =====');
+                const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'];
+                const footerArray = window.lastFooterArrayQH || [];
+                
+                footerArray.forEach((value, idx) => {
+                    const colLetter = columns[idx] || '?';
+                    const excelCell = `${colLetter}13`;
+                    console.log(`[EXCEL_MAP_QH] [${String(idx).padStart(2, '0')}] = ${excelCell} : ${value}`);
+                });
+                console.log('[EXCEL_MAP_QH] ===== END MAPPING =====');
+            }
+            
+            // Capture table data from the displayed page
+            console.log('[DEBUG] Capturing table data from page for export...');
+            let tbodyId = 'officialTableBodyXa';
+            if (selectedLevel === 'tinh') {
+                tbodyId = 'officialTableBodyTinh';
+            } else if (selectedLevel === 'quochoi') {
+                tbodyId = 'officialTableBodyQuochoi';
+            }
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody || tbody.rows.length === 0) {
+                alert('Vui lòng tải dữ liệu bầu cử trước khi xuất file!');
+                return;
+            }
+            
+            const tableData = [];
+            let columnCount = 0;
+            
+            // Get first row to determine column count
+            if (tbody.rows.length > 0) {
+                const firstRow = tbody.rows[0];
+                for (let j = 0; j < firstRow.cells.length; j++) {
+                    if (firstRow.cells[j].style.display !== 'none') {
+                        columnCount++;
+                    }
+                }
+            }
+            console.log('[DEBUG] Column count:', columnCount);
+            
+            // Capture all body rows
+            for (let i = 0; i < tbody.rows.length; i++) {
+                const row = tbody.rows[i];
+                const rowData = [];
+                for (let j = 0; j < row.cells.length; j++) {
+                    const cell = row.cells[j];
+                    // Get visible text value
+                    if (cell.style.display !== 'none') {
+                        rowData.push(cell.textContent.trim());
+                    }
+                }
+                tableData.push(rowData);
+                console.log(`[DEBUG] Row ${i}:`, rowData);
+            }
+            
+            console.log('[DEBUG] Total rows captured:', tableData.length);
+            
+            // Use the footerArray that was stored during populate function
+            let footerData = [];
+            if (level === 'tinh') {
+                footerData = window.lastFooterArrayTinh || [];
+            } else if (level === 'quochoi') {
+                footerData = window.lastFooterArrayQH || [];
+            } else {
+                footerData = window.lastFooterArrayXa || [];
+            }
+            
+            console.log('[DEBUG] Using footer data from window:', footerData);
+            
+            // Convert all footer data to strings (in case some values are numbers)
+            footerData = footerData.map(v => String(v));
+            console.log('[DEBUG] Footer data after string conversion:', footerData);
+            
+            // Send the page-displayed data to backend
+            const exportRequest = {
+                level: level,
+                tableData: tableData,
+                footerData: footerData
+            };
+            
+            console.log('[DEBUG] Sending export request:', exportRequest);
+            const jsonBody = JSON.stringify(exportRequest);
+            console.log('[DEBUG] JSON body length:', jsonBody.length);
+            console.log('[DEBUG] JSON body:', jsonBody.substring(0, 500) + (jsonBody.length > 500 ? '...' : ''));
+            
+            fetch(`${API_BASE}/export-official-form`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonBody
+            })
                 .then(response => {
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    console.log('[DEBUG] Response status:', response.status, response.statusText);
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error('[DEBUG] Response body:', text);
+                            throw new Error(`HTTP error! status: ${response.status}\n${text}`);
+                        });
+                    }
                     return response.blob();
                 })
                 .then(blob => {
@@ -2666,7 +3016,10 @@
                     window.URL.revokeObjectURL(url);
                     document.body.removeChild(a);
                 })
-                .catch(error => console.error('Lỗi xuất file:', error));
+                .catch(error => {
+                    console.error('Lỗi xuất file:', error);
+                    alert('Lỗi: ' + error.message);
+                });
         }
 
         function exportComprehensiveWithLevel() {
@@ -2786,10 +3139,13 @@
 
         let currentSelectedGroup = null;
         let currentSelectedArea = null;
+        let currentUnitAreas = [];  // Store areas for current unit
+        let currentUnitData = null;  // Store current unit's ballot data
 
         // Initialize Unit Dropdown
         function initializeUnitAreaDropdowns() {
             const unitSelect = document.getElementById('unitSelect');
+            const areaSelect = document.getElementById('areaSelect');
             
             if (!unitSelect) return;
             
@@ -2807,8 +3163,21 @@
                 
                 if (unitNum) {
                     console.log(`Selected: Unit ${unitNum}`);
+                    // Reset area selection
+                    areaSelect.value = '';
+                    currentUnitAreas = [];
                     // Fetch aggregated data from all areas in this unit
                     loadAggregatedUnitData(unitNum);
+                }
+            });
+
+            // Handle area selection
+            areaSelect.addEventListener('change', (e) => {
+                const selectedArea = e.target.value ? parseInt(e.target.value) : null;
+                if (selectedArea && currentUnitData) {
+                    console.log(`Selected: Area ${selectedArea}`);
+                    // Filter and populate ballot table for selected area
+                    filterAndPopulateByArea(selectedArea, currentUnitData);
                 }
             });
         }
@@ -2829,9 +3198,22 @@
                     candidate1Votes: r.candidate1Votes
                 })));
                 
-                // Get all areas for this unit
-                const areas = groupAreaMapping[unitNum] || [];
-                console.log(`[DEBUG] Unit ${unitNum} mapped areas:`, areas);
+                // Get all areas for this unit by looking at what's actually in the data
+                const areasInData = new Set();
+                ballotData.forEach(r => {
+                    // Match pattern "Tổ X - Khu Vực Y"
+                    const match = r.districtName.match(/Tổ\s+(\d+)\s*-\s*Khu\s+Vực\s+(\d+)/i);
+                    if (match) {
+                        const toChu = parseInt(match[1]);
+                        const khuVuc = parseInt(match[2]);
+                        if (toChu === unitNum) {
+                            areasInData.add(khuVuc);
+                        }
+                    }
+                });
+                const areas = Array.from(areasInData).sort((a, b) => a - b);
+                console.log(`[DEBUG] Unit ${unitNum} areas found in API data:`, areas);
+                console.log(`[DEBUG] Expected areas from mapping:`, groupAreaMapping[unitNum] || []);
                 
                 // Find records matching this unit and all its areas
                 const unitRecords = ballotData.filter(r => {
@@ -2846,12 +3228,47 @@
                 console.log(`Found ${unitRecords.length} records for Unit ${unitNum}`, unitRecords);
                 
                 if (unitRecords.length > 0) {
+                    // === EXTRACT CANDIDATE NAMES FROM FIRST RECORD ===
+                    const firstRecord = unitRecords[0];
+                    console.log('[DEBUG] === EXTRACTING CANDIDATE NAMES FROM UNIT GROUP DATA ===');
+                    console.log('[DEBUG] First record:', firstRecord);
+                    console.log('[DEBUG] First record keys:', Object.keys(firstRecord || {}));
+                    
+                    // Initialize candidate names object
+                    window.ballotCandidateNames = {};
+                    
+                    // Determine candidate count
+                    let candidateCountForNames = 5;
+                    if (selectedLevel && selectedLevel.toLowerCase().includes('tinh')) {
+                        candidateCountForNames = 7;
+                    }
+                    
+                    // Extract candidate names from database
+                    for (let i = 1; i <= candidateCountForNames; i++) {
+                        const nameKey = `candidate${i}Name`;
+                        let candidateName = firstRecord[nameKey] || '';
+                        
+                        if (!candidateName || candidateName.trim().length === 0) {
+                            candidateName = `Ứng cử viên ${i}`;
+                        }
+                        
+                        window.ballotCandidateNames[nameKey] = candidateName;
+                        console.log(`✅ ${nameKey}: "${candidateName}"`);
+                    }
+                    
+                    console.log('[DEBUG] ✅ Candidate names stored in window.ballotCandidateNames');
+                    updateCandidateTableHeaders(); // Update table headers with real names
+                    
                     // Aggregate data from all records
                     let totalVoters = 0;
                     let totalIssuedBallots = 0;
                     let totalReceivedBallots = 0;
                     let totalValidBallots = 0;
                     let totalInvalidBallots = 0;
+                    let ballotType1Total = 0;
+                    let ballotType2Total = 0;
+                    let ballotType3Total = 0;
+                    let ballotType4Total = 0;
                     
                     // Set total candidates based on level
                     // District level (cấp xã): 5 candidates, elect 3
@@ -2870,18 +3287,79 @@
                         candidateVoteCounts[i] = 0;
                     }
                     
-                    unitRecords.forEach(record => {
-                        totalIssuedBallots += record.issuedBallots || 0;
-                        totalReceivedBallots += record.receivedBallots || 0;
-                        totalValidBallots += record.validBallots || 0;
-                        totalInvalidBallots += record.invalidBallots || 0;
+                    console.log('[DEBUG] === START AGGREGATING UNIT RECORDS ===');
+                    console.log('[DEBUG] Total records to process:', unitRecords.length);
+                    
+                    unitRecords.forEach((record, recordIndex) => {
+                        console.log(`\n[DEBUG] === PROCESSING RECORD ${recordIndex + 1}/${unitRecords.length} ===`);
+                        console.log('[DEBUG] Record districtName:', record.districtName);
+                        console.log('[DEBUG] Record data:', {
+                            issuedBallots: record.issuedBallots,
+                            receivedBallots: record.receivedBallots,
+                            validBallots: record.validBallots,
+                            invalidBallots: record.invalidBallots,
+                            ballotType1Count: record.ballotType1Count,
+                            ballotType2Count: record.ballotType2Count,
+                            ballotType3Count: record.ballotType3Count,
+                            ballotType4Count: record.ballotType4Count
+                        });
                         
+                        // Add ballot stats
+                        const issued = record.issuedBallots || 0;
+                        const received = record.receivedBallots || 0;
+                        const valid = record.validBallots || 0;
+                        const invalid = record.invalidBallots || 0;
+                        
+                        totalIssuedBallots += issued;
+                        totalReceivedBallots += received;
+                        totalValidBallots += valid;
+                        totalInvalidBallots += invalid;
+                        
+                        console.log('[DEBUG] After adding ballot stats:');
+                        console.log(`[DEBUG]   totalIssuedBallots = ${totalIssuedBallots}`);
+                        console.log(`[DEBUG]   totalReceivedBallots = ${totalReceivedBallots}`);
+                        console.log(`[DEBUG]   totalValidBallots = ${totalValidBallots}`);
+                        console.log(`[DEBUG]   totalInvalidBallots = ${totalInvalidBallots}`);
+                        
+                        // Add ballot type totals
+                        const bt1 = record.ballotType1Count || 0;
+                        const bt2 = record.ballotType2Count || 0;
+                        const bt3 = record.ballotType3Count || 0;
+                        const bt4 = record.ballotType4Count || 0;
+                        
+                        ballotType1Total += bt1;
+                        ballotType2Total += bt2;
+                        ballotType3Total += bt3;
+                        ballotType4Total += bt4;
+                        
+                        console.log('[DEBUG] After adding ballot types:');
+                        console.log(`[DEBUG]   ballotType1Total = ${ballotType1Total} (added ${bt1})`);
+                        console.log(`[DEBUG]   ballotType2Total = ${ballotType2Total} (added ${bt2})`);
+                        console.log(`[DEBUG]   ballotType3Total = ${ballotType3Total} (added ${bt3})`);
+                        console.log(`[DEBUG]   ballotType4Total = ${ballotType4Total} (added ${bt4})`);
+                        
+                        // Add candidate votes
+                        console.log('[DEBUG] Candidate votes from this record:');
                         for (let i = 1; i <= totalCandidates; i++) {
-                            if (record[`candidate${i}Votes`]) {
-                                candidateVoteCounts[i] += record[`candidate${i}Votes`];
+                            const votes = record[`candidate${i}Votes`] || 0;
+                            if (votes > 0) {
+                                candidateVoteCounts[i] += votes;
+                                console.log(`[DEBUG]   candidate${i}Votes: ${votes} -> total = ${candidateVoteCounts[i]}`);
                             }
                         }
                     });
+                    
+                    console.log('[DEBUG] === END AGGREGATING UNIT RECORDS ===');
+                    console.log('[DEBUG] FINAL TOTALS:');
+                    console.log('[DEBUG]   totalIssuedBallots:', totalIssuedBallots);
+                    console.log('[DEBUG]   totalReceivedBallots:', totalReceivedBallots);
+                    console.log('[DEBUG]   totalValidBallots:', totalValidBallots);
+                    console.log('[DEBUG]   totalInvalidBallots:', totalInvalidBallots);
+                    console.log('[DEBUG]   ballotType1Total:', ballotType1Total);
+                    console.log('[DEBUG]   ballotType2Total:', ballotType2Total);
+                    console.log('[DEBUG]   ballotType3Total:', ballotType3Total);
+                    console.log('[DEBUG]   ballotType4Total:', ballotType4Total);
+                    console.log('[DEBUG]   candidateVoteCounts:', candidateVoteCounts);
                     
                     totalVoters = totalIssuedBallots;
                     
@@ -2928,24 +3406,157 @@
                         totalReceivedBallots,
                         totalValidBallots,
                         totalInvalidBallots,
+                        ballotType1Total,
+                        ballotType2Total,
+                        ballotType3Total,
+                        ballotType4Total,
                         areas
                     };
+
+                    console.log('[DEBUG] Stored ballot type totals:', {
+                        ballotType1: ballotType1Total,
+                        ballotType2: ballotType2Total,
+                        ballotType3: ballotType3Total,
+                        ballotType4: ballotType4Total
+                    });
+
+                    // Save current unit data and areas for filtering by area
+                    currentUnitData = ballotData;
+                    currentUnitAreas = areas;
+                    populateAreaDropdown(areas);
 
                     // Populate area details table
                     console.log('[DEBUG] About to call populateAreaDetailsTable with:', { unitNum, areas, ballotDataLength: ballotData.length });
                     populateAreaDetailsTable(unitNum, areas, ballotData);
-                    console.log('[DEBUG] About to call populateOfficialBallotTable with:', { unitNum, areas, ballotDataLength: ballotData.length });
-                    populateOfficialBallotTable(unitNum, areas, ballotData);
+                    console.log('[DEBUG] About to call populateOfficialBallotTable with:', { unitNum, areas, unitRecordsLength: unitRecords.length });
+                    clearOfficialBallotTable();  // Clear old data BEFORE populating new
+                    populateOfficialBallotTable(unitNum, areas, unitRecords);
                 } else {
                     console.log('No records found for this unit');
                     clearGroupDataFields();
                     clearAreaDetailsTable();
+                    clearOfficialBallotTable();  // Clear old data when no new data
+                    // Clear area dropdown
+                    const areaSelect = document.getElementById('areaSelect');
+                    if (areaSelect) {
+                        areaSelect.innerHTML = '<option value="">-- Chọn khu vực --</option>';
+                        areaSelect.style.opacity = '0.5';
+                    }
                 }
             } catch (error) {
                 console.error('Error loading aggregated unit data:', error);
                 clearGroupDataFields();
                 clearAreaDetailsTable();
             }
+        }
+        
+        // Clear official ballot table and its header fields
+        function clearOfficialBallotTable() {
+            console.log('[DEBUG] clearOfficialBallotTable() called for level:', selectedLevel);
+            
+            // Determine which tbody to clear based on selected level
+            let tbodyId = 'officialTableBodyXa';  // default
+            let levelSuffix = 'Xa';
+            
+            if (selectedLevel === 'tinh') {
+                tbodyId = 'officialTableBodyTinh';
+                levelSuffix = 'Tinh';
+            } else if (selectedLevel === 'quochoi') {
+                tbodyId = 'officialTableBodyQuochoi';
+                levelSuffix = 'Quochoi';
+            }
+            
+            // Clear table body
+            const tbody = document.getElementById(tbodyId);
+            if (tbody) {
+                tbody.innerHTML = '';
+                console.log('[DEBUG] Cleared tbody for level:', selectedLevel);
+            }
+            
+            // Clear all footer cells
+            if (tbody) {
+                const table = tbody.closest('table');
+                if (table) {
+                    const tfoot = table.querySelector('tfoot');
+                    if (tfoot) {
+                        const footerCells = tfoot.querySelectorAll('td');
+                        console.log('[DEBUG] Found ' + footerCells.length + ' footer cells');
+                        
+                        footerCells.forEach((cell, index) => {
+                            // Skip the first cell (Tổng text) - usually colspan cell
+                            if (index > 0 || cell.textContent.trim() === '') {
+                                if (cell.textContent.includes('%')) {
+                                    cell.textContent = '0%';
+                                } else {
+                                    cell.textContent = '0';
+                                }
+                            }
+                        });
+                        console.log('[DEBUG] Cleared all footer cells');
+                    } else {
+                        console.log('[DEBUG] tfoot not found');
+                    }
+                } else {
+                    console.log('[DEBUG] parent table not found');
+                }
+            }
+            
+            // Clear header input fields
+            const wardNameInput = document.getElementById('officialWardName');
+            if (wardNameInput) {
+                wardNameInput.value = '';
+            }
+            
+            const unitNameInput = document.getElementById('officialUnitName');
+            if (unitNameInput) {
+                unitNameInput.value = '';
+            }
+            
+            console.log('[DEBUG] Official ballot table and footer cleared for level:', selectedLevel);
+        }
+        
+        // Populate area dropdown based on available areas
+        function populateAreaDropdown(areas) {
+            const areaSelect = document.getElementById('areaSelect');
+            if (!areaSelect) return;
+            
+            // Clear existing options except default
+            areaSelect.innerHTML = '<option value="">-- Chọn khu vực --</option>';
+            
+            // Add area options
+            areas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = `Khu vực ${area}`;
+                areaSelect.appendChild(option);
+            });
+            
+            // Enable dropdown if areas exist
+            areaSelect.style.opacity = areas.length > 0 ? '1' : '0.5';
+            console.log('[DEBUG] Area dropdown populated with areas:', areas);
+        }
+        
+        // Filter and populate ballot table by selected area
+        function filterAndPopulateByArea(selectedArea, ballotData) {
+            if (!selectedArea || !ballotData) {
+                console.log('[DEBUG] Missing area or ballot data for filtering');
+                return;
+            }
+            
+            // Get current unit from dropdown
+            const unitSelect = document.getElementById('unitSelect');
+            const unitNum = parseInt(unitSelect.value);
+            
+            console.log(`[DEBUG] Filtering for Unit ${unitNum}, Area ${selectedArea}`);
+            
+            // Clear and repopulate with just this one area
+            clearOfficialBallotTable();
+            populateOfficialBallotTable(unitNum, [selectedArea], ballotData);
+        }
+        
+        // (DEPRECATED - no longer needed - kept for reference)
+        function populateOfficialBallotTableSingleArea(unitNum, areaNum, areaRecords) {
+            // This function is deprecated - use populateOfficialBallotTable with single area array instead
         }
         
         // Clear all group data fields
@@ -3165,7 +3776,23 @@
                 console.log('[DEBUG] First ballot data record:', ballotData[0]);
             }
 
-            const tbody = document.getElementById('officialTableBody');
+            // Determine which tbody and level suffix based on selected level
+            let tbodyId = 'officialTableBodyXa';
+            let levelSuffix = 'Xa';
+            if (selectedLevel === 'tinh') {
+                tbodyId = 'officialTableBodyTinh';
+                levelSuffix = 'Tinh';
+            } else if (selectedLevel === 'quochoi') {
+                tbodyId = 'officialTableBodyQuochoi';
+                levelSuffix = 'Quochoi';
+            }
+
+            // Show correct table container, hide others
+            document.getElementById('officialTableContainerXa').style.display = selectedLevel === 'xa' ? 'block' : 'none';
+            document.getElementById('officialTableContainerTinh').style.display = selectedLevel === 'tinh' ? 'block' : 'none';
+            document.getElementById('officialTableContainerQuochoi').style.display = selectedLevel === 'quochoi' ? 'block' : 'none';
+
+            const tbody = document.getElementById(tbodyId);
             tbody.innerHTML = '';
 
             // Update header fields
@@ -3182,8 +3809,13 @@
             console.log('[DEBUG] candidateCount:', candidateCount);
 
             let totalVoters = 0, totalIssued = 0, totalReceived = 0, totalValid = 0, totalInvalid = 0;
+            let ballotType1Total = 0, ballotType2Total = 0, ballotType3Total = 0, ballotType4Total = 0;
+            let ballotType1VotesTotal = 0, ballotType2VotesTotal = 0, ballotType3VotesTotal = 0, ballotType4VotesTotal = 0;
             const candTotals = Array(7).fill(0);
             let rowNum = 1;
+            
+            // Array to hold all data row arrays (one per khu vực)
+            let dataRowArrays = [];
 
             // Get area records
             areas.forEach((areaNum, idx) => {
@@ -3247,6 +3879,30 @@
                 const ballotType2 = record.ballotType2Count || 0;
                 const ballotType3 = record.ballotType3Count || 0;
                 const ballotType4 = record.ballotType4Count || 0;
+                
+                // Get ballot type votes
+                const ballotType1Votes = record.ballotType1Votes || 0;
+                const ballotType2Votes = record.ballotType2Votes || 0;
+                const ballotType3Votes = record.ballotType3Votes || 0;
+                const ballotType4Votes = record.ballotType4Votes || 0;
+                
+                console.log(`[DEBUG] BALLOT TYPE VOTES for Khu Vực ${areaNum}:`);
+                console.log(`[DEBUG]   ballotType4Votes: ${ballotType4Votes} (from record.ballotType4Votes: ${record.ballotType4Votes})`);
+                console.log(`[DEBUG]   ballotType3Votes: ${ballotType3Votes} (from record.ballotType3Votes: ${record.ballotType3Votes})`);
+                console.log(`[DEBUG]   ballotType2Votes: ${ballotType2Votes} (from record.ballotType2Votes: ${record.ballotType2Votes})`);
+                console.log(`[DEBUG]   ballotType1Votes: ${ballotType1Votes} (from record.ballotType1Votes: ${record.ballotType1Votes})`);
+                
+                // Add to ballot type totals (counts)
+                ballotType1Total += ballotType1;
+                ballotType2Total += ballotType2;
+                ballotType3Total += ballotType3;
+                ballotType4Total += ballotType4;
+                
+                // Add to ballot type votes totals
+                ballotType1VotesTotal += ballotType1Votes;
+                ballotType2VotesTotal += ballotType2Votes;
+                ballotType3VotesTotal += ballotType3Votes;
+                ballotType4VotesTotal += ballotType4Votes;
 
                 // Only use candidateCount votes (5 for commune/national, 7 for province)
                 const displayCandVotes = candVotes.slice(0, candidateCount);
@@ -3256,7 +3912,7 @@
                 const row = document.createElement('tr');
                 row.style.border = '1px solid #333';
                 
-                // Build cells array - skip Bầu 04 (ballotType1) for XA level
+                // Build cells array - structure varies by level
                 let cells = [
                     'Xã Văn',                        // Xã/Phường
                     unitNum,                          // Tổ
@@ -3275,10 +3931,10 @@
                 // Add ballot types based on level (skip Bầu 04 for XA level)
                 console.log('[DEBUG] Ballot type processing for level:', selectedLevel);
                 if (selectedLevel !== 'xa') {
-                    console.log('[DEBUG] Adding ballotType1 (Bầu 04):', ballotType1);
-                    cells.push(ballotType1);         // Bầu 04 - only for TINH and QUOCHOI
+                    console.log('[DEBUG] Adding ballotType4 (Bầu 04):', ballotType4);
+                    cells.push(ballotType4);         // Bầu 04 - only for TINH and QUOCHOI
                 } else {
-                    console.log('[DEBUG] SKIPPING ballotType1 (Bầu 04) for XA level');
+                    console.log('[DEBUG] SKIPPING ballotType4 (Bầu 04) for XA level');
                 }
                 console.log('[DEBUG] Adding ballotType3 (Bầu 03):', ballotType3);
                 console.log('[DEBUG] Adding ballotType2 (Bầu 02):', ballotType2);
@@ -3288,6 +3944,52 @@
                 console.log('[DEBUG] Adding candidate votes. candidateCount:', candidateCount, 'displayCandVotes:', displayCandVotes);
                 cells.push(...displayCandVotes, totalCandVotes);
                 console.log('[DEBUG] Final cells array for row:', cells);
+                
+                // ========== BUILD DATA ROW ARRAY (FOR KHU VỰC) ==========
+                console.log('[DEBUG] === BUILD DATA ROW ARRAY FOR KHU VỰC ' + areaNum + ' ===');
+                let dataRowArray = [
+                    `Tổ ${unitNum} - Khu Vực ${areaNum}`,  // Pos 0: Full identifier
+                    issued,                                  // Pos 1: Tổng cử tri
+                    votersRate,                             // Pos 2: Tỉ lệ (%)
+                    issued,                                 // Pos 3: Phát
+                    received,                               // Pos 4: Thu
+                    invalid,                                // Pos 5: Phiếu KHĐ
+                    invalidRate,                            // Pos 6: Tỉ lệ KHĐ (%)
+                    valid,                                  // Pos 7: Phiếu HL
+                    validRate                               // Pos 8: Tỉ lệ HL (%)
+                ];
+                
+                // Add ballot type counts for this khu vực
+                if (selectedLevel !== 'xa') {
+                    dataRowArray.push(ballotType4);         // Bầu 04 Count
+                }
+                dataRowArray.push(ballotType3, ballotType2, ballotType1);  // Bầu 03, 02, 01 counts
+                
+                // Add ballot type votes for this khu vực
+                console.log(`[DEBUG] BEFORE PUSH BALLOT VOTES - Current dataRowArray length: ${dataRowArray.length}`);
+                if (selectedLevel !== 'xa') {
+                    console.log(`[DEBUG] TINH/QUOCHOI: Pushing ballotType4Votes=${ballotType4Votes}`);
+                    dataRowArray.push(ballotType4Votes);    // B04 Votes
+                } else {
+                    console.log(`[DEBUG] XA: Skipping ballotType4Votes`);
+                }
+                console.log(`[DEBUG] XA: About to push B03Votes=${ballotType3Votes}, B02Votes=${ballotType2Votes}, B01Votes=${ballotType1Votes}`);
+                dataRowArray.push(ballotType3Votes, ballotType2Votes, ballotType1Votes);  // B03, B02, B01 Votes
+                console.log(`[DEBUG] AFTER PUSH BALLOT VOTES - dataRowArray now:`, dataRowArray);
+                
+                // Add candidate votes and total for this khu vực
+                dataRowArray.push(...displayCandVotes, totalCandVotes);
+                
+                console.log('[DEBUG] Data row array for Khu Vực ' + areaNum + ':');
+                dataRowArray.forEach((val, idx) => {
+                    console.log(`[DEBUG]   [${idx}] = ${val}`);
+                });
+                
+                // Store this row's array
+                dataRowArrays.push({
+                    areaNum: areaNum,
+                    array: dataRowArray
+                });
 
                 // Build HTML cells with dynamic background colors
                 let cellHTML = '';
@@ -3301,9 +4003,11 @@
                     '#ffff99', '#ffff99',               // HL (Số, %)
                 ];
                 
-                // Add ballot type colors (skip Bầu 04 for XA)
-                if (selectedLevel !== 'xa') {
-                    bgColors.push('#fff0f0');        // Bầu 04 color
+                // Add ballot type colors (depends on level)
+                if (selectedLevel === 'tinh') {
+                    bgColors.push('#fff0f0');        // Bầu 04 color (only for TINH)
+                } else if (selectedLevel === 'quochoi') {
+                    bgColors.push('#fff0f0');        // Bầu 04 color (for QUOCHOI)
                 }
                 bgColors.push('#fff0f0', '#fff0f0', '#fff0f0');  // Bầu 03, 02, 01 colors
                 
@@ -3325,44 +4029,246 @@
             });
 
             // Calculate totals percentages
-            const totalVotersRate = totalIssued > 0 ? '100.0' : '0.0';
+            // Total Voters Rate = Participation rate (received / issued * 100)
+            const totalVotersRate = totalIssued > 0 ? ((totalReceived / totalIssued) * 100).toFixed(1) : '0.0';
             const totalReceivedRate = totalIssued > 0 ? ((totalReceived / totalIssued) * 100).toFixed(1) : '0.0';
             const totalInvalidRate = totalReceived > 0 ? ((totalInvalid / totalReceived) * 100).toFixed(1) : '0.0';
             const totalValidRate = totalReceived > 0 ? ((totalValid / totalReceived) * 100).toFixed(1) : '0.0';
 
-            // Update totals
-            document.getElementById('totalVoters').textContent = totalVoters;
-            document.getElementById('totalVotersRate').textContent = totalVotersRate + '%';
-            document.getElementById('totalVotersRate2').textContent = totalVotersRate + '%';
-            document.getElementById('totalIssued').textContent = totalIssued;
-            document.getElementById('totalReceived').textContent = totalReceived;
-            document.getElementById('totalValid').textContent = totalValid;
-            document.getElementById('totalValidRate').textContent = totalValidRate + '%';
-            document.getElementById('totalInvalid').textContent = totalInvalid;
-            document.getElementById('totalInvalidRate').textContent = totalInvalidRate + '%';
+            // Log totals calculation
+            console.log('[DEBUG] ===== TOTALS FOR LEVEL: ' + levelSuffix + ' =====');
+            console.log('[DEBUG] totalVotersRate:', totalVotersRate);
+            console.log('[DEBUG] totalIssued:', totalIssued);
+            console.log('[DEBUG] totalReceived:', totalReceived);
+            console.log('[DEBUG] totalReceivedRate:', totalReceivedRate);
+            console.log('[DEBUG] totalInvalid:', totalInvalid);
+            console.log('[DEBUG] totalInvalidRate:', totalInvalidRate);
+            console.log('[DEBUG] totalValid:', totalValid);
+            console.log('[DEBUG] totalValidRate:', totalValidRate);
+
+            // Update totals using level-specific IDs
+            document.getElementById('totalVoters' + levelSuffix).textContent = totalVoters;
+            document.getElementById('totalVotersRate' + levelSuffix).textContent = totalVotersRate + '%';
+            document.getElementById('totalVotersRate2' + levelSuffix).textContent = totalVotersRate + '%';
+            document.getElementById('totalIssued' + levelSuffix).textContent = totalIssued;
+            document.getElementById('totalReceived' + levelSuffix).textContent = totalReceived;
+            document.getElementById('totalValid' + levelSuffix).textContent = totalValid;
+            document.getElementById('totalValidRate' + levelSuffix).textContent = totalValidRate + '%';
+            document.getElementById('totalInvalid' + levelSuffix).textContent = totalInvalid;
+            document.getElementById('totalInvalidRate' + levelSuffix).textContent = totalInvalidRate + '%';
 
             for (let i = 0; i < candidateCount; i++) {
-                const totalCandEl = document.getElementById(`totalCand${i+1}`);
+                const totalCandEl = document.getElementById(`totalCand${i+1}` + levelSuffix);
                 if (totalCandEl) {
+                    console.log(`[DEBUG] Setting totalCand${i+1}${levelSuffix} = ${candTotals[i]}`);
                     totalCandEl.textContent = candTotals[i];
-                    // Restore visibility in case switching from 5 to 7 candidates
-                    totalCandEl.parentElement.style.display = '';
                 }
             }
             
-            // Hide remaining candidate columns for commune level (show only 5)
-            for (let i = candidateCount; i < 7; i++) {
-                const totalCandEl = document.getElementById(`totalCand${i+1}`);
-                if (totalCandEl) {
-                    totalCandEl.parentElement.style.display = 'none';
-                }
+            // Update ballot type totals - always 4 types (Bầu 04, 03, 02, 01)
+            console.log('[DEBUG] === UPDATE BALLOT TYPE CELLS ===');
+            console.log('[DEBUG] Level for display:', selectedLevel);
+            
+            // Bầu 04 - only for TINH and QUOCHOI levels
+            const ballotType4El = document.getElementById('totalBallotType4' + levelSuffix);
+            if (ballotType4El) {
+                ballotType4El.textContent = ballotType4Total;
+                console.log('[DEBUG] Bầu 04:', ballotType4Total);
             }
             
-            // Also hide header columns for extra candidates
-            updateOfficialTableHeaderVisibility(candidateCount);
-
-            const totalSum = candTotals.reduce((a, b) => a + b, 0);
-            document.getElementById('totalSum').textContent = totalSum;
+            // Bầu 03, 02, 01 - Display VOTES for XA level, COUNTS for TINH/QUOCHOI
+            const ballotType3El = document.getElementById('totalBallotType3' + levelSuffix);
+            const ballotType2El = document.getElementById('totalBallotType2' + levelSuffix);
+            const ballotType1El = document.getElementById('totalBallotType1' + levelSuffix);
+            
+            if (selectedLevel === 'xa') {
+                // XA level: Display VOTES not COUNTS
+                console.log('[DEBUG] XA LEVEL: Displaying VOTES instead of COUNTS');
+                console.log('[DEBUG] B03Votes:', ballotType3VotesTotal, '| B02Votes:', ballotType2VotesTotal, '| B01Votes:', ballotType1VotesTotal);
+                if (ballotType3El) ballotType3El.textContent = ballotType3VotesTotal;
+                if (ballotType2El) ballotType2El.textContent = ballotType2VotesTotal;
+                if (ballotType1El) ballotType1El.textContent = ballotType1VotesTotal;
+            } else {
+                // TINH and QUOCHOI: Display COUNTS
+                console.log('[DEBUG] TINH/QUOCHOI LEVEL: Displaying COUNTS');
+                console.log('[DEBUG] Bầu 03:', ballotType3Total, '| Bầu 02:', ballotType2Total, '| Bầu 01:', ballotType1Total);
+                if (ballotType3El) ballotType3El.textContent = ballotType3Total;
+                if (ballotType2El) ballotType2El.textContent = ballotType2Total;
+                if (ballotType1El) ballotType1El.textContent = ballotType1Total;
+            }
+            
+            // Update sum total
+            const totalSum = candTotals.slice(0, candidateCount).reduce((a, b) => a + b, 0);
+            document.getElementById('totalSum' + levelSuffix).textContent = totalSum;
+            console.log('[DEBUG] Final totalSum for ' + levelSuffix + ':', totalSum);
+            
+            // ============ BUILD FOOTER ARRAY FOR HÀNG TỔNG ============
+            console.log('[DEBUG] ========== BUILDING FOOTER ROW (HÀNG TỔNG) ==========');
+            
+            let footerArray = [
+                'Tổng',                  // Pos 0: Row label
+                totalVoters,             // Pos 1: Tổng cử tri
+                totalVotersRate,         // Pos 2: Tỉ lệ (%)
+                totalIssued,             // Pos 3: Phát
+                totalReceived,           // Pos 4: Thu
+                totalInvalid,            // Pos 5: Số phiếu KHĐ
+                totalInvalidRate,        // Pos 6: Tỉ lệ KHĐ (%)
+                totalValid,              // Pos 7: Số phiếu HL
+                totalValidRate           // Pos 8: Tỉ lệ HL (%)
+            ];
+            
+            // Add ballot type totals - conditional based on level
+            if (selectedLevel === 'tinh' || selectedLevel === 'quochoi') {
+                // TINH/QUOCHOI: 4 Counts + 4 Votes
+                footerArray.push(ballotType4Total, ballotType3Total, ballotType2Total, ballotType1Total);       // Pos 9-12: Counts
+                footerArray.push(ballotType4VotesTotal, ballotType3VotesTotal, ballotType2VotesTotal, ballotType1VotesTotal);  // Pos 13-16: Votes
+            } else {
+                // XA: 3 Votes only (no Bầu 04)
+                footerArray.push(ballotType3VotesTotal, ballotType2VotesTotal, ballotType1VotesTotal);  // Pos 9-11: Votes
+            }
+            
+            // Add candidate vote totals
+            for (let i = 0; i < candidateCount; i++) {
+                footerArray.push(candTotals[i]);
+            }
+            
+            // Add total sum at the end
+            footerArray.push(totalSum);
+            
+            // Store in window for export function to access
+            if (selectedLevel === 'tinh') {
+                window.lastFooterArrayTinh = footerArray;
+                window.lastDataRowArraysTinh = dataRowArrays;
+                console.log('[DEBUG] Saved to window.lastFooterArrayTinh and window.lastDataRowArraysTinh');
+            } else if (selectedLevel === 'quochoi') {
+                window.lastFooterArrayQH = footerArray;
+                window.lastDataRowArraysQH = dataRowArrays;
+                console.log('[DEBUG] Saved to window.lastFooterArrayQH and window.lastDataRowArraysQH');
+            } else {
+                window.lastFooterArrayXa = footerArray;
+                window.lastDataRowArraysXa = dataRowArrays;
+                console.log('[DEBUG] Saved to window.lastFooterArrayXa and window.lastDataRowArraysXa');
+            }
+            
+            console.log('[EXCEL_EXPORT_ARRAY_FOOTER]', footerArray);
+            console.log('[EXCEL_EXPORT_ARRAY_DATA]', dataRowArrays);
+            console.log('[EXCEL_EXPORT_JSON_FOOTER]', JSON.stringify(footerArray));
+            console.log('[EXCEL_EXPORT_JSON_DATA]', JSON.stringify(dataRowArrays));
+            
+            // ===== DEBUG: Display array data on page =====
+            // Field names mapping - different for XA vs TINH/QUOCHOI levels
+            let fieldNames = {};
+            
+            if (selectedLevel === 'xa') {
+                // XA level: No Bầu 04, only 03, 02, 01
+                fieldNames = {
+                    0: 'Identifier (Tổ - Khu Vực)',
+                    1: 'Tổng cử tri',
+                    2: 'Tỉ lệ (%)',
+                    3: 'Phát',
+                    4: 'Thu',
+                    5: 'Phiếu KHĐ',
+                    6: 'Tỉ lệ KHĐ (%)',
+                    7: 'Phiếu HL',
+                    8: 'Tỉ lệ HL (%)',
+                    9: 'Bầu 03 COUNT',
+                    10: 'Bầu 02 COUNT',
+                    11: 'Bầu 01 COUNT',
+                    12: 'Bầu 03 VOTES',
+                    13: 'Bầu 02 VOTES',
+                    14: 'Bầu 01 VOTES',
+                    15: 'Ứng cử viên 1 votes',
+                    16: 'Ứng cử viên 2 votes',
+                    17: 'Ứng cử viên 3 votes',
+                    18: 'Ứng cử viên 4 votes',
+                    19: 'Ứng cử viên 5 votes',
+                    20: 'Total sum'
+                };
+            } else {
+                // TINH and QUOCHOI level: Has Bầu 04, 03, 02, 01
+                fieldNames = {
+                    0: 'Identifier (Tổ - Khu Vực)',
+                    1: 'Tổng cử tri',
+                    2: 'Tỉ lệ (%)',
+                    3: 'Phát',
+                    4: 'Thu',
+                    5: 'Phiếu KHĐ',
+                    6: 'Tỉ lệ KHĐ (%)',
+                    7: 'Phiếu HL',
+                    8: 'Tỉ lệ HL (%)',
+                    9: 'Bầu 04 COUNT',
+                    10: 'Bầu 03 COUNT',
+                    11: 'Bầu 02 COUNT',
+                    12: 'Bầu 01 COUNT',
+                    13: 'Bầu 04 VOTES',
+                    14: 'Bầu 03 VOTES',
+                    15: 'Bầu 02 VOTES',
+                    16: 'Bầu 01 VOTES',
+                    17: 'Ứng cử viên 1 votes',
+                    18: 'Ứng cử viên 2 votes',
+                    19: 'Ứng cử viên 3 votes',
+                    20: 'Ứng cử viên 4 votes',
+                    21: 'Ứng cử viên 5 votes',
+                    22: 'Ứng cử viên 6 votes',
+                    23: 'Ứng cử viên 7 votes',
+                    24: 'Total sum'
+                };
+            }
+            
+            let debugHtml = '<div style="background: #fff9e6; border: 3px solid red; padding: 15px; margin: 20px 0; font-family: monospace; font-size: 12px; max-height: 600px; overflow-y: auto;">';
+            debugHtml += '<h3 style="margin-top: 0; color: red;">🔴 DEBUG: KHU VỰC ARRAY STRUCTURE</h3>';
+            
+            debugHtml += '<h4 style="color: #0066cc; margin-bottom: 10px;">📋 KHU VỰC ARRAY FIELD NAMES:</h4>';
+            debugHtml += '<table style="width: 100%; border-collapse: collapse; background: white; margin-bottom: 15px;">';
+            debugHtml += '<tr style="background: #e6f2ff;"><th style="border: 1px solid #666; padding: 5px; text-align: left;">[Pos]</th><th style="border: 1px solid #666; padding: 5px; text-align: left;">Field Name</th></tr>';
+            
+            // Determine max position based on level
+            const maxPos = selectedLevel === 'xa' ? 20 : 24;
+            for (let i = 0; i <= maxPos; i++) {
+                const fieldName = fieldNames[i] || `(Unused)`;
+                const bgColor = i <= 8 ? '#fff0f0' : (i <= 14 ? '#f0f0aa' : '#e6f0ff');
+                debugHtml += `<tr style="background: ${bgColor};"><td style="border: 1px solid #ccc; padding: 5px;"><strong>[${String(i).padStart(2, '0')}]</strong></td><td style="border: 1px solid #ccc; padding: 5px;">${fieldName}</td></tr>`;
+            }
+            debugHtml += '</table>';
+            
+            debugHtml += '<h4 style="color: #0066cc;">📊 FOOTER ARRAY (Hàng Tổng):</h4>';
+            debugHtml += '<pre style="background: white; padding: 10px; border: 1px solid #ccc; overflow-x: auto;">';
+            footerArray.forEach((val, idx) => {
+                const fieldName = fieldNames[idx] || '(Not mapped)';
+                debugHtml += `[${String(idx).padStart(2, '0')}] ${fieldName.padEnd(30)} = ${val}\n`;
+            });
+            debugHtml += '</pre>';
+            
+            debugHtml += '<h4 style="color: #0066cc;">📄 DATA ROW ARRAYS (Dữ liệu Chi Tiết Khu Vực):</h4>';
+            dataRowArrays.forEach((row, rowIdx) => {
+                debugHtml += `<div style="background: #e6f3ff; padding: 10px; margin: 8px 0; border-left: 5px solid #0066cc; border-radius: 3px;"><strong>Khu Vực ${row.areaNum}:</strong>`;
+                debugHtml += '<table style="width: 100%; border-collapse: collapse; background: white; margin-top: 5px;">';
+                debugHtml += '<tr style="background: #d9ebf7;"><th style="border: 1px solid #999; padding: 5px; text-align: left;">[Pos]</th><th style="border: 1px solid #999; padding: 5px; text-align: left;">Field</th><th style="border: 1px solid #999; padding: 5px; text-align: center;">Value</th></tr>';
+                row.array.forEach((val, idx) => {
+                    const fieldName = fieldNames[idx] || '(Field)';
+                    // Color coding based on level
+                    let bgColor;
+                    if (selectedLevel === 'xa') {
+                        // XA: [0-8] gray, [9-14] ballot, [15-20] candidates
+                        bgColor = idx <= 8 ? '#fff0f0' : (idx <= 14 ? '#f0f0aa' : '#e6f0ff');
+                    } else {
+                        // TINH/QUOCHOI: [0-8] gray, [9-16] ballot, [17-24] candidates
+                        bgColor = idx <= 8 ? '#fff0f0' : (idx <= 16 ? '#f0f0aa' : '#e6f0ff');
+                    }
+                    debugHtml += `<tr style="background: ${bgColor};"><td style="border: 1px solid #ccc; padding: 5px;"><strong>[${String(idx).padStart(2, '0')}]</strong></td><td style="border: 1px solid #ccc; padding: 5px;">${fieldName}</td><td style="border: 1px solid #ccc; padding: 5px; text-align: center; font-weight: bold;">${val}</td></tr>`;
+                });
+                debugHtml += '</table></div>';
+            });
+            
+            debugHtml += '</div>';
+            
+            // Insert debug div after the table
+            const container = document.getElementById('officialTableContainer' + levelSuffix);
+            if (container) {
+                const debugDiv = document.createElement('div');
+                debugDiv.innerHTML = debugHtml;
+                container.parentNode.insertBefore(debugDiv, container.nextSibling);
+            }
             
             console.log('[DEBUG] ========== populateOfficialBallotTable END ==========');
             console.log('[DEBUG] Total rows added:', tbody.rows.length);
@@ -3420,64 +4326,116 @@
                 return;
             }
             
-            console.log('=== exportGroupDataToExcel ===');
+            console.log('=== exportGroupDataToExcel (Official Form) ===');
             console.log('selectedLevel:', selectedLevel);
             console.log('currentUnitAggregatedData:', window.currentUnitAggregatedData);
             
-            const data = window.currentUnitAggregatedData;
-            let htmlContent = `
-            <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse;">
-                <tr style="background-color: #E7E6E6;">
-                    <td colspan="2" style="font-weight: bold; text-align: center; font-size: 14px;">SỐ LIỆU QUẢN LÝ ĐƠN VỊ BẦU CỬ - TỔNG HỢP</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #D3D3D3;">Đơn vị</td>
-                    <td>Đơn vị ${data.unitNum}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #D3D3D3;">Khu vực bao gồm</td>
-                    <td>${data.areas.join(', ')}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #C6EFCE;">Tổng số cử tri</td>
-                    <td style="background-color: #FFE5E5;">${data.totalVoters}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #FFFF99;">Tổng số phiếu phát ra</td>
-                    <td style="background-color: #FFE5E5;">${data.totalIssuedBallots}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #FFFF99;">Tổng số phiếu thu vào</td>
-                    <td style="background-color: #FFE5E5;">${data.totalReceivedBallots}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #FFFF99;">Tổng số phiếu hợp lệ</td>
-                    <td style="background-color: #FFE5E5;">${data.totalValidBallots}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #FFFF99;">Tổng số phiếu không hợp lệ</td>
-                    <td style="background-color: #FFE5E5;">${data.totalInvalidBallots}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #E8E8E8;">Tổng số được bầu</td>
-                    <td style="background-color: #FFE5E5;">${data.totalVotes}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #E8E8E8;">Tổng ứng cử viên được bầu</td>
-                    <td style="background-color: #FFE5E5;">${data.totalCandidateVotes}</td>
-                </tr>
-            </table>
-            `;
+            const level = selectedLevel || 'xa';
+            const fileName = `BangTongHopKiemPhieu_${level}_DonVi${window.currentUnitAggregatedData.unitNum}_${new Date().toISOString().slice(0,10)}.xlsx`;
             
-            const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `Dan-vị-${data.unitNum}-${new Date().getTime()}.xls`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Get table data from the visible table on the page
+            let tbodyId = 'officialTableBodyXa';
+            if (selectedLevel === 'tinh') {
+                tbodyId = 'officialTableBodyTinh';
+            } else if (selectedLevel === 'quochoi') {
+                tbodyId = 'officialTableBodyQuochoi';
+            }
+            
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody || tbody.rows.length === 0) {
+                alert('Vui lòng tải dữ liệu đơn vị bầu cử trước khi xuất file!');
+                return;
+            }
+            
+            const tableData = [];
+            let columnCount = 0;
+            
+            // Get first row to determine column count
+            if (tbody.rows.length > 0) {
+                const firstRow = tbody.rows[0];
+                for (let j = 0; j < firstRow.cells.length; j++) {
+                    if (firstRow.cells[j].style.display !== 'none') {
+                        columnCount++;
+                    }
+                }
+            }
+            console.log('[DEBUG] Column count:', columnCount);
+            
+            // Capture all body rows
+            for (let i = 0; i < tbody.rows.length; i++) {
+                const row = tbody.rows[i];
+                const rowData = [];
+                for (let j = 0; j < row.cells.length; j++) {
+                    const cell = row.cells[j];
+                    if (cell.style.display !== 'none') {
+                        rowData.push(cell.textContent.trim());
+                    }
+                }
+                tableData.push(rowData);
+                console.log(`[DEBUG] Row ${i}:`, rowData);
+            }
+            
+            console.log('[DEBUG] Total rows captured from group view:', tableData.length);
+            
+            // Use the footer array that was already calculated by populateOfficialBallotTable
+            // It includes ballot type totals and candidate votes
+            let footerData = [];
+            if (level === 'tinh') {
+                footerData = window.lastFooterArrayTinh || [];
+            } else if (level === 'quochoi') {
+                footerData = window.lastFooterArrayQH || [];
+            } else {
+                footerData = window.lastFooterArrayXa || [];
+            }
+            
+            // Convert all footer data to strings
+            footerData = footerData.map(v => String(v));
+            
+            console.log('[DEBUG] Using stored footer array from populateOfficialBallotTable:', footerData);
+            console.log('[DEBUG] Footer array length:', footerData.length);
+            console.log('[DEBUG] Footer array includes ballotType totals and all candidate votes');
+            
+            // Send the data to backend using same export endpoint
+            const exportRequest = {
+                level: level,
+                tableData: tableData,
+                footerData: footerData
+            };
+            
+            console.log('[DEBUG] Sending export request from group view:', exportRequest);
+            
+            fetch(`${API_BASE}/export-official-form`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(exportRequest)
+            })
+                .then(response => {
+                    console.log('[DEBUG] Response status:', response.status, response.statusText);
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error('[DEBUG] Response body:', text);
+                            throw new Error(`HTTP error! status: ${response.status}\n${text}`);
+                        });
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    console.log('[DEBUG] File exported successfully from group view');
+                })
+                .catch(error => {
+                    console.error('Lỗi xuất file từ quản lý tổ:', error);
+                    alert('Lỗi: ' + error.message);
+                });
         }
         
         // Initialize when page load completes
@@ -3733,15 +4691,61 @@
                 });
         }
 
+        // Update table headers to show real candidate names instead of UCV 1, 2, 3
+        function updateCandidateTableHeaders() {
+            if (!window.ballotCandidateNames || Object.keys(window.ballotCandidateNames).length === 0) {
+                console.log('[DEBUG] Cannot update headers - ballotCandidateNames not available');
+                return;
+            }
+
+            console.log('[DEBUG] === UPDATING TABLE HEADERS WITH CANDIDATE NAMES ===');
+
+            // Update areaDetailsTable headers (UCV 1, 2, 3, 4, 5)
+            const areaDetailsHeaders = document.querySelectorAll('#areaDetailsTable thead th');
+            let ucvIndex = 0;
+            areaDetailsHeaders.forEach((th, index) => {
+                const text = th.textContent.trim();
+                if (text.match(/^UCV \d+$/)) {
+                    const candidateNum = parseInt(text.match(/\d+/)[0]);
+                    const nameKey = `candidate${candidateNum}Name`;
+                    const candidateName = window.ballotCandidateNames[nameKey] || text;
+                    th.textContent = candidateName;
+                    console.log(`[DEBUG] areaDetailsTable: Updated UCV ${candidateNum} → ${candidateName}`);
+                }
+            });
+
+            // Update officialTable headers (UCV 1-7)
+            const officialHeaders = document.querySelectorAll('table:last-of-type thead th');
+            officialHeaders.forEach((th) => {
+                const text = th.textContent.trim();
+                if (text.match(/^UCV \d+$/)) {
+                    const candidateNum = parseInt(text.match(/\d+/)[0]);
+                    const nameKey = `candidate${candidateNum}Name`;
+                    const candidateName = window.ballotCandidateNames[nameKey] || text;
+                    th.textContent = candidateName;
+                    console.log(`[DEBUG] officialTable: Updated UCV ${candidateNum} → ${candidateName}`);
+                }
+            });
+
+            console.log('[DEBUG] ✅ Table headers updated successfully');
+        }
+
         function loadGroupSummary(groupNum) {
             const areas = groupAreaMapping[groupNum] || [];
             const summaryTable = document.getElementById('groupSummaryTable');
             const candidatesSummaryTable = document.getElementById('candidatesSummaryTable');
             
+            console.log(`[DEBUG] loadGroupSummary() called with groupNum=${groupNum}`);
+            console.log(`[DEBUG] selectedLevel=${selectedLevel}`);
+            
             // Fetch real data from API with level filter
             fetch(`http://localhost:5000/api/ballotverification?level=${encodeURIComponent(selectedLevel)}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log(`[DEBUG] API response received, data.length=${data.length}`);
+                    console.log('[DEBUG] First record from API:', data[0]);
+                    console.log('[DEBUG] Keys in first record:', Object.keys(data[0] || {}));
+                    
                     // Filter records for this group
                     const groupRecords = data.filter(r => r.districtName && r.districtName.includes(`Tổ ${groupNum}`));
                     
@@ -3751,6 +4755,45 @@
                         console.log(`    Candidate votes: C1=${rec.candidate1Votes}, C2=${rec.candidate2Votes}, C3=${rec.candidate3Votes}, C4=${rec.candidate4Votes}, C5=${rec.candidate5Votes}, C6=${rec.candidate6Votes}, C7=${rec.candidate7Votes}`);
                         console.log(`    Candidate names: N1='${rec.candidate1Name}', N2='${rec.candidate2Name}', N3='${rec.candidate3Name}', N4='${rec.candidate4Name}', N5='${rec.candidate5Name}', N6='${rec.candidate6Name}', N7='${rec.candidate7Name}'`);
                     });
+                    
+                    // === STORE CANDIDATE NAMES FROM FIRST RECORD ===
+                    if (groupRecords.length > 0) {
+                        const firstRecord = groupRecords[0];
+                        window.ballotCandidateNames = {};
+                        
+                        console.log('[DEBUG] === EXTRACTING CANDIDATE NAMES FROM GROUP DATA ===');
+                        console.log('[DEBUG] First record:', firstRecord);
+                        
+                        // Check if database has candidate names
+                        let hasNames = false;
+                        for (let i = 1; i <= 7; i++) {
+                            const nameKey = `candidate${i}Name`;
+                            if (firstRecord[nameKey] && firstRecord[nameKey].trim().length > 0) {
+                                hasNames = true;
+                                break;
+                            }
+                        }
+                        
+                        console.log(`[DEBUG] Database has candidate names: ${hasNames}`);
+                        
+                        for (let i = 1; i <= 7; i++) {
+                            const nameKey = `candidate${i}Name`;
+                            let candidateName = firstRecord[nameKey] || '';
+                            
+                            // If empty, create default name
+                            if (!candidateName || candidateName.trim().length === 0) {
+                                candidateName = `Ứng cử viên ${i}`;
+                            }
+                            
+                            window.ballotCandidateNames[nameKey] = candidateName;
+                            console.log(`✅ ${nameKey}: "${candidateName}"`);
+                        }
+                        
+                        console.log('[DEBUG] ✅ Candidate names stored in window.ballotCandidateNames:', window.ballotCandidateNames);
+                        
+                        // Display debug immediately
+                        displayCandidateNamesDebug();
+                    }
                     
                     // Build summary rows for each area in this group
                     const summaryRows = areas.map(areaNum => {

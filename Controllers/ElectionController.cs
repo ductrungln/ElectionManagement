@@ -124,7 +124,108 @@ namespace ElectionManagement.Controllers
             }
         }
 
-        // GET: api/election/export-official-form
+        // POST: api/election/export-official-form (with page data)
+        [HttpPost("export-official-form")]
+        public async Task<IActionResult> ExportOfficialFormPost([FromBody] ExportOfficialFormRequest request)
+        {
+            try
+            {
+                Console.WriteLine("[DEBUG] ExportOfficialFormPost called");
+                if (request == null)
+                {
+                    Console.WriteLine("[ERROR] Request is NULL!");
+                    return BadRequest(new { message = "Request body is null" });
+                }
+                Console.WriteLine($"[DEBUG] Level: {request.Level}");
+                Console.WriteLine($"[DEBUG] Table rows: {request.TableData?.Count ?? 0}");
+                Console.WriteLine($"[DEBUG] Footer data: {request.FooterData?.Count ?? 0} items");
+                
+                // Convert page data to ElectionResult objects
+                var results = new List<ElectionResult>();
+                
+                if (request.TableData != null)
+                {
+                    int rowNum = 1;
+                    foreach (var rowData in request.TableData)
+                    {
+                        if (rowData == null || rowData.Count < 7) continue;
+                        
+                        try
+                        {
+                            // Parse all values first to avoid variable naming conflicts
+                            // For XA/QUOCHOI level: 21 columns (A-U)
+                            // A-L (0-11): basic info (Number, Ward, District, Voters, etc.)
+                            // M-U (12-20): M=Bầu03, N=Bầu02, O=Bầu01, P=UCV1, Q=UCV2, R=UCV3, S=UCV4, T=UCV5, U=Cộng
+                            int tongCuTri = int.TryParse(rowData[3], out int v1) ? v1 : 0;
+                            int phieuPhatRa = rowData.Count > 6 ? (int.TryParse(rowData[6], out int v2) ? v2 : 0) : 0;
+                            int phieuThuVe = rowData.Count > 7 ? (int.TryParse(rowData[7], out int v3) ? v3 : 0) : 0;
+                            int phieuKhongHopLe = rowData.Count > 8 ? (int.TryParse(rowData[8], out int v4) ? v4 : 0) : 0;
+                            int phieuHopLe = rowData.Count > 10 ? (int.TryParse(rowData[10], out int v5) ? v5 : 0) : 0;
+                            // For XA/QUOCHOI: no Bầu 04, M(12)=Bầu03, N(13)=Bầu02, O(14)=Bầu01, P(15)=UCV1, Q(16)=UCV2, R(17)=UCV3, S(18)=UCV4, T(19)=UCV5
+                            int phieuBau04 = 0;  // No Bầu 04 for XA/QUOCHOI levels
+                            int phieuBau03 = rowData.Count > 12 ? (int.TryParse(rowData[12], out int v6) ? v6 : 0) : 0;
+                            int phieuBau02 = rowData.Count > 13 ? (int.TryParse(rowData[13], out int v7) ? v7 : 0) : 0;
+                            int phieuBau01 = rowData.Count > 14 ? (int.TryParse(rowData[14], out int v8) ? v8 : 0) : 0;
+                            int ungCuVien1 = rowData.Count > 15 ? (int.TryParse(rowData[15], out int v9) ? v9 : 0) : 0;
+                            int ungCuVien2 = rowData.Count > 16 ? (int.TryParse(rowData[16], out int v10) ? v10 : 0) : 0;
+                            int ungCuVien3 = rowData.Count > 17 ? (int.TryParse(rowData[17], out int v11) ? v11 : 0) : 0;
+                            int ungCuVien4 = rowData.Count > 18 ? (int.TryParse(rowData[18], out int v12) ? v12 : 0) : 0;
+                            int ungCuVien5 = rowData.Count > 19 ? (int.TryParse(rowData[19], out int v13) ? v13 : 0) : 0;
+                            int ungCuVien6 = 0;  // No UCV 6 for XA/QUOCHOI levels (only 5 candidates)
+                            int ungCuVien7 = 0;  // No UCV 7 for XA/QUOCHOI levels (only 5 candidates)
+                            
+                            var result = new ElectionResult
+                            {
+                                Stt = rowNum,
+                                Level = request.Level ?? "xa",
+                                KhuVuc = rowData.Count > 2 ? rowData[2] : "",
+                                To = rowData.Count > 1 ? rowData[1] : "",
+                                TongCuTri = tongCuTri,
+                                PhieuPhatRa = phieuPhatRa,
+                                PhieuThuVe = phieuThuVe,
+                                PhieuKhongHopLe = phieuKhongHopLe,
+                                PhieuHopLe = phieuHopLe,
+                                PhieuBau04 = phieuBau04,
+                                PhieuBau03 = phieuBau03,
+                                PhieuBau02 = phieuBau02,
+                                PhieuBau01 = phieuBau01,
+                                UngCuVien1 = ungCuVien1,
+                                UngCuVien2 = ungCuVien2,
+                                UngCuVien3 = ungCuVien3,
+                                UngCuVien4 = ungCuVien4,
+                                UngCuVien5 = ungCuVien5,
+                                UngCuVien6 = ungCuVien6,
+                                UngCuVien7 = ungCuVien7,
+                            };
+                            
+                            results.Add(result);
+                            rowNum++;
+                            
+                            Console.WriteLine($"[DEBUG] Converted row {rowNum-1}: KhuVuc={result.KhuVuc}, Candidates=[{result.UngCuVien1},{result.UngCuVien2},{result.UngCuVien3},{result.UngCuVien4},{result.UngCuVien5}]");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[ERROR] Failed to convert row: {ex.Message}");
+                        }
+                    }
+                }
+                
+                Console.WriteLine($"[DEBUG] Converted {results.Count} rows to ElectionResult objects");
+                
+                // Use the existing export method with converted data (keeps same Excel structure)
+                var fileBytes = await _excelService.ExportOfficialBallotVerificationForm(results, request.Level ?? "xa", "", request.FooterData);
+                
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+                    $"BangTongHopKiemPhieu_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] ExportOfficialFormPost failed: {ex}");
+                return BadRequest(new { message = $"Lỗi xuất file: {ex.Message}" });
+            }
+        }
+
+        // GET: api/election/export-official-form (backward compatibility)
         [HttpGet("export-official-form")]
         public async Task<IActionResult> ExportOfficialForm([FromQuery] string level, [FromQuery] string area = "")
         {

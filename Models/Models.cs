@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace ElectionManagement.Models
 {
@@ -77,5 +79,18 @@ namespace ElectionManagement.Models
         public string PasswordHash { get; set; }
         public string Role { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+    }
+
+    // Request model for exporting official form with page-displayed data
+    public class ExportOfficialFormRequest
+    {
+        [JsonPropertyName("level")]
+        public string Level { get; set; }
+        
+        [JsonPropertyName("tableData")]
+        public List<List<string>> TableData { get; set; }
+        
+        [JsonPropertyName("footerData")]
+        public List<string> FooterData { get; set; }
     }
 }

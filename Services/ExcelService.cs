@@ -19,7 +19,7 @@ namespace ElectionManagement.Services
         Task<byte[]> ExportElectionProgress(List<ElectionProgress> data);
         Task<byte[]> ExportProgressSummary(List<dynamic> summaryData);
         Task<byte[]> ExportComprehensiveElectionResults(List<ElectionResult> results, List<ElectionProgress> progress, string level);
-        Task<byte[]> ExportOfficialBallotVerificationForm(List<ElectionResult> results, string level, string area = "");
+        Task<byte[]> ExportOfficialBallotVerificationForm(List<ElectionResult> results, string level, string area = "", List<string> footerData = null);
     }
 
     public class ImportResult
@@ -943,7 +943,7 @@ namespace ElectionManagement.Services
             ws.Cells.AutoFitColumns();
         }
 
-        public async Task<byte[]> ExportOfficialBallotVerificationForm(List<ElectionResult> results, string level, string area = "")
+        public async Task<byte[]> ExportOfficialBallotVerificationForm(List<ElectionResult> results, string level, string area = "", List<string> footerData = null)
         {
             using (var package = new ExcelPackage())
             {
@@ -1480,6 +1480,18 @@ namespace ElectionManagement.Services
                 // TOTAL ROW
                 ws.Cells[row, 1].Value = "Tổng";
                 
+                // Populate footer data from array if provided
+                if (footerData != null && footerData.Count > 0)
+                {
+                    Console.WriteLine($"[DEBUG EXCEL] Populating row {row} (TOTAL ROW) with {footerData.Count} footer values");
+                    for (int col = 1; col <= Math.Min(footerData.Count, maxCol); col++)
+                    {
+                        ws.Cells[row, col].Value = footerData[col - 1]; // footerData[0] -> column 1, footerData[1] -> column 2, etc.
+                        Console.WriteLine($"[DEBUG EXCEL] Row {row}, Col {col}: {footerData[col - 1]}");
+                    }
+                    Console.WriteLine($"[DEBUG EXCEL] Completed footer data population for row {row}");
+                }
+                
                 // Totals for UCV columns
                 if (ucvCount == 5)
                 {
@@ -1656,3 +1668,4 @@ namespace ElectionManagement.Services
         }
     }
 }
+
